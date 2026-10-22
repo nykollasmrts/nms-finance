@@ -81,12 +81,13 @@ senha, escolhendo Pessoal ou Empresa. Os dados de cada uma ficam separados;
 só você, como Master, vê todos.
 
 SE ALGUÉM ESQUECER A SENHA
-• No Supabase > "Authentication" > "Users", procure usuario@usuarios.nms.app,
-  clique nos três pontinhos > "Send password recovery" não funciona (não é
-  e-mail real). Use "Reset password"/"Update user" para definir uma senha nova
-  e passe para a pessoa.
-• Senha mínima: 6 caracteres (dá para mudar em Authentication > Policies >
-  "Minimum password length").
+• Como as contas não têm e-mail de verdade, a recuperação é feita por você.
+  No Supabase > "SQL Editor", rode trocando o usuário e a senha nova:
+     update auth.users
+     set encrypted_password = extensions.crypt('NOVA-SENHA', extensions.gen_salt('bf'))
+     where email = 'USUARIO@usuarios.nms.app';
+  Depois passe a senha nova para a pessoa.
+• Senha mínima: 6 caracteres.
 
 
 COMO PUBLICAR UMA ATUALIZAÇÃO (e todo mundo receber)

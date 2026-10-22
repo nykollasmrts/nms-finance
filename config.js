@@ -4,7 +4,7 @@
    2) Enquanto estiver com COLE_AQUI, o app abre em modo demonstração, com dados fictícios
       salvos só no navegador. */
 window.NMS_CONFIG = {
-  supabaseUrl: "COLE_AQUI_O_PROJECT_URL",
-  supabaseAnonKey: "COLE_AQUI_A_CHAVE_ANON_PUBLIC",
-  versao: "1.0.1"
+  supabaseUrl: "https://cnovucrtrbmdqofedloj.supabase.co",
+  supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNub3Z1Y3J0cmJtZHFvZmVkbG9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2ODQwMjksImV4cCI6MjEwODI2MDAyOX0.rEVArGafYTjINd-nVb7wo4briojiLKEspF0FjRoMpyo",
+  versao: "1.1.0"
 };

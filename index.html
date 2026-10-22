@@ -697,6 +697,16 @@ body.corp .btn{font-weight:500}
 .pasteBox summary{cursor:pointer;font-weight:600;font-size:14px}
 .pasteBox[open]{display:flex;flex-direction:column;gap:8px}
 .pasteBox textarea{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:var(--r);padding:10px;font:13px var(--f-num);min-height:110px}
+
+.navSpace{display:none}
+@media (min-width:900px){
+  .navSpace:not([hidden]){display:flex;flex-direction:column;gap:4px;margin-top:auto;padding:12px 10px;border-top:1px solid var(--nav-sel)}
+  .navSpace .label{color:var(--nav-muted);margin-bottom:2px}
+  .navSpace button{display:flex !important;flex-direction:row !important;justify-content:space-between !important;align-items:center;gap:8px;padding:8px 10px !important;border:1px solid var(--nav-sel) !important;border-left-width:1px !important;border-radius:var(--r) !important;font-size:13px !important;color:var(--nav-muted) !important;background:none !important}
+  .navSpace button small{font-size:11px;opacity:.8}
+  .navSpace button[aria-pressed="true"]{color:var(--nav-fg) !important;border-color:var(--nav-fg) !important;background:var(--nav-sel) !important}
+  .navSpace:not([hidden]) ~ .logout,.navSpace:not([hidden]) ~ .instBtn{margin-top:8px !important}
+}
 .fab{position:fixed;right:max(18px,calc(env(safe-area-inset-right,0px) + 18px));bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:25;width:56px;height:56px;border-radius:16px;border:0;background:var(--accent);color:var(--on-accent);font-size:28px;border-radius:var(--r);box-shadow:0 6px 18px rgba(0,0,0,.25)}
 @media (min-width:900px){.fab{display:none}}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(150px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:60;font-size:14px;font-weight:600}
@@ -724,6 +734,7 @@ body.corp .btn{font-weight:500}
     <button data-tab="master" id="navMaster" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.8c1.7.8 2.7 2.5 3 5.2"/></svg><span class="nl" data-pf="Master" data-pj="Master">Master</span></button>
     <button data-tab="agenda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span class="nl" data-pf="Agenda" data-pj="Pagar e receber">Agenda</span></button>
     <button class="instBtn" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg>Instalar app</button>
+    <div class="navSpace" id="navSpace" hidden></div>
     <button class="logout" data-act="logout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 17l5-5-5-5M15 12H3"/></svg>Sair</button>
     <div class="sync" id="syncNote">Carregando…</div>
     <div class="sync" id="verTag"></div>
@@ -934,7 +945,7 @@ async function openSpace(space){
   const uid = state.ident.uid, base = baseDoc = dbRef.doc(`data/users/${uid}/${space === "nms" ? "nms" : "conta"}`);
   memberPath = space === "nms" ? `membros/${uid}/perfis/nms` : `membros/${uid}`;
   state.mode = "loading"; render();
-  try { const d = await base.get(); applyBase(d.exists ? d.data() : {}, space); } catch {}
+  try { const d = await base.get(); if (state.space === space) applyBase(d.exists ? d.data() : {}, space); } catch {}
   try { const m = await dbRef.doc(memberPath).get(); state.membro = m.exists ? m.data() : null; } catch {}
   if (state.space !== space) return;
   unsubs.push(base.onSnapshot(d => { applyBase(d.exists ? d.data() : {}, space); if (space === "nms") state.nmsHash = state.senhaHash; render(); }, () => {}));
@@ -1193,7 +1204,7 @@ function logout(){
   unsubs.forEach(u => { try { u(); } catch {} }); unsubs = [];
   if (SB) SB.auth.signOut().finally(() => location.reload()); else location.reload();
 }
-function switchSpace(sp){ if (state.role !== "master" || state.space === sp) return; openSpace(sp).then(() => { queueMember(); toast(sp === "nms" ? "Vendo a conta NMS (empresa)" : "Vendo sua conta pessoal"); }); }
+function switchSpace(sp){ if (state.role !== "master" || state.space === sp) return; window.scrollTo(0,0); openSpace(sp).then(() => { queueMember(); toast(sp === "nms" ? "Vendo a conta NMS (empresa)" : "Vendo sua conta pessoal"); }); }
 async function pwaStart(){
   showLock(); lockMode = "loading"; drawLock();
   if (!SB) { lockMode = "login"; unlocked = true; showLock(); boot(); return; }
@@ -1498,6 +1509,7 @@ function pendWithin(days){
 }
 function caixaAtual(){ return state.tx.reduce((a,t) => a + (t.type === "entrada" ? 1 : -1) * (+t.amount||0), 0); }
 function tipoToggle(){
+  if (state.role === "master") return `<span class="seg tom" role="group" aria-label="Conta"><button data-act="space" data-v="pessoal" aria-pressed="${state.space!=="nms"}">PF</button><button data-act="space" data-v="nms" aria-pressed="${state.space==="nms"}">PJ</button></span>`;
   if (state.space === "nms") return `<span class="chip ap">Empresa · PJ</span>`;
   return `<span class="seg tom" role="group" aria-label="Tipo de conta"><button data-act="tipo" data-v="pf" aria-pressed="${state.tipo!=="pj"}">PF</button><button data-act="tipo" data-v="pj" aria-pressed="${state.tipo==="pj"}">PJ</button></span>`;
 }
@@ -1957,6 +1969,8 @@ function render(){
   document.querySelectorAll(".nav .nl").forEach(n => n.textContent = corp ? n.dataset.pj : n.dataset.pf);
   
   const isMaster = state.role === "master";
+  const ns = document.getElementById("navSpace");
+  if (ns) { ns.hidden = !isMaster; if (isMaster) ns.innerHTML = `<span class="label">Conta</span>${[["pessoal","Pessoal","PF"],["nms","NMS","Empresa"]].concat(typeof USUARIOS !== "undefined" ? Object.entries(USUARIOS).map(([k,u]) => [k, u.nome, u.tipo === "pj" ? "Empresa" : "PF"]) : []).map(([k,n,t]) => `<button data-act="space" data-v="${k}" aria-pressed="${(state.space||"pessoal")===k}"><b>${n}</b><small>${t}</small></button>`).join("")}`; }
   document.getElementById("navMaster").hidden = !isMaster;
   if (state.tab === "master" && !isMaster) state.tab = "painel";
   if (state.tab === "chat") state.tab = "painel";

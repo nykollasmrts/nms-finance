@@ -1397,6 +1397,7 @@ async function chatConfirm(i, j, yes){
 
 /* ---------- master ---------- */
 state.membros = []; state.names = {}; state.mCat = ""; state.mQ = ""; state.mUser = null; state.mData = {};
+state.mAtF = "todos"; state.mAtQ = ""; state.mAtLim = 60;
 let masterOn = false;
 function startMaster(){
   if (masterOn || !dbRef || state.ident.uid === "local") return; masterOn = true;
@@ -1417,10 +1418,44 @@ async function loadUser(id, force){
   state.mData[id] = { loading: true }; render();
   try {
     const base = dbRef.doc(id.endsWith(":nms") ? `data/users/${id.split(":")[0]}/nms` : `data/users/${id}/conta`);
-    const [t, g] = await Promise.all([base.collection("lancamentos").get(), base.collection("agenda").get()]);
-    state.mData[id] = { tx: t.docs.map(d => ({ id:d.id, ...d.data() })), ag: g.docs.map(d => ({ id:d.id, ...d.data() })), at: Date.now() };
+    const rows = s => s.docs.map(d => ({ id:d.id, ...d.data() }));
+    const [t, g, f, c] = await Promise.all([base.collection("lancamentos").get(), base.collection("agenda").get(), base.collection("fornecedores").get().catch(() => ({ docs: [] })), base.collection("clientes").get().catch(() => ({ docs: [] }))]);
+    state.mData[id] = { tx: rows(t), ag: rows(g), forn: rows(f), cli: rows(c), at: Date.now() };
   } catch { state.mData[id] = { erro: true }; }
   render();
+}
+/* histórico completo de um usuário (tudo o que ele registrou, do mais recente para o mais antigo) */
+function renderActivity(d){
+  const real = ts => typeof ts === "number" && ts > 1e12;
+  const when = (ts, date) => real(ts) ? `${new Date(ts).toLocaleDateString("pt-BR")} ${new Date(ts).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}` : date ? fmtD(date) + "/" + date.slice(0,4) : "—";
+  const order = (ts, date) => real(ts) ? ts : date ? Date.parse(date + "T12:00") : 0;
+  const paidIds = new Set(d.tx.map(t => t.id));
+  const TX_ACAO = { extrato:"Importou do extrato", agenda:"Pagou pela agenda", chat:"Registrou pelo chat", manual:"Lançou" };
+  const fornName = id => (d.forn || []).find(f => f.id === id)?.nome, cliName = id => (d.cli || []).find(c => c.id === id)?.nome;
+  const all = [
+    ...d.tx.map(t => ({ k:"tx", ts:order(t.createdAt, t.date), quando:when(t.createdAt, t.date), acao: t.src === "agenda" && t.type === "entrada" ? "Recebeu pela agenda" : (TX_ACAO[t.src] || "Lançou"), titulo:t.desc || t.cat, det:[t.cat, t.date ? "movimento em " + fmtD(t.date) : "", fornName(t.forn) || cliName(t.cli) || ""].filter(Boolean).join(" · "), amt:t.amount, inn:t.type === "entrada", ex:t.exemplo })),
+    ...d.ag.map(a => { const nPag = [...paidIds].filter(x => x.startsWith(`ag-${a.id}-`)).length;
+      return { k:"ag", ts:order(a.createdAt, a.date), quando:when(a.createdAt, a.date), acao: a.type === "entrada" ? "Programou recebimento" : "Programou pagamento", titulo:a.title, det:[a.cat, a.date ? "dia " + fmtD(a.date) : "", a.rec === "mensal" ? "todo mês" : "uma vez", nPag ? `${nPag} ${nPag > 1 ? "baixas" : "baixa"}` : "", fornName(a.forn) || cliName(a.cli) || ""].filter(Boolean).join(" · "), amt:a.amount, inn:a.type === "entrada", ex:a.exemplo }; }),
+    ...(d.forn || []).map(f => ({ k:"cad", ts:order(f.createdAt), quando:when(f.createdAt), acao:"Cadastrou fornecedor", titulo:f.nome, det:[f.documento, f.telefone, f.email].filter(Boolean).join(" · "), ex:f.exemplo })),
+    ...(d.cli || []).map(c => ({ k:"cad", ts:order(c.createdAt), quando:when(c.createdAt), acao:"Cadastrou cliente", titulo:c.nome, det:[c.documento, c.telefone, c.email].filter(Boolean).join(" · "), ex:c.exemplo })),
+  ].sort((a,b) => b.ts - a.ts);
+  const cnt = { todos: all.length, tx: all.filter(x => x.k === "tx").length, ag: all.filter(x => x.k === "ag").length, cad: all.filter(x => x.k === "cad").length };
+  const q = plain(state.mAtQ);
+  const list = all.filter(x => (state.mAtF === "todos" || x.k === state.mAtF) && (!q || plain(`${x.acao} ${x.titulo} ${x.det}`).includes(q)));
+  const shown = list.slice(0, state.mAtLim);
+  const COR = { tx:"var(--k-bal)", ag:"var(--k-proj)", cad:"var(--muted)" };
+  const filtros = [["todos","Tudo"],["tx","Lançamentos"],["ag","Agenda"],["cad","Cadastros"]];
+  return `<div class="label" style="margin:18px 0 8px">Todas as atividades <span class="num" style="color:var(--muted)">· ${all.length}</span></div>
+    <div class="tools" style="margin-bottom:10px"><input class="search" id="mAtQ" type="search" placeholder="Buscar nas atividades (ex.: iFood, aluguel, extrato)" value="${esc(state.mAtQ)}" aria-label="Buscar nas atividades"></div>
+    <div class="cpFilt">${filtros.map(([k,t]) => `<button class="chipBtn ${state.mAtF===k?"on":""}" data-act="mAt" data-v="${k}">${t} <span class="num">${cnt[k]}</span></button>`).join("")}</div>
+    ${shown.length ? `<div class="catTbl"><table><thead><tr><th>Quando</th><th>O que fez</th><th class="hideS">Detalhes</th><th class="r">Valor</th></tr></thead><tbody>
+      ${shown.map(x => `<tr style="cursor:default"><td class="num" style="white-space:nowrap">${x.quando}</td>
+        <td><span class="tcat"><span class="dot" style="background:${COR[x.k]}"></span><span><small style="color:var(--muted);display:block">${esc(x.acao)}${x.ex ? ' <span class="chip ex">exemplo</span>' : ""}</small><b>${esc(x.titulo)}</b></span></span></td>
+        <td class="hideS" style="color:var(--muted);font-size:13px">${esc(x.det)}</td>
+        <td class="r num" style="color:${x.amt == null ? "var(--muted)" : x.inn ? "var(--k-in)" : "var(--k-out)"}">${x.amt == null ? "—" : (x.inn ? "+" : "−") + money(x.amt)}</td></tr>`).join("")}
+    </tbody></table></div>
+    ${list.length > shown.length ? `<div class="tools" style="justify-content:center;margin-top:10px"><button class="btn small" data-act="mAtMore">Mostrar mais (${list.length - shown.length} restantes)</button></div>` : ""}`
+    : `<div class="empty">${all.length ? "Nenhuma atividade com esse filtro." : "Este usuário ainda não registrou nada."}</div>`}`;
 }
 function renderMaster(){
   if (state.mode === "local") return `<div class="panel empty">O Painel Master aparece quando o app está conectado ao servidor (config.js).</div>`;
@@ -1494,9 +1529,9 @@ function renderMaster(){
             <div><div class="label" style="margin-bottom:8px">Gastos por categoria</div>${cl.length ? `<div class="mRank">${cl.map(([k,v]) => `<div class="mRow static"><span class="dot" style="background:${catColor(k)}"></span><span class="mName">${esc(k)}</span><span class="mBar"><i style="width:${(v/cmax*100).toFixed(1)}%;background:${catColor(k)}"></i></span><span class="num">${money(v)}</span><span class="num mMuted">${sm.out ? Math.round(v/sm.out*100) : 0}%</span></div>`).join("")}</div>` : `<p class="note">Sem gastos neste mês.</p>`}
               <div class="label" style="margin:14px 0 6px">Agenda pendente</div>${pend.length ? `<div class="psList">${pend.slice(0,8).map(a => `<div class="mLine"><span class="num">${a.date.slice(8)}</span><span>${esc(a.title)}</span><b class="num">${money(a.amount)}</b></div>`).join("")}</div>` : `<p class="note">Nada pendente.</p>`}</div>
             <div><div class="label" style="margin-bottom:8px">Últimos lançamentos</div>${d.tx.length ? `<div class="psList">${d.tx.slice().sort((a,b) => (b.date||"").localeCompare(a.date||"")).slice(0,15).map(t => `<div class="mLine"><span class="num">${fmtD(t.date)}</span><span>${esc(t.desc)} <small style="color:var(--muted)">· ${esc(t.cat)}</small></span><b class="num" style="color:${t.type==="entrada"?"var(--k-in)":"var(--k-out)"}">${t.type==="entrada"?"+":"−"}${money(t.amount)}</b></div>`).join("")}</div>` : `<p class="note">Nenhum lançamento.</p>`}</div>
-          </div>`;
+          </div>` + renderActivity(d);
       }
-      detail = `<section class="panel" style="border-top:3px solid var(--k-bal)"><h2>${esc(uName(m))} <small><button class="btn small" data-act="mReload">Atualizar</button> <button class="btn small" data-act="mUser" data-id="">Fechar</button></small></h2>
+      detail =`<section class="panel" style="border-top:3px solid var(--k-bal)"><h2>${esc(uName(m))} <small><button class="btn small" data-act="mReload">Atualizar</button> <button class="btn small" data-act="mUser" data-id="">Fechar</button></small></h2>
         <p class="note" style="margin-top:-6px">Desde ${m.criadoEm ? new Date(m.criadoEm).toLocaleDateString("pt-BR") : "—"} · ${m.acessos||0} acessos · último ${ago(m.ultimoAcesso)} · ${m.nAg||0} programações · ${m.nImport||0} lançamentos por extrato</p>
         ${inner}</section>`;
     }
@@ -2754,7 +2789,9 @@ document.addEventListener("click", async e => {
   else if (act === "space") switchSpace(el.dataset.v);
   else if (act === "tipo") { if (state.tipo !== el.dataset.v) { state.tipo = el.dataset.v; applyTipo(state.tipo); render(); saveBase().catch(() => toast("Não foi possível salvar o tipo de conta.")); queueMember(); toast(state.tipo === "pj" ? "Conta PJ: categorias empresariais e indicadores financeiros" : "Conta PF: categorias pessoais e indicadores simples"); } }
   else if (act === "mCat") { state.mCat = el.dataset.cat; render(); }
-  else if (act === "mUser") { state.mUser = el.dataset.id && el.dataset.id !== state.mUser ? el.dataset.id : null; if (state.mUser) loadUser(state.mUser); render(); if (state.mUser) window.scrollTo({ top: 0, behavior: "smooth" }); }
+  else if (act === "mAt") { state.mAtF = el.dataset.v; state.mAtLim = 60; render(); }
+  else if (act === "mAtMore") { state.mAtLim += 100; render(); }
+  else if (act === "mUser") { state.mUser = el.dataset.id && el.dataset.id !== state.mUser ? el.dataset.id : null; state.mAtF = "todos"; state.mAtQ = ""; state.mAtLim = 60; if (state.mUser) loadUser(state.mUser); render(); if (state.mUser) window.scrollTo({ top: 0, behavior: "smooth" }); }
   else if (act === "mReload") { if (state.mUser) loadUser(state.mUser, true); }
   else if (act === "limits") openLimits();
   else if (act === "chatSug") sendChat(el.dataset.t);
@@ -2795,6 +2832,7 @@ document.addEventListener("click", async e => {
 document.getElementById("fab").onclick = () => (state.tipo === "pj" && state.tab === "agenda") ? (state.cpTab === "fornecedores" ? openParty("forn") : state.cpTab === "clientes" ? openParty("cli") : openConta(state.cpTab === "receber" ? "receber" : "pagar")) : openForm((state.tab === "agenda" || state.tab === "calendario") ? "ag" : "tx", null, state.tab === "calendario" && state.selDay ? {date: state.selDay} : null);
 let qT;
 document.addEventListener("input", e => {
+  if (e.target.id === "mAtQ") { clearTimeout(qT); qT = setTimeout(() => { state.mAtQ = e.target.value; state.mAtLim = 60; render(); const q = document.getElementById("mAtQ"); if (q) { q.focus(); q.setSelectionRange(q.value.length, q.value.length); } }, 250); }
   if (e.target.id === "mQ") { clearTimeout(qT); qT = setTimeout(() => { state.mQ = e.target.value; render(); const q = document.getElementById("mQ"); q.focus(); q.setSelectionRange(q.value.length, q.value.length); }, 250); }
   if (e.target.id === "q") { clearTimeout(qT); qT = setTimeout(() => { state.q = e.target.value; render(); const q = document.getElementById("q"); q.focus(); q.setSelectionRange(q.value.length, q.value.length); }, 250); }
 });

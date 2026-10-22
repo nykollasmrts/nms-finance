@@ -25,9 +25,8 @@ PASSO 1 — CRIAR O BANCO DE DADOS NO SUPABASE
 4. Abra o arquivo  supabase/schema.sql  (desta pasta) no Bloco de Notas,
    copie tudo, cole no Supabase e clique em "Run". Deve aparecer "Success".
 5. Menu "Authentication" > "Sign In / Providers" > "Email":
-   - Se quiser que as pessoas entrem logo depois de criar a conta,
-     DESLIGUE "Confirm email". (Se deixar ligado, elas recebem um
-     e-mail de confirmação antes do primeiro acesso.)
+   DESLIGUE "Confirm email" e clique em "Save". (OBRIGATÓRIO: as contas do
+   NMS são criadas só com usuário e senha, sem e-mail de verdade.)
 
 
 PASSO 2 — LIGAR O APP AO SUPABASE
@@ -52,17 +51,18 @@ PASSO 3 — COLOCAR O APP NO AR COM O NETLIFY
    https://nome-aleatorio.netlify.app
    Para trocar o nome: "Site configuration" > "Change site name" (ex.: nms-financeiro).
 5. Volte ao Supabase > "Authentication" > "URL Configuration" e coloque esse
-   link em "Site URL". (É para onde vão os links de confirmação e de
-   recuperação de senha.)
+   link em "Site URL".
 
 
 PASSO 4 — CRIAR A SUA CONTA E VIRAR MASTER
 ------------------------------------------
 1. Abra o link do app, clique em "Criar conta", escolha "Pessoal",
-   preencha nome, e-mail e senha.
-2. No Supabase > "SQL Editor", rode esta linha trocando pelo seu e-mail:
+   escolha um usuário (ex.: nykollas) e uma senha.
+2. No Supabase > "SQL Editor", rode esta linha trocando pelo seu usuário:
      update public.profiles set role = 'master'
-     where id = (select id from auth.users where email = 'SEU-EMAIL-AQUI');
+     where id = (select id from auth.users where email = 'SEU-USUARIO@usuarios.nms.app');
+   (O app guarda cada usuário como usuario@usuarios.nms.app. Não é um
+    e-mail de verdade, é só o jeito de o Supabase identificar a conta.)
 3. Saia e entre de novo no app. A aba Master aparece, e no login você pode
    escolher "Empresa" para abrir a conta NMS.
 
@@ -76,8 +76,17 @@ INSTALAR NO COMPUTADOR (você e qualquer pessoa)
 • No celular: Chrome > ⋮ > "Instalar app"  |  iPhone/Safari > Compartilhar >
   "Adicionar à Tela de Início".
 
-Cada pessoa cria a própria conta no app (Pessoal ou Empresa). Os dados de cada
-uma ficam separados; só você, como Master, vê todos.
+Cada pessoa cria a própria conta no app em "Criar conta", só com usuário e
+senha, escolhendo Pessoal ou Empresa. Os dados de cada uma ficam separados;
+só você, como Master, vê todos.
+
+SE ALGUÉM ESQUECER A SENHA
+• No Supabase > "Authentication" > "Users", procure usuario@usuarios.nms.app,
+  clique nos três pontinhos > "Send password recovery" não funciona (não é
+  e-mail real). Use "Reset password"/"Update user" para definir uma senha nova
+  e passe para a pessoa.
+• Senha mínima: 6 caracteres (dá para mudar em Authentication > Policies >
+  "Minimum password length").
 
 
 COMO PUBLICAR UMA ATUALIZAÇÃO (e todo mundo receber)

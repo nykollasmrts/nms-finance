@@ -707,6 +707,10 @@ body.corp .btn{font-weight:500}
   .navSpace button[aria-pressed="true"]{color:var(--nav-fg) !important;border-color:var(--nav-fg) !important;background:var(--nav-sel) !important}
   .navSpace:not([hidden]) ~ .logout,.navSpace:not([hidden]) ~ .instBtn{margin-top:8px !important}
 }
+
+.lkNew{color:var(--muted)}
+.fHint{color:var(--muted);font-size:12px}
+.spaceBar .seg.tom{grid-auto-flow:column;grid-auto-columns:1fr;grid-template-columns:none}
 .fab{position:fixed;right:max(18px,calc(env(safe-area-inset-right,0px) + 18px));bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:25;width:56px;height:56px;border-radius:16px;border:0;background:var(--accent);color:var(--on-accent);font-size:28px;border-radius:var(--r);box-shadow:0 6px 18px rgba(0,0,0,.25)}
 @media (min-width:900px){.fab{display:none}}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(150px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:60;font-size:14px;font-weight:600}
@@ -1127,18 +1131,17 @@ async function drawLock(){
   if (lockMode === "loading") { t.textContent = "Carregando…"; f.innerHTML = ""; btn.hidden = true; }
   else if (lockMode === "login") {
     t.textContent = loginTipo === "pj" ? "Acesso da empresa" : "Acesso pessoal"; btn.textContent = "Entrar";
-    f.innerHTML = `${pick(loginTipo, "lgTipoDono")}<div class="field"><label for="lgUser">E-mail</label><input id="lgUser" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" placeholder="voce@email.com" required></div>${pw("lgPass","Senha","current-password")}
-      <div class="lkRow">${link("signup","Criar conta")}${link("reset","Esqueci minha senha")}</div>`;
+    f.innerHTML = `${pick(loginTipo, "lgTipoDono")}<div class="field"><label for="lgUser">Usuário</label><input id="lgUser" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="seu usuário" required></div>${pw("lgPass","Senha","current-password")}
+      <div class="lkRow"><span class="lkNew">Novo por aqui? ${link("signup","Criar conta")}</span>${link("reset","Esqueci minha senha")}</div>`;
   } else if (lockMode === "signup") {
-    t.textContent = "Criar conta no NMS"; btn.textContent = "Criar conta";
-    f.innerHTML = `${pick(loginTipo, "lgTipo")}<div class="field"><label for="lgNome">${loginTipo === "pj" ? "Nome da empresa" : "Seu nome"}</label><input id="lgNome" autocomplete="name" required></div>
-      <div class="field"><label for="lgUser">E-mail</label><input id="lgUser" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" required></div>
+    t.textContent = loginTipo === "pj" ? "Criar conta da empresa" : "Criar conta pessoal"; btn.textContent = "Criar conta e entrar";
+    f.innerHTML = `${pick(loginTipo, "lgTipo")}<div class="field"><label for="lgUser">Usuário</label><input id="lgUser" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="escolha um usuário" maxlength="20" required><small class="fHint">3 a 20 caracteres: letras, números, ponto, hífen ou _</small></div>
       ${pw("lgPass","Senha (mínimo 6 caracteres)","new-password")}${pw("lgPass2","Repita a senha","new-password")}
       <p class="privNote"><b>Aviso de privacidade:</b> o administrador (Master) deste app pode ver seus lançamentos, sua agenda, suas categorias de gasto e como você usa o NMS.</p>
       <div class="lkRow">${link("login","Já tenho conta")}</div>`;
   } else if (lockMode === "reset") {
-    t.textContent = "Recuperar senha"; btn.textContent = "Enviar link por e-mail";
-    f.innerHTML = `<p class="note" style="margin:0">Digite seu e-mail. Vamos enviar um link para você criar uma nova senha.</p><div class="field"><label for="lgUser">E-mail</label><input id="lgUser" type="email" autocomplete="email" required></div><div class="lkRow">${link("login","Voltar para o login")}</div>`;
+    t.textContent = "Esqueceu a senha?"; btn.hidden = true;
+    f.innerHTML = `<p class="note" style="margin:0;font-size:15px">Contas criadas com usuário não têm e-mail de recuperação. Peça ao administrador do NMS para redefinir sua senha.</p><div class="lkRow">${link("login","Voltar para o login")}</div>`;
   } else if (lockMode === "newpass") {
     t.textContent = "Criar nova senha"; btn.textContent = "Salvar nova senha";
     f.innerHTML = `${pw("lgPass","Nova senha (mínimo 6 caracteres)","new-password")}${pw("lgPass2","Repita a senha","new-password")}`;
@@ -1153,36 +1156,37 @@ async function drawLock(){
   f.querySelectorAll(".tipoSeg input").forEach(r => r.addEventListener("change", () => {
     r.closest(".tipoSeg").dataset.v = r.value; loginTipo = r.value; lockEl.classList.toggle("lockCorp", r.value === "pj");
     if (lockMode === "login") document.getElementById("lockTitle").textContent = loginTipo === "pj" ? "Acesso da empresa" : "Acesso pessoal";
-    const nl = document.querySelector('label[for="lgNome"]'); if (nl) nl.textContent = loginTipo === "pj" ? "Nome da empresa" : "Seu nome";
+    if (lockMode === "signup") document.getElementById("lockTitle").textContent = loginTipo === "pj" ? "Criar conta da empresa" : "Criar conta pessoal";
   }));
   setTimeout(() => (document.getElementById("lgUser") || document.getElementById("lgNome") || document.getElementById("lgPass"))?.focus(), 60);
 }
 function showLock(){ document.body.classList.toggle("locked", !unlocked); document.getElementById("lock").hidden = unlocked; }
-const authMsg = e => { const m = (e && e.message) || ""; return /invalid login/i.test(m) ? "E-mail ou senha incorretos." : /not confirmed/i.test(m) ? "Confirme seu e-mail antes de entrar (veja sua caixa de entrada)." : /already registered|already exists/i.test(m) ? "Esse e-mail já tem conta. Use Entrar ou Esqueci minha senha." : /password/i.test(m) && /6/.test(m) ? "A senha precisa ter pelo menos 6 caracteres." : /rate|too many/i.test(m) ? "Muitas tentativas. Aguarde um minuto e tente de novo." : /fetch|network/i.test(m) ? "Sem conexão com o servidor. Verifique a internet." : "Não foi possível concluir: " + m; };
+const authMsg = e => { const m = (e && e.message) || ""; return /invalid login/i.test(m) ? "Usuário ou senha incorretos." : /not confirmed/i.test(m) ? "Sua conta ainda não foi liberada. Peça ao administrador para desligar a confirmação por e-mail no Supabase." : /already registered|already exists/i.test(m) ? "Esse usuário já existe. Escolha outro." : /password/i.test(m) && /6/.test(m) ? "A senha precisa ter pelo menos 6 caracteres." : /rate|too many/i.test(m) ? "Muitas tentativas. Aguarde um minuto e tente de novo." : /fetch|network/i.test(m) ? "Sem conexão com o servidor. Verifique a internet." : "Não foi possível concluir: " + m; };
 document.getElementById("lockForm").addEventListener("submit", async e => {
   e.preventDefault(); e.stopPropagation();
   const err = document.getElementById("lgErr"), btn = document.getElementById("lgBtn"), card = document.querySelector(".lockCard");
   const say = m => { err.hidden = !m; err.textContent = m || ""; };
   const nope = m => { say(m); card.classList.remove("nope"); void card.offsetWidth; card.classList.add("nope"); };
-  const email = (document.getElementById("lgUser")?.value || "").trim().toLowerCase(), pwv = document.getElementById("lgPass")?.value || "", p2 = document.getElementById("lgPass2")?.value || "";
+  const usuario = (document.getElementById("lgUser")?.value || "").trim().toLowerCase();
+  const email = usuario.includes("@") ? usuario : `${usuario}@usuarios.nms.app`, pwv = document.getElementById("lgPass")?.value || "", p2 = document.getElementById("lgPass2")?.value || "";
   try { localStorage.setItem("nms.ultimoTipo", loginTipo); } catch {}
   if (!SB) { unlocked = true; showLock(); return boot(); }
   btn.disabled = true;
   try {
     if (lockMode === "login") {
-      if (!email || !pwv) { btn.disabled = false; return say("Preencha e-mail e senha."); }
+      if (!usuario || !pwv) { btn.disabled = false; return say("Preencha usuário e senha."); }
       const { error } = await SB.auth.signInWithPassword({ email, password: pwv });
       if (error) { btn.disabled = false; return nope(authMsg(error)); }
       await window.NMS_loadProfile(); say(""); boot();
     } else if (lockMode === "signup") {
-      const nome = (document.getElementById("lgNome")?.value || "").trim();
-      if (!nome || !email) { btn.disabled = false; return say("Preencha nome e e-mail."); }
+      if (!/^[a-z0-9._-]{3,20}$/.test(usuario)) { btn.disabled = false; return say("Usuário inválido. Use de 3 a 20 caracteres: letras, números, ponto, hífen ou _ (sem espaços e sem acento)."); }
       if (pwv.length < 6) { btn.disabled = false; return say("A senha precisa ter pelo menos 6 caracteres."); }
       if (pwv !== p2) { btn.disabled = false; return say("As duas senhas não são iguais."); }
-      const { data, error } = await SB.auth.signUp({ email, password: pwv, options: { data: { nome, tipo: loginTipo }, emailRedirectTo: location.origin + location.pathname } });
+      const { data, error } = await SB.auth.signUp({ email, password: pwv, options: { data: { nome: usuario, usuario, tipo: loginTipo } } });
       if (error) { btn.disabled = false; return nope(authMsg(error)); }
       if (data.session) { await window.NMS_loadProfile(); say(""); boot(); }
-      else { state.pendingEmail = email; lockMode = "check"; say(""); drawLock(); }
+      else { btn.disabled = false; return say("Conta criada, mas o servidor ainda pede confirmação por e-mail. O administrador precisa desligar \"Confirm email\" no Supabase (veja o COMO-PUBLICAR)."); }
+      setTimeout(() => toast(`Conta criada. Bem-vindo, ${usuario}!`), 800);
     } else if (lockMode === "reset") {
       if (!email) { btn.disabled = false; return say("Digite seu e-mail."); }
       const { error } = await SB.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
@@ -2061,7 +2065,7 @@ function renderPainel(){
   const outs = list.filter(t => t.type !== "entrada");
   const biggest = outs.slice().sort((a,b) => b.amount - a.amount)[0];
   const daysGone = state.ym === ymOf(todayStr()) ? +todayStr().slice(8) : dim(state.ym);
-  const side = state.selCat ? (() => {
+  const side = !cats.length ? "" : state.selCat ? (() => {
     const k = state.selCat, v = byCat[k], items = outs.filter(t => t.cat === k).sort((a,b) => b.amount - a.amount);
     const pv = prevBy[k] || 0, dv = pv ? (v - pv)/pv*100 : null;
     return `<div class="pieSide" style="--k:${catColor(k)}">

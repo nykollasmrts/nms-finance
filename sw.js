@@ -1,7 +1,7 @@
 /* NMS · service worker
    Guarda o app para abrir rápido (e até sem internet) e detecta versões novas.
    Para publicar uma atualização: mude o número em VERSAO (e em config.js) e envie os arquivos de novo. */
-const VERSAO = "1.2.0";
+const VERSAO = "1.3.0";
 const CACHE = "nms-" + VERSAO;
 const ARQUIVOS = ["./", "./index.html", "./config.js", "./nms-cloud.js", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/maskable-512.png", "./icons/favicon-32.png"];
 

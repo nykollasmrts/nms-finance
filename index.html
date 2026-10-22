@@ -886,10 +886,18 @@ const lsKey = () => LS + "." + (state.space || "pessoal");
 const local = {
   load(){
     let raw = null;
-    try { raw = localStorage.getItem(lsKey()) || (state.space !== "nms" ? localStorage.getItem(LS) : null); } catch {}
+    try { raw = localStorage.getItem(lsKey()) || ((state.space || "pessoal") === "pessoal" ? localStorage.getItem(LS) : null); } catch {}
     let d = null; try { d = raw ? JSON.parse(raw) : null; } catch {}
     if (!d && LOCAL_SEED && LOCAL_SEED[state.space || "pessoal"]) { d = JSON.parse(JSON.stringify(LOCAL_SEED[state.space || "pessoal"])); try { localStorage.setItem(lsKey(), JSON.stringify(d)); } catch {} }
     d = d || {};
+    try {
+      const sp = state.space || "pessoal", rec = typeof USUARIOS !== "undefined" ? USUARIOS[sp] : null;
+      if (rec && rec.criadoEm && !localStorage.getItem(lsKey() + ".limpo")) {
+        const velhos = new Set(); for (const k of [LS, LS + ".pessoal"]) { try { const o = JSON.parse(localStorage.getItem(k) || "{}"); (o.tx || []).concat(o.ag || []).forEach(x => velhos.add(x.id)); } catch {} }
+        d.tx = (d.tx || []).filter(x => !velhos.has(x.id)); d.ag = (d.ag || []).filter(x => !velhos.has(x.id));
+        localStorage.setItem(lsKey(), JSON.stringify({ ...d })); localStorage.setItem(lsKey() + ".limpo", "1");
+      }
+    } catch {}
     return {tx:d.tx||[], ag:d.ag||[], forn:d.forn||[], cli:d.cli||[], regras:d.regras||{}, limites:d.limites||{}, vigias:d.vigias, tom:d.tom, tipo:d.tipo};
   },
   save(){ try { localStorage.setItem(lsKey(), JSON.stringify({tx:state.tx, ag:state.ag, forn:state.forn, cli:state.cli, regras:state.regras, limites:state.limites, vigias:state.vigias, tom:state.tom, tipo:state.tipo})); } catch {} }

@@ -1164,6 +1164,9 @@ async function drawLock(){
       ${pw("lgPass","Senha (mínimo 6 caracteres)","new-password")}${pw("lgPass2","Repita a senha","new-password")}
       <p class="privNote"><b>Aviso de privacidade:</b> o administrador (Master) deste app pode ver seus lançamentos, sua agenda, suas categorias de gasto e como você usa o NMS.</p>
       <div class="lkRow">${link("login","Já tenho conta")}</div>`;
+  } else if (lockMode === "local") {
+    t.textContent = "Escolha o acesso"; btn.textContent = "Entrar";
+    f.innerHTML = `${pick(loginTipo, "lgTipoLocal")}<p class="note" style="margin:0">Modo demonstração: sem usuário e senha. Cada acesso guarda seus dados neste navegador.</p>`;
   } else if (lockMode === "reset") {
     t.textContent = "Esqueceu a senha?"; btn.hidden = true;
     f.innerHTML = `<p class="note" style="margin:0;font-size:15px">Contas criadas com usuário não têm e-mail de recuperação. Peça ao administrador do NMS para redefinir sua senha.</p><div class="lkRow">${link("login","Voltar para o login")}</div>`;
@@ -1177,11 +1180,12 @@ async function drawLock(){
   f.querySelectorAll("[data-eye]").forEach(b => b.onclick = () => { const i = document.getElementById(b.dataset.eye), show = i.type === "password"; i.type = show ? "text" : "password"; b.textContent = show ? "Ocultar" : "Mostrar"; });
   f.querySelectorAll("[data-lk]").forEach(b => b.onclick = () => { lockMode = b.dataset.lk; document.getElementById("lgErr").hidden = true; drawLock(); });
   const lockEl = document.getElementById("lock");
-  lockEl.classList.toggle("lockCorp", (lockMode === "login" || lockMode === "signup") && loginTipo === "pj");
+  lockEl.classList.toggle("lockCorp", (lockMode === "login" || lockMode === "signup" || lockMode === "local") && loginTipo === "pj");
   f.querySelectorAll(".tipoSeg input").forEach(r => r.addEventListener("change", () => {
     r.closest(".tipoSeg").dataset.v = r.value; loginTipo = r.value; lockEl.classList.toggle("lockCorp", r.value === "pj");
     if (lockMode === "login") document.getElementById("lockTitle").textContent = loginTipo === "pj" ? "Acesso da empresa" : "Acesso pessoal";
     if (lockMode === "signup") document.getElementById("lockTitle").textContent = loginTipo === "pj" ? "Criar conta da empresa" : "Criar conta pessoal";
+    if (lockMode === "local") document.getElementById("lockTitle").textContent = loginTipo === "pj" ? "Acesso da empresa" : "Acesso pessoal";
   }));
   setTimeout(() => (document.getElementById("lgUser") || document.getElementById("lgNome") || document.getElementById("lgPass"))?.focus(), 60);
 }
@@ -1231,7 +1235,11 @@ document.getElementById("lockForm").addEventListener("submit", async e => {
 });
 function logout(){
   unsubs.forEach(u => { try { u(); } catch {} }); unsubs = [];
-  if (SB) SB.auth.signOut().finally(() => location.reload()); else location.reload();
+  if (SB) { SB.auth.signOut().finally(() => location.reload()); return; }
+  // modo demonstração (sem servidor): volta para a tela de escolha de acesso
+  unlocked = false; cols = null; baseDoc = null; close(); state.tab = "painel"; state.selDay = null; state.selCat = null;
+  try { history.replaceState(null, "", location.pathname); } catch {}
+  lockMode = "local"; document.getElementById("lgErr").hidden = true; render(); showLock(); drawLock(); window.scrollTo(0, 0);
 }
 function switchSpace(sp){ if (state.role !== "master" || state.space === sp) return; window.scrollTo(0,0); openSpace(sp).then(() => { queueMember(); toast(sp === "nms" ? "Vendo a conta NMS (empresa)" : "Vendo sua conta pessoal"); }); }
 async function pwaStart(){

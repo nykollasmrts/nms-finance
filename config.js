@@ -6,5 +6,5 @@
 window.NMS_CONFIG = {
   supabaseUrl: "COLE_AQUI_O_PROJECT_URL",
   supabaseAnonKey: "COLE_AQUI_A_CHAVE_ANON_PUBLIC",
-  versao: "1.0.0"
+  versao: "1.0.1"
 };

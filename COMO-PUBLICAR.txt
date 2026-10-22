@@ -1,0 +1,109 @@
+NMS CONTROLE FINANCEIRO — COMO PUBLICAR O APLICATIVO
+=====================================================
+
+Você vai precisar de duas contas gratuitas:
+  • Supabase  (guarda os dados e as contas de usuário)  → https://supabase.com
+  • Netlify   (deixa o app no ar, com um link seu)       → https://www.netlify.com
+
+Tempo total: uns 20 minutos, uma vez só.
+
+
+TESTAR ANTES (opcional)
+-----------------------
+Antes de configurar qualquer coisa, dá para ver o app funcionando em modo
+demonstração: publique a pasta no Netlify (passo 3) sem mexer no config.js.
+Ele abre com os dados fictícios das contas Nykollas (PF) e NMS (empresa),
+salvos só no navegador.
+
+
+PASSO 1 — CRIAR O BANCO DE DADOS NO SUPABASE
+--------------------------------------------
+1. Entre em supabase.com, crie a conta e clique em "New project".
+2. Nome: NMS. Crie uma senha forte para o banco (guarde-a).
+   Região: South America (São Paulo). Clique em "Create new project".
+3. Quando o projeto terminar de criar, abra o menu "SQL Editor" > "New query".
+4. Abra o arquivo  supabase/schema.sql  (desta pasta) no Bloco de Notas,
+   copie tudo, cole no Supabase e clique em "Run". Deve aparecer "Success".
+5. Menu "Authentication" > "Sign In / Providers" > "Email":
+   - Se quiser que as pessoas entrem logo depois de criar a conta,
+     DESLIGUE "Confirm email". (Se deixar ligado, elas recebem um
+     e-mail de confirmação antes do primeiro acesso.)
+
+
+PASSO 2 — LIGAR O APP AO SUPABASE
+---------------------------------
+1. No Supabase, abra "Project Settings" > "API".
+2. Copie o "Project URL" e a chave "anon public".
+3. Abra o arquivo  config.js  desta pasta no Bloco de Notas e cole:
+     supabaseUrl: "https://xxxxxxxx.supabase.co",
+     supabaseAnonKey: "eyJhbGciOi....",
+4. Salve o arquivo.
+   (A chave "anon public" pode ficar no app; os dados de cada pessoa são
+    protegidos pelas regras de segurança do schema.sql. NUNCA use a chave
+    "service_role" aqui.)
+
+
+PASSO 3 — COLOCAR O APP NO AR COM O NETLIFY
+-------------------------------------------
+1. Crie a conta em netlify.com e entre.
+2. Clique em "Add new site" > "Deploy manually".
+3. Arraste a PASTA INTEIRA do NMS (a que tem o index.html) para a área indicada.
+4. Em alguns segundos o Netlify mostra o link do app, algo como
+   https://nome-aleatorio.netlify.app
+   Para trocar o nome: "Site configuration" > "Change site name" (ex.: nms-financeiro).
+5. Volte ao Supabase > "Authentication" > "URL Configuration" e coloque esse
+   link em "Site URL". (É para onde vão os links de confirmação e de
+   recuperação de senha.)
+
+
+PASSO 4 — CRIAR A SUA CONTA E VIRAR MASTER
+------------------------------------------
+1. Abra o link do app, clique em "Criar conta", escolha "Pessoal",
+   preencha nome, e-mail e senha.
+2. No Supabase > "SQL Editor", rode esta linha trocando pelo seu e-mail:
+     update public.profiles set role = 'master'
+     where id = (select id from auth.users where email = 'SEU-EMAIL-AQUI');
+3. Saia e entre de novo no app. A aba Master aparece, e no login você pode
+   escolher "Empresa" para abrir a conta NMS.
+
+
+INSTALAR NO COMPUTADOR (você e qualquer pessoa)
+-----------------------------------------------
+• Chrome ou Edge: abra o link do app e clique no ícone de instalar na barra de
+  endereço (um monitor com seta) ou no botão "Instalar app" no menu lateral.
+• O NMS ganha ícone na área de trabalho e no menu Iniciar e abre em janela
+  própria. Para fixar: botão direito no ícone da barra de tarefas > Fixar.
+• No celular: Chrome > ⋮ > "Instalar app"  |  iPhone/Safari > Compartilhar >
+  "Adicionar à Tela de Início".
+
+Cada pessoa cria a própria conta no app (Pessoal ou Empresa). Os dados de cada
+uma ficam separados; só você, como Master, vê todos.
+
+
+COMO PUBLICAR UMA ATUALIZAÇÃO (e todo mundo receber)
+---------------------------------------------------
+1. Faça as mudanças nos arquivos (ou peça a versão nova ao Claude).
+2. Aumente o número da versão em DOIS lugares:
+     config.js  →  versao: "1.0.1"
+     sw.js      →  const VERSAO = "1.0.1";
+3. No Netlify, abra o site > "Deploys" e arraste a pasta inteira de novo.
+4. Quem já instalou recebe o aviso "Nova versão do NMS disponível" ao abrir
+   o app (ou em até 30 minutos com ele aberto) e atualiza com um clique.
+
+Os DADOS (lançamentos, contas, clientes etc.) não dependem de atualização:
+qualquer mudança aparece na hora em todos os aparelhos da mesma conta.
+
+
+ATALHOS DE TECLADO (computador)
+-------------------------------
+  Alt + 1 a 6  → trocar de aba (Painel, Dashboard/DRE, Lançamentos,
+                 Calendário, Agenda/Pagar e receber, Master)
+  N            → novo lançamento ou nova conta (na aba atual)
+  Esc          → fechar janelas
+
+
+O QUE FUNCIONA DIFERENTE DA VERSÃO DENTRO DO CLAUDE
+---------------------------------------------------
+• A importação de extrato funciona com OFX e CSV. PDF não.
+• Os dados que estão no NMS dentro do Claude não passam sozinhos para cá;
+  é possível importar os lançamentos por extrato (CSV) se precisar.

@@ -1,0 +1,13 @@
+[build]
+  publish = "."
+
+# o service worker precisa sempre da versão mais recente para detectar atualizações
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/config.js"
+  [headers.values]
+    Cache-Control = "no-cache"

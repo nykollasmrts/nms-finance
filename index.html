@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>NMS Controle Financeiro</title>
 <meta name="description" content="Controle financeiro pessoal e empresarial">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#0A0A0A">
 <script>try{var t=localStorage.getItem("nms.tema");if(t==="claro"||t==="escuro")document.documentElement.setAttribute("data-theme",t==="claro"?"light":"dark")}catch(e){}</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Montserrat:wght@500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@300;400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -571,15 +571,17 @@ body.corp .btn{font-weight:500}
 .isParty{display:flex;flex-direction:column;gap:2px;padding:10px 12px;background:var(--sunk)}
 .isParty small{color:var(--muted);font-size:12px}
 
-/* logo NMS */
-.nmsLogo{--s:120px;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--s)*.05);flex:none;color:inherit;font-family:"Montserrat","Helvetica Neue",Arial,sans-serif;user-select:none;line-height:1}
-.nmsLogo b{font-weight:600;font-size:calc(var(--s)*.34);letter-spacing:-.01em}
-.nmsLogo i{font-style:normal;font-weight:500;font-size:calc(var(--s)*.058);letter-spacing:.32em;padding-left:.32em;white-space:nowrap;opacity:.85}
-.brand .nmsLogo{margin:0 auto;color:var(--nav-fg)}
+/* logo NMS — modelo C: círculo com "nms" e ponto verde */
+.nmsLogo{--s:120px;--logo-ink:var(--nav-bg);--logo-dot:#16A34A;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--s)*.09);flex:none;color:inherit;font-family:"Inter","Helvetica Neue",Arial,sans-serif;user-select:none;line-height:1}
+.nmsMark{position:relative;display:grid;place-items:center;width:calc(var(--s)*.56);height:calc(var(--s)*.56);border-radius:50%;background:currentColor;flex:none}
+.nmsMark b{color:var(--logo-ink);font-weight:600;font-size:calc(var(--s)*.2);letter-spacing:.01em;margin-top:calc(var(--s)*-.01)}
+.nmsMark::after{content:"";position:absolute;right:16%;top:15%;width:10.7%;height:10.7%;border-radius:50%;background:var(--logo-dot)}
+.nmsLogo i{font-style:normal;font-weight:300;font-size:calc(var(--s)*.105);letter-spacing:.02em;white-space:nowrap;opacity:.9}
+.brand .nmsLogo,.lockLogo .nmsLogo{margin:0 auto;color:var(--nav-fg);--logo-ink:var(--nav-bg)}
 @media (min-width:900px){.brand{display:flex !important;justify-content:center;padding:4px 0 28px !important}}
 .lockLogo{display:flex;justify-content:center;margin-bottom:4px}
 .mLogo{display:none}
-@media (max-width:899px){.mLogo{display:inline-flex}.mLogo .nmsLogo i{display:none}.mLogo .nmsLogo b{font-size:calc(var(--s)*.5)}.top h1{flex:1;min-width:0}.top{flex-wrap:wrap}}
+@media (max-width:899px){.mLogo{display:inline-flex}.mLogo .nmsLogo{color:var(--fg);--logo-ink:var(--bg)}.mLogo .nmsLogo i{display:none}.mLogo .nmsMark{width:var(--s);height:var(--s)}.mLogo .nmsMark b{font-size:calc(var(--s)*.36)}.top h1{flex:1;min-width:0}.top{flex-wrap:wrap}}
 
 .tipoSeg{position:relative;display:grid;grid-template-columns:1fr 1fr;background:var(--sunk);padding:5px;border-radius:14px;isolation:isolate}
 .tipoSeg input{position:absolute;opacity:0;pointer-events:none}
@@ -741,7 +743,7 @@ body.corp .btn{font-weight:500}
 
 <div class="lock" id="lock">
   <form class="lockCard" id="lockForm" novalidate autocomplete="on">
-    <div class="lockLogo"><span class="nmsLogo" style="--s:150px" role="img" aria-label="NMS Controle Financeiro"><b>NMS</b><i>CONTROLE FINANCEIRO</i></span></div>
+    <div class="lockLogo"><span class="nmsLogo" style="--s:150px" role="img" aria-label="NMS Controle Financeiro"><span class="nmsMark"><b>nms</b></span><i>controle financeiro</i></span></div>
     <div class="lockTitle" id="lockTitle">Carregando…</div>
     <div id="lockFields" style="display:flex;flex-direction:column;gap:14px"></div>
     <label class="keep"><input type="checkbox" id="lgKeep"> Manter conectado neste aparelho por 30 dias</label>
@@ -751,7 +753,7 @@ body.corp .btn{font-weight:500}
 </div>
 <div class="app">
   <nav class="nav" aria-label="Seções">
-    <div class="brand"><span class="nmsLogo" style="--s:132px" role="img" aria-label="NMS Controle Financeiro"><b>NMS</b><i>CONTROLE FINANCEIRO</i></span><small id="brandSub" hidden></small></div>
+    <div class="brand"><span class="nmsLogo" style="--s:132px" role="img" aria-label="NMS Controle Financeiro"><span class="nmsMark"><b>nms</b></span><i>controle financeiro</i></span><small id="brandSub" hidden></small></div>
     <button data-tab="painel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="nl" data-pf="Painel" data-pj="Visão geral">Painel</span></button>
     <button data-tab="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 13l4-4M8 21h8"/></svg><span class="nl" data-pf="Dashboard" data-pj="DRE financeiro">Dashboard</span></button>
     <button data-tab="lancamentos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span class="nl" data-pf="Lançamentos" data-pj="Movimentações">Lançamentos</span></button>
@@ -1563,7 +1565,7 @@ function renderMaster(){
 
 
 /* ---------- dashboard PF / PJ ---------- */
-const logoHTML = sz => `<span class="nmsLogo" style="--s:${sz}px" role="img" aria-label="NMS Controle Financeiro"><b>NMS</b><i>CONTROLE FINANCEIRO</i></span>`;
+const logoHTML = sz => `<span class="nmsLogo" style="--s:${sz}px" role="img" aria-label="NMS Controle Financeiro"><span class="nmsMark"><b>nms</b></span><i>controle financeiro</i></span>`;
 const L = (pf, pj) => state.tipo === "pj" ? pj : pf;
 function spark(vals, color){
   const w = 96, h = 26, mx = Math.max(...vals), mn = Math.min(...vals), r = (mx - mn) || 1;

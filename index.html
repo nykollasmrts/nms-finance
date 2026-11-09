@@ -728,6 +728,11 @@ body.corp .btn{font-weight:500}
 
 .lkNew{color:var(--muted)}
 .fHint{color:var(--muted);font-size:12px}
+.optTicket{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line, var(--sunk));border-radius:12px;cursor:pointer}
+.optTicket[hidden]{display:none}
+.optTicket input{margin-top:3px;width:18px;height:18px;accent-color:var(--accent);flex:none}
+.optTicket span{display:flex;flex-direction:column;gap:2px;font-size:14px}
+.optTicket small{color:var(--muted);font-size:12px}
 .spaceBar .seg.tom{grid-auto-flow:column;grid-auto-columns:1fr;grid-template-columns:none}
 .fab{position:fixed;right:max(18px,calc(env(safe-area-inset-right,0px) + 18px));bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:25;width:56px;height:56px;border-radius:16px;border:0;background:var(--accent);color:var(--on-accent);font-size:28px;border-radius:var(--r);box-shadow:0 6px 18px rgba(0,0,0,.25)}
 @media (min-width:900px){.fab{display:none}}
@@ -983,6 +988,16 @@ async function boot(){
   }
   decideLock();
 }
+/* ticket alimentação escolhido no cadastro (opcional, só pessoa física) */
+async function ticketInicial(space){
+  let pend = null; try { pend = localStorage.getItem("nms.ticketPendente"); } catch {}
+  if (!pend || space !== "pessoal" || state.tipo === "pj") return;
+  try { localStorage.removeItem("nms.ticketPendente"); } catch {}
+  if ((state.carteiras || []).some(c => /ticket/i.test(c.nome))) return;
+  const id = "c-" + rid();
+  state.carteiras = [...(state.carteiras || []), { id, nome: "Ticket alimentação" }];
+  try { await saveBase(); } catch { state.carteiras = state.carteiras.filter(c => c.id !== id); }
+}
 async function openSpace(space){
   unsubs.forEach(u => { try { u(); } catch {} }); unsubs = [];
   state.space = space; state.tx = []; state.ag = []; state.forn = []; state.cli = []; state.selDay = null; state.selCat = null; state.fcat = ""; state.q = "";
@@ -996,6 +1011,7 @@ async function openSpace(space){
   memberPath = space === "nms" ? `membros/${uid}/perfis/nms` : `membros/${uid}`;
   state.mode = "loading"; render();
   try { const d = await base.get(); if (state.space === space) applyBase(d.exists ? d.data() : {}, space); } catch {}
+  if (state.space === space) await ticketInicial(space);
   try { const m = await dbRef.doc(memberPath).get(); state.membro = m.exists ? m.data() : null; } catch {}
   if (state.space !== space) return;
   unsubs.push(base.onSnapshot(d => { applyBase(d.exists ? d.data() : {}, space); if (space === "nms") state.nmsHash = state.senhaHash; render(); }, () => {}));
@@ -1185,7 +1201,7 @@ async function drawLock(){
     t.textContent = loginTipo === "pj" ? "Criar conta da empresa" : "Criar conta pessoal"; btn.textContent = "Criar conta e entrar";
     f.innerHTML = `${pick(loginTipo, "lgTipo")}<div class="field"><label for="lgUser">Usuário</label><input id="lgUser" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="escolha um usuário" maxlength="20" required><small class="fHint">3 a 20 caracteres: letras, números, ponto, hífen ou _</small></div>
       ${pw("lgPass","Senha (mínimo 6 caracteres)","new-password")}${pw("lgPass2","Repita a senha","new-password")}
-      <p class="privNote"><b>Aviso de privacidade:</b> o administrador (Master) deste app pode ver seus lançamentos, sua agenda, suas categorias de gasto e como você usa o NMS.</p>
+      <label class="optTicket" id="lgTicketWrap" ${loginTipo==="pj"?"hidden":""}><input type="checkbox" id="lgTicket"><span><b>Recebo ticket alimentação</b><small>Opcional. Cria uma conta separada só para o saldo do ticket.</small></span></label>
       <div class="lkRow">${link("login","Já tenho conta")}</div>`;
   } else if (lockMode === "local") {
     t.textContent = "Escolha o acesso"; btn.textContent = "Entrar";
@@ -1207,7 +1223,7 @@ async function drawLock(){
   f.querySelectorAll(".tipoSeg input").forEach(r => r.addEventListener("change", () => {
     r.closest(".tipoSeg").dataset.v = r.value; loginTipo = r.value; lockEl.classList.toggle("lockCorp", r.value === "pj");
     if (lockMode === "login") document.getElementById("lockTitle").textContent = loginTipo === "pj" ? "Acesso da empresa" : "Acesso pessoal";
-    if (lockMode === "signup") document.getElementById("lockTitle").textContent = loginTipo === "pj" ? "Criar conta da empresa" : "Criar conta pessoal";
+    if (lockMode === "signup") { document.getElementById("lockTitle").textContent = loginTipo === "pj" ? "Criar conta da empresa" : "Criar conta pessoal"; const tw = document.getElementById("lgTicketWrap"); if (tw) tw.hidden = loginTipo === "pj"; }
     if (lockMode === "local") document.getElementById("lockTitle").textContent = loginTipo === "pj" ? "Acesso da empresa" : "Acesso pessoal";
   }));
   setTimeout(() => (document.getElementById("lgUser") || document.getElementById("lgNome") || document.getElementById("lgPass"))?.focus(), 60);
@@ -1234,8 +1250,10 @@ document.getElementById("lockForm").addEventListener("submit", async e => {
       if (!/^[a-z0-9._-]{3,20}$/.test(usuario)) { btn.disabled = false; return say("Usuário inválido. Use de 3 a 20 caracteres: letras, números, ponto, hífen ou _ (sem espaços e sem acento)."); }
       if (pwv.length < 6) { btn.disabled = false; return say("A senha precisa ter pelo menos 6 caracteres."); }
       if (pwv !== p2) { btn.disabled = false; return say("As duas senhas não são iguais."); }
+      const querTicket = loginTipo !== "pj" && !!document.getElementById("lgTicket")?.checked;
       const { data, error } = await SB.auth.signUp({ email, password: pwv, options: { data: { nome: usuario, usuario, tipo: loginTipo } } });
       if (error) { btn.disabled = false; return nope(authMsg(error)); }
+      if (querTicket) { try { localStorage.setItem("nms.ticketPendente", usuario); } catch {} }
       if (data.session) { await window.NMS_loadProfile(); say(""); boot(); }
       else { btn.disabled = false; return say("Conta criada, mas o servidor ainda pede confirmação por e-mail. O administrador precisa desligar \"Confirm email\" no Supabase (veja o COMO-PUBLICAR)."); }
       setTimeout(() => toast(`Conta criada. Bem-vindo, ${usuario}!`), 800);

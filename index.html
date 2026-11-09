@@ -409,6 +409,7 @@ button.mRow:hover{background:var(--sunk)}
 .mLine span:nth-child(2){white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .onDot{width:8px;height:8px;border-radius:50%;flex:none}
 @media (max-width:899px){.nav{justify-content:flex-start;overflow-x:auto;scrollbar-width:none;gap:2px}.nav::-webkit-scrollbar{display:none}.nav button{flex:1 0 64px;font-size:11px;padding:6px 2px;white-space:nowrap}.nav button svg{width:20px;height:20px}}
+@media (max-width:520px){.nav{gap:0}.nav button{flex:1 1 0;min-width:0;font-size:10.5px;padding:6px 1px;letter-spacing:0}.nav .nl{max-width:100%;overflow:hidden;text-overflow:ellipsis;text-align:center}.nav button svg{width:20px;height:20px}}
 
 .pfHero{display:flex;gap:20px;align-items:center;background:color-mix(in srgb, var(--k) 8%, var(--surface));border:1px solid color-mix(in srgb, var(--k) 30%, var(--line));border-left:5px solid var(--k);padding:18px;flex-wrap:wrap}
 .ring{width:128px;height:128px;flex:none}
@@ -503,7 +504,7 @@ body.corp .btn{font-weight:500}
 .wfRow.total b{font-size:16px}
 .wfTxt{display:flex;flex-direction:column;min-width:0}
 .wfTxt small{color:var(--muted);font-size:12.5px;line-height:1.35}
-.wfBar{position:relative;height:16px;background:var(--sunk)}
+.wfBar{position:relative;height:16px;background:var(--sunk);overflow:hidden}
 .wfBar i{position:absolute;top:0;bottom:0}
 .wfVal{font-size:15px;font-weight:600;white-space:nowrap;text-align:right;min-width:110px}
 @media (max-width:640px){.wfRow{grid-template-columns:minmax(0,1fr) auto;gap:6px 10px}.wfBar{grid-column:1 / -1;grid-row:2}}
@@ -757,12 +758,12 @@ body.corp .btn{font-weight:500}
 <div class="app">
   <nav class="nav" aria-label="Seções">
     <div class="brand"><span class="nmsLogo" style="--s:132px" role="img" aria-label="NMS Controle Financeiro"><span class="nmsMark"><b>nms</b></span><i>controle financeiro</i></span><small id="brandSub" hidden></small></div>
-    <button data-tab="painel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="nl" data-pf="Painel" data-pj="Visão geral">Painel</span></button>
-    <button data-tab="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 13l4-4M8 21h8"/></svg><span class="nl" data-pf="Dashboard" data-pj="DRE financeiro">Dashboard</span></button>
-    <button data-tab="lancamentos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span class="nl" data-pf="Lançamentos" data-pj="Movimentações">Lançamentos</span></button>
-    <button data-tab="calendario"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="1"/><path d="M3 9h18M3 15h18M9 9v12M15 9v12"/></svg><span class="nl" data-pf="Calendário" data-pj="Calendário financeiro">Calendário</span></button>
+    <button data-tab="painel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="nl" data-pf="Painel" data-pj="Visão geral" data-pjs="Visão">Painel</span></button>
+    <button data-tab="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 13l4-4M8 21h8"/></svg><span class="nl" data-pf="Dashboard" data-pj="DRE financeiro" data-pjs="DRE">Dashboard</span></button>
+    <button data-tab="lancamentos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span class="nl" data-pf="Lançamentos" data-pj="Movimentações" data-pjs="Movim.">Lançamentos</span></button>
+    <button data-tab="calendario"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="1"/><path d="M3 9h18M3 15h18M9 9v12M15 9v12"/></svg><span class="nl" data-pf="Calendário" data-pj="Calendário financeiro" data-pjs="Calendário">Calendário</span></button>
     <button data-tab="master" id="navMaster" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.8c1.7.8 2.7 2.5 3 5.2"/></svg><span class="nl" data-pf="Master" data-pj="Master">Master</span></button>
-    <button data-tab="agenda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span class="nl" data-pf="Agenda" data-pj="Pagar e receber">Agenda</span></button>
+    <button data-tab="agenda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span class="nl" data-pf="Agenda" data-pj="Pagar e receber" data-pjs="Contas">Agenda</span></button>
     <button class="instBtn" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg>Instalar app</button>
     <div class="navSpace" id="navSpace" hidden></div>
     <div class="navTheme" id="navTheme"></div>
@@ -976,7 +977,7 @@ let cols = null, baseDoc = null, sampleFn = null;
 
 const store = {
   async put(kind, doc){
-    if ((kind === "tx" || kind === "ag") && doc.carteira === undefined && state.cart) doc = { ...doc, carteira: state.cart };
+    if ((kind === "tx" || kind === "ag") && doc.carteira === undefined && state.cart && state.tipo !== "pj") doc = { ...doc, carteira: state.cart };
     const { id, ...body } = doc;
     if (cols) await cols[kind].doc(id).set(body);
     const arr = state[kind]; const i = arr.findIndex(x => x.id === id);
@@ -1068,7 +1069,7 @@ async function syncMember(){
 }
 
 /* ---------- cálculos ---------- */
-const inCart = x => (x.carteira || "") === (state.cart || "");
+const inCart = x => state.tipo === "pj" ? !x.carteira : (x.carteira || "") === (state.cart || ""); /* contas separadas (ticket etc.) são só da pessoa física */
 const txOfMonth = ym => state.tx.filter(t => t.date && ymOf(t.date) === ym && inCart(t));
 const cartSaldo = id => state.tx.reduce((a,t) => (t.carteira || "") === id ? a + (t.type === "entrada" ? 1 : -1) * (+t.amount||0) : a, 0);
 const sums = list => list.reduce((a,t) => { a[t.type === "entrada" ? "in" : "out"] += +t.amount || 0; return a; }, {in:0,out:0});
@@ -1764,26 +1765,31 @@ function renderPJ(){
     { k:"out", t:"Desgaste dos equipamentos", d:`Câmeras, computadores etc. perdem valor aos poucos (1/${DEP_MESES} por mês)`, v:A.dep },
     ...(A.recfin ? [{ k:"in2", t:"Rendimentos", d:"Juros e outras receitas que não são de clientes", v:A.recfin }] : []),
   ];
-  const max = Math.max(1, R + A.recfin);
+  /* escala do gráfico: cobre do menor ao maior ponto, inclusive prejuízo (sem isso a barra estourava a tela quando não havia faturamento) */
   let cur = 0;
-  const bars = steps.map(st => {
+  const seg = steps.map(st => {
     let from, to;
     if (st.k === "in") { from = 0; to = st.v; cur = st.v; }
     else if (st.k === "in2") { from = cur; to = cur + st.v; cur = to; }
     else { to = cur; from = cur - st.v; cur = from; }
-    const l = Math.max(0, Math.min(from, to)) / max * 100, w = Math.abs(to - from) / max * 100;
+    return [from, to];
+  });
+  const lo = Math.min(0, ...seg.flat(), A.lucro), hi = Math.max(1, ...seg.flat(), A.lucro), span = hi - lo;
+  const bars = steps.map((st, i) => {
+    const [from, to] = seg[i];
+    const l = (Math.min(from, to) - lo) / span * 100, w = Math.abs(to - from) / span * 100;
     const col = st.k === "out" ? "var(--k-out)" : "var(--k-in)";
     return `<div class="wfRow"><div class="wfTxt"><b>${st.k === "out" ? "− " : st.k === "in2" ? "+ " : ""}${st.t}</b><small>${st.d}</small></div>
       <div class="wfBar"><i style="left:${l.toFixed(2)}%;width:${Math.max(.4, w).toFixed(2)}%;background:${col}"></i></div>
-      <div class="wfVal num" style="color:${col}">${st.k === "out" ? "−" : ""}${money(st.v)}</div></div>`;
+      <div class="wfVal num" style="color:${st.v ? col : "var(--muted)"}">${st.k === "out" && st.v ? "−" : ""}${money(st.v)}</div></div>`;
   }).join("");
-  const lucro = A.lucro, lucroW = Math.max(0, lucro) / max * 100;
+  const lucro = A.lucro, lucroL = (Math.min(0, lucro) - lo) / span * 100, lucroW = Math.abs(lucro) / span * 100;
   const dl = delta(lucro, P.lucro);
   const cem = R ? [["Impostos", A.ded, "var(--c8)"], ["Custo do trabalho", A.csp, "var(--c2)"], ["Despesas da empresa", opex, "var(--c7)"], ["Desgaste de equipamentos", A.dep, "var(--c12)"], ["Lucro", Math.max(0, lucro - A.recfin), "var(--k-in)"]].map(([n,x,c]) => [n, x / R * 100, c]) : [];
   const dreSimple = `<section class="panel dreBox"><h2>Resultado do mês, de forma simples <small><button class="btn small" data-act="dreMode" data-v="completo">Ver DRE completo</button></small></h2>
     <div class="wf">${bars}
       <div class="wfRow total"><div class="wfTxt"><b>= Lucro do mês</b><small>O que sobrou depois de pagar tudo</small></div>
-        <div class="wfBar"><i style="left:0;width:${Math.max(.4, lucroW).toFixed(2)}%;background:${lucro < 0 ? "var(--k-out)" : "var(--k-bal)"}"></i></div>
+        <div class="wfBar"><i style="left:${lucroL.toFixed(2)}%;width:${Math.max(.4, lucroW).toFixed(2)}%;background:${lucro < 0 ? "var(--k-out)" : "var(--k-bal)"}"></i></div>
         <div class="wfVal num" style="color:${lucro < 0 ? "var(--k-out)" : "var(--k-bal)"}">${money(lucro)}</div></div>
     </div>
     ${R ? `<div class="cem"><div class="cemHead"><b>De cada R$ 100 faturados</b><span>${lucro >= 0 ? `sobram <b style="color:var(--k-in)">R$ ${(Math.max(0, lucro - A.recfin)/R*100).toFixed(0)}</b> de lucro` : `a empresa <b style="color:var(--k-out)">perde R$ ${(-lucro/R*100).toFixed(0)}</b>`}</span></div>
@@ -2055,7 +2061,8 @@ function openConta(kind, item, pre){
     <div class="field"><label for="c-doc">Nº da nota fiscal ou documento (opcional)</label><input id="c-doc" value="${esc(it.doc)}" placeholder="Ex.: 001234"></div>
     <div class="field"><label for="c-obs">Observações</label><textarea id="c-obs" rows="2">${esc(it.obs)}</textarea></div>
     <p class="note" id="c-info" hidden></p><p class="note" id="c-err" hidden style="color:var(--k-out)"></p>
-    <div class="actions">${item ? `<button type="button" class="btn danger" id="c-del">Excluir</button>` : ""}<span class="sp"></span><button type="button" class="btn" data-act="close">Cancelar</button><button class="btn primary" type="submit">Salvar</button></div>
+    ${item && item.grupo && state.ag.filter(a => a.grupo === item.grupo).length > 1 ? `<div class="actions" style="justify-content:flex-start"><button type="button" class="btn danger" id="c-delGrp">Excluir todas as ${state.ag.filter(a => a.grupo === item.grupo).length} parcelas</button></div>` : ""}
+    <div class="actions">${item ? `<button type="button" class="btn danger" id="c-del">${item.grupo ? "Excluir só esta parcela" : "Excluir"}</button>` : ""}<span class="sp"></span><button type="button" class="btn" data-act="close">Cancelar</button><button class="btn primary" type="submit">Salvar</button></div>
   </form></div>`;
   const $ = q => modal.querySelector(q);
   const keep = () => ({ [pk]: $("#c-p").value === "__novo" ? "" : $("#c-p").value, item: $("#c-item").value, valor: $("#c-v").value, date: $("#c-d").value, cat: $("#c-cat").value, forma: $("#c-f").value, doc: $("#c-doc").value, obs: $("#c-obs").value });
@@ -2069,6 +2076,10 @@ function openConta(kind, item, pre){
     info.hidden = !(m === "parc" && v) && m !== "mensal";
     info.textContent = m === "parc" ? `${n} parcelas de ${money(v/n)}, uma por mês a partir da data escolhida.` : m === "mensal" ? `Vai se repetir todo mês, no mesmo dia, até você excluir.` : ""; };
   if (rep) { rep.onchange = upd; $("#c-n").onchange = upd; $("#c-v").oninput = upd; }
+  const delG = $("#c-delGrp"); if (delG) delG.onclick = async () => {
+    if (!delG.dataset.sure) { delG.dataset.sure = 1; delG.textContent = "Toque de novo para excluir todas"; return; }
+    try { for (const a of state.ag.filter(x => x.grupo === item.grupo)) { for (const t of linkedTx(a.id)) await store.remove("tx", t.id); await store.remove("ag", a.id); } close(); toast("Parcelamento excluído"); } catch { toast("Não foi possível excluir agora."); }
+  };
   const del = $("#c-del"); if (del) del.onclick = async () => {
     if (!del.dataset.sure) { del.dataset.sure = 1; del.textContent = "Toque de novo para excluir"; return; }
     try { for (const t of linkedTx(item.id)) await store.remove("tx", t.id); await store.remove("ag", item.id); close(); toast("Conta excluída"); } catch { toast("Não foi possível excluir agora."); }
@@ -2138,7 +2149,8 @@ function render(){
   if (nt) { const t = tema(); nt.innerHTML = `<span class="label">Tema</span><span class="tSeg" role="group" aria-label="Tema">${["auto","claro","escuro"].map(k => `<button data-act="tema" data-v="${k}" aria-pressed="${t===k}" title="${k==="auto"?"Segue o tema do aparelho":""}">${k==="auto"?"Auto":TEMA_NOME[k]}</button>`).join("")}</span>`; }
   const corp = state.tipo === "pj";
   document.body.classList.toggle("corp", corp);
-  document.querySelectorAll(".nav .nl").forEach(n => n.textContent = corp ? n.dataset.pj : n.dataset.pf);
+  const curto = window.matchMedia("(max-width:899px)").matches;
+  document.querySelectorAll(".nav .nl").forEach(n => n.textContent = corp ? (curto && n.dataset.pjs || n.dataset.pj) : n.dataset.pf);
   
   const isMaster = state.role === "master";
   const ns = document.getElementById("navSpace");
@@ -2509,7 +2521,8 @@ function openForm(kind, item, pre, ctxYm){
       ${isAg ? `<div class="two"><div class="field"><label for="f-rec">Repete</label><select id="f-rec"><option value="unica" ${it.rec!=="mensal"?"selected":""}>Só uma vez</option><option value="mensal" ${it.rec==="mensal"?"selected":""}>Todo mês</option></select></div>
         <div class="field"><label for="f-ate">Até (opcional)</label><input id="f-ate" type="month" value="${it.ate||""}"></div></div>` : ""}
       <p class="note" id="f-err" hidden></p>
-      ${item ? `<div class="actions" style="justify-content:flex-start">${isAg && it.rec==="mensal" && ctxYm ? `<button type="button" class="btn danger" id="f-del1">Excluir só ${monthShort(ctxYm)}</button><button type="button" class="btn danger" id="f-del">Excluir todos os meses</button>` : `<button type="button" class="btn danger" id="f-del">Excluir</button>`}</div>` : ""}
+      ${item ? `<div class="actions" style="justify-content:flex-start">${isAg && it.rec==="mensal" && ctxYm ? `<button type="button" class="btn danger" id="f-del1">Excluir só ${monthShort(ctxYm)}</button><button type="button" class="btn danger" id="f-del">Excluir todos os meses</button>` : `<button type="button" class="btn danger" id="f-del">${isAg && it.grupo ? "Excluir só esta parcela" : "Excluir"}</button>`}</div>` : ""}
+      ${isAg && item && item.grupo && state.ag.filter(a => a.grupo === item.grupo).length > 1 ? `<div class="actions" style="justify-content:flex-start;margin-top:-6px"><button type="button" class="btn danger" id="f-delGrp">Excluir o parcelamento inteiro (${state.ag.filter(a => a.grupo === item.grupo).length} parcelas)</button></div>` : ""}
       ${isAg && item && linkedTx(item.id).length ? `<p class="note" style="margin:-6px 0 0">Excluir também remove os pagamentos já marcados desta programação.</p>` : ""}
       <div class="actions"><span class="sp"></span>
         <button type="button" class="btn" data-act="close">Cancelar</button><button class="btn primary" type="submit">Salvar</button></div>
@@ -2528,6 +2541,9 @@ function openForm(kind, item, pre, ctxYm){
     arm(modal.querySelector("#f-del"), async () => {
       if (isAg) for (const t of linkedTx(item.id)) await store.remove("tx", t.id);
       await store.remove(isAg ? "ag" : "tx", item.id);
+    });
+    arm(modal.querySelector("#f-delGrp"), async () => {
+      for (const a of state.ag.filter(x => x.grupo === item.grupo)) { for (const t of linkedTx(a.id)) await store.remove("tx", t.id); await store.remove("ag", a.id); }
     });
     arm(modal.querySelector("#f-del1"), async () => {
       const t = state.tx.find(x => x.id === linkId(item.id, ctxYm)); if (t) await store.remove("tx", t.id);
@@ -2814,10 +2830,10 @@ function openImport(){
     say("Classificando com o Claude os movimentos que as regras não reconheceram…", true);
     busy = new AbortController();
     const list = todo.map((r,i) => `${i}|${r.type === "entrada" ? "entrada" : "saida"}|${r.desc}`).join("\n");
-    const prompt = `Você classifica movimentações de extrato bancário brasileiro de uma pessoa física.
+    const prompt = `Você classifica movimentações de extrato bancário brasileiro de ${state.tipo === "pj" ? "uma pequena empresa" : "uma pessoa física"}.
 Categorias de SAÍDA: ${VALID_OUT.join(", ")}.
 Categorias de ENTRADA: ${VALID_IN.join(", ")}.
-Use o nome do estabelecimento e os termos comuns de bancos (PIX, TED, débito automático, IFD* = iFood, MP* = Mercado Pago etc.). Se não der para saber, use "Outros gastos" ou "Outras entradas".
+Use o nome do estabelecimento e os termos comuns de bancos (PIX, TED, débito automático, IFD* = iFood, MP* = Mercado Pago etc.). Se não der para saber, use "${state.tipo === "pj" ? "Outras despesas" : "Outros gastos"}" ou "${state.tipo === "pj" ? "Outras receitas" : "Outras entradas"}".
 Responda só com um objeto JSON que mapeia o índice para a categoria, por exemplo {"0":"Mercado","1":"Salário"}.
 
 Movimentações (índice|tipo|descrição):

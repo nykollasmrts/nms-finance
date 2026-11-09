@@ -51,13 +51,15 @@ drop policy if exists "docs: ler" on public.docs;
 drop policy if exists "docs: criar" on public.docs;
 drop policy if exists "docs: alterar" on public.docs;
 drop policy if exists "docs: excluir" on public.docs;
-create policy "docs: ler" on public.docs for select using (owner = auth.uid() or public.nms_is_master());
-create policy "docs: criar" on public.docs for insert with check (owner = auth.uid());
-create policy "docs: alterar" on public.docs for update using (owner = auth.uid()) with check (owner = auth.uid());
-create policy "docs: excluir" on public.docs for delete using (owner = auth.uid());
+create policy "docs: ler" on public.docs for select to authenticated using (owner = (select auth.uid()) or (select public.nms_is_master()));
+create policy "docs: criar" on public.docs for insert to authenticated with check (owner = (select auth.uid()));
+create policy "docs: alterar" on public.docs for update to authenticated using (owner = (select auth.uid())) with check (owner = (select auth.uid()));
+create policy "docs: excluir" on public.docs for delete to authenticated using (owner = (select auth.uid()));
 
 drop policy if exists "perfis: ler" on public.profiles;
-create policy "perfis: ler" on public.profiles for select using (id = auth.uid() or public.nms_is_master());
+create policy "perfis: ler" on public.profiles for select to authenticated using (id = (select auth.uid()) or (select public.nms_is_master()));
+revoke execute on function public.nms_is_master() from public, anon;
+grant execute on function public.nms_is_master() to authenticated;
 
 -- 6) Ao criar conta, já cria o perfil com o nome e o tipo escolhidos na tela de cadastro
 create or replace function public.nms_novo_usuario() returns trigger
@@ -71,6 +73,7 @@ end $$;
 drop trigger if exists nms_on_auth_user_created on auth.users;
 create trigger nms_on_auth_user_created after insert on auth.users
   for each row execute function public.nms_novo_usuario();
+revoke execute on function public.nms_novo_usuario() from public, anon, authenticated;
 
 -- 7) Atualização em tempo real entre computadores e celulares
 do $$ begin

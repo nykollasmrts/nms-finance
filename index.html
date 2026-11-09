@@ -998,7 +998,9 @@ async function putMany(kind, docs, onProgress){
 }
 
 let dbRef = null, userRef = null, unsubs = [], memberPath = null;
-const applyBase = (b, space) => { state.regras = b.regras || {}; state.limites = b.limites || {}; if (Array.isArray(b.vigias)) state.vigias = b.vigias; else state.vigias = [{ termo:"iFood", limite:200, vezes:4 }]; state.tom = b.tom || "normal"; state.senhaHash = b.senhaHash || null; state.carteiras = Array.isArray(b.carteiras) ? b.carteiras : []; if (state.cart && !state.carteiras.some(c => c.id === state.cart)) state.cart = ""; state.tipo = b.tipo === "pj" || (!b.tipo && (space === "nms" || (space !== "nms" && state.profileTipo === "pj"))) ? "pj" : "pf"; applyTipo(state.tipo); };
+const applyBase = (b, space) => { state.regras = b.regras || {}; state.limites = b.limites || {}; if (Array.isArray(b.vigias)) state.vigias = b.vigias; else state.vigias = [{ termo:"iFood", limite:200, vezes:4 }]; state.tom = b.tom || "normal"; state.senhaHash = b.senhaHash || null; state.carteiras = Array.isArray(b.carteiras) ? b.carteiras : []; if (state.cart && !state.carteiras.some(c => c.id === state.cart)) state.cart = ""; state.tipo = b.tipo === "pj" || (!b.tipo && (space === "nms" || (space !== "nms" && state.profileTipo === "pj"))) ? "pj" : "pf"; applyTipo(state.tipo);
+  /* o vigia padrão do iFood é coisa de pessoa física: na empresa ele não aparece */
+  if (state.tipo === "pj") state.vigias = state.vigias.filter(v => !(/^ifood$/i.test(v.termo || "") && +v.limite === 200 && +v.vezes === 4)); };
 async function boot(){
   render();
   let db = null, user = null;

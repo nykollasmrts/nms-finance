@@ -450,6 +450,13 @@ button.mRow:hover{background:var(--sunk)}
 .legend div{display:flex;gap:6px;align-items:center;min-width:0}
 .legend span:last-child{margin-left:auto}
 
+.cartBar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.cartBar button{display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-width:150px;padding:9px 14px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);color:var(--fg);text-align:left;cursor:pointer}
+.cartBar button span{font-size:12px;color:var(--muted);font-weight:600}
+.cartBar button b{font-size:17px}
+.cartBar button small{font-size:11px;color:var(--muted)}
+.cartBar button[aria-pressed="true"]{border-color:var(--fg);box-shadow:inset 0 0 0 1px var(--fg)}
+.cartBar .cartAdd{min-width:0;justify-content:center;align-items:center;border-style:dashed;color:var(--muted);font-weight:600;font-size:13px}
 .spaceBar{display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
 .spaceBar .seg.tom button{font-size:12px;padding:5px 10px}
 .spaceBar .seg.tom button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
@@ -834,7 +841,7 @@ async function learn(pairs){
   await saveBase();
 }
 async function saveBase(){
-  const body = { regras: state.regras, limites: state.limites, vigias: state.vigias, tom: state.tom, tipo: state.tipo, ...(state.senhaHash ? { senhaHash: state.senhaHash } : {}) };
+  const body = { regras: state.regras, limites: state.limites, vigias: state.vigias, tom: state.tom, tipo: state.tipo, carteiras: state.carteiras || [], ...(state.senhaHash ? { senhaHash: state.senhaHash } : {}) };
   if (baseDoc) await baseDoc.set(body); else local.save();
 }
 const catInfo = k => [...CATS.saida, ...CATS.entrada].find(c => c.k === k) || [...PF_CATS.saida, ...PF_CATS.entrada, ...PJ_CATS.saida, ...PJ_CATS.entrada].find(c => c.k === k) || {k, c:"--c9"};
@@ -927,14 +934,15 @@ const local = {
         localStorage.setItem(lsKey(), JSON.stringify({ ...d })); localStorage.setItem(lsKey() + ".limpo", "1");
       }
     } catch {}
-    return {tx:d.tx||[], ag:d.ag||[], forn:d.forn||[], cli:d.cli||[], regras:d.regras||{}, limites:d.limites||{}, vigias:d.vigias, tom:d.tom, tipo:d.tipo};
+    return {tx:d.tx||[], ag:d.ag||[], forn:d.forn||[], cli:d.cli||[], regras:d.regras||{}, limites:d.limites||{}, vigias:d.vigias, tom:d.tom, tipo:d.tipo, carteiras:d.carteiras};
   },
-  save(){ try { localStorage.setItem(lsKey(), JSON.stringify({tx:state.tx, ag:state.ag, forn:state.forn, cli:state.cli, regras:state.regras, limites:state.limites, vigias:state.vigias, tom:state.tom, tipo:state.tipo})); } catch {} }
+  save(){ try { localStorage.setItem(lsKey(), JSON.stringify({tx:state.tx, ag:state.ag, forn:state.forn, cli:state.cli, regras:state.regras, limites:state.limites, vigias:state.vigias, tom:state.tom, tipo:state.tipo, carteiras:state.carteiras})); } catch {} }
 };
 let cols = null, baseDoc = null, sampleFn = null;
 
 const store = {
   async put(kind, doc){
+    if ((kind === "tx" || kind === "ag") && doc.carteira === undefined && state.cart) doc = { ...doc, carteira: state.cart };
     const { id, ...body } = doc;
     if (cols) await cols[kind].doc(id).set(body);
     const arr = state[kind]; const i = arr.findIndex(x => x.id === id);
@@ -956,7 +964,7 @@ async function putMany(kind, docs, onProgress){
 }
 
 let dbRef = null, userRef = null, unsubs = [], memberPath = null;
-const applyBase = (b, space) => { state.regras = b.regras || {}; state.limites = b.limites || {}; if (Array.isArray(b.vigias)) state.vigias = b.vigias; else state.vigias = [{ termo:"iFood", limite:200, vezes:4 }]; state.tom = b.tom || "normal"; state.senhaHash = b.senhaHash || null; state.tipo = b.tipo === "pj" || (!b.tipo && (space === "nms" || (space !== "nms" && state.profileTipo === "pj"))) ? "pj" : "pf"; applyTipo(state.tipo); };
+const applyBase = (b, space) => { state.regras = b.regras || {}; state.limites = b.limites || {}; if (Array.isArray(b.vigias)) state.vigias = b.vigias; else state.vigias = [{ termo:"iFood", limite:200, vezes:4 }]; state.tom = b.tom || "normal"; state.senhaHash = b.senhaHash || null; state.carteiras = Array.isArray(b.carteiras) ? b.carteiras : []; if (state.cart && !state.carteiras.some(c => c.id === state.cart)) state.cart = ""; state.tipo = b.tipo === "pj" || (!b.tipo && (space === "nms" || (space !== "nms" && state.profileTipo === "pj"))) ? "pj" : "pf"; applyTipo(state.tipo); };
 async function boot(){
   render();
   let db = null, user = null;
@@ -980,6 +988,7 @@ async function openSpace(space){
   state.space = space; state.tx = []; state.ag = []; state.forn = []; state.cli = []; state.selDay = null; state.selCat = null; state.fcat = ""; state.q = "";
   try { state.chat = JSON.parse(localStorage.getItem(CHAT_LS + "." + space) || "[]"); } catch { state.chat = []; }
   memberCounted = false; state.membro = null;
+  try { state.cart = localStorage.getItem("nms.cart." + space) || ""; } catch { state.cart = ""; }
   if (!dbRef || state.ident.uid === "local") {
     const d = local.load(); state.tx = d.tx; state.ag = d.ag; state.forn = d.forn; state.cli = d.cli; applyBase(d, space); state.mode = "local"; render(); return;
   }
@@ -1002,7 +1011,7 @@ let memberT = null, memberCounted = false;
 function queueMember(){ clearTimeout(memberT); memberT = setTimeout(syncMember, 4000); }
 async function syncMember(){
   if (!dbRef || !state.ident || state.ident.uid === "local" || !unlocked || state.mode !== "nuvem" || !memberPath) return;
-  const ym = ymOf(todayStr()), list = txOfMonth(ym), sm = sums(list), por = {};
+  const ym = ymOf(todayStr()), list = state.tx.filter(t => t.date && ymOf(t.date) === ym), sm = sums(list), por = {};
   list.filter(t => t.type !== "entrada").forEach(t => por[t.cat] = Math.round(((por[t.cat]||0) + (+t.amount||0))*100)/100);
   const prev = state.membro || {};
   const doc = { criadoEm: prev.criadoEm || Date.now(), ultimoAcesso: Date.now(), acessos: (prev.acessos || 0) + (memberCounted ? 0 : 1),
@@ -1012,13 +1021,15 @@ async function syncMember(){
 }
 
 /* ---------- cálculos ---------- */
-const txOfMonth = ym => state.tx.filter(t => t.date && ymOf(t.date) === ym);
+const inCart = x => (x.carteira || "") === (state.cart || "");
+const txOfMonth = ym => state.tx.filter(t => t.date && ymOf(t.date) === ym && inCart(t));
+const cartSaldo = id => state.tx.reduce((a,t) => (t.carteira || "") === id ? a + (t.type === "entrada" ? 1 : -1) * (+t.amount||0) : a, 0);
 const sums = list => list.reduce((a,t) => { a[t.type === "entrada" ? "in" : "out"] += +t.amount || 0; return a; }, {in:0,out:0});
 const linkId = (agId, ym) => `ag-${agId}-${ym}`;
 const linkedTx = agId => state.tx.filter(t => t.id.startsWith(`ag-${agId}-`));
 function occurrences(ym){
   const out = [], txIds = new Set(state.tx.map(t => t.id));
-  for (const a of state.ag) {
+  for (const a of state.ag.filter(inCart)) {
     if (a.pulados && a.pulados[ym]) continue;
     if (!a.date) continue;
     const start = ymOf(a.date), day = +a.date.slice(8,10);
@@ -2092,12 +2103,13 @@ function render(){
   const hasEx = state.tx.some(t => t.exemplo) || state.ag.some(a => a.exemplo) || state.forn.some(f => f.exemplo) || state.cli.some(c => c.exemplo);
   const banner = (state.mode === "local" ? `<div class="banner"><span class="sp"><b>Modo local.</b> Os dados ficam só neste navegador. Configure o servidor (arquivo config.js) para sincronizar entre aparelhos e ter contas de usuário.</span></div>` : "")
     + (hasEx ? `<div class="banner"><span class="sp"><b>Dados de exemplo.</b> Os itens marcados como exemplo mostram como o app funciona. Apague quando for começar.</span><button class="btn small" data-act="clearEx">Apagar exemplos</button></div>` : "");
+  const cartBar = state.tipo !== "pj" && state.mode !== "loading" && !["chat","master"].includes(state.tab) ? `<div class="cartBar" role="group" aria-label="Contas">${[{id:"", nome:"Conta principal"}, ...(state.carteiras||[])].map(c => { const s = cartSaldo(c.id); return `<button data-act="cart" data-v="${esc(c.id)}" aria-pressed="${(state.cart||"")===c.id}"><span>${esc(c.nome)}</span><b class="num" style="${s<0?"color:var(--k-out)":""}">${money(s)}</b><small>saldo</small></button>`; }).join("")}<button class="cartAdd" data-act="cartNew" aria-label="Nova conta">+ Conta</button></div>` : "";
   const body = state.mode === "loading" ? `<div class="panel empty">Carregando seus dados…</div>` :
     state.tab === "painel" ? renderPainel() : state.tab === "dashboard" ? renderDash() : state.tab === "lancamentos" ? renderLanc() : state.tab === "calendario" ? renderCal() : state.tab === "chat" ? renderChat() : state.tab === "master" ? renderMaster() : (state.tipo === "pj" ? renderContas() : renderAgenda());
   const animKey = `${state.tab}|${state.ym}|${state.space}|${state.cpTab}|${state.mode === "loading" ? 0 : 1}`;
   const doAnim = animKey !== lastAnimKey && state.mode !== "loading" && !reduceMotion;
   lastAnimKey = animKey;
-  view.innerHTML = head + (state.tab === "chat" || state.tab === "master" ? "" : banner) + body;
+  view.innerHTML = head + (state.tab === "chat" || state.tab === "master" ? "" : banner + cartBar) + body;
   if (doAnim) runEnter();
   if (state.tab === "chat") { const ci = document.getElementById("chatIn"); if (ci && keep) { ci.value = keep.v; if (!keep.blur) ci.focus(); } const box = document.getElementById("chatLog"); if (box) box.scrollTop = box.scrollHeight; }
 }
@@ -2388,6 +2400,7 @@ function openForm(kind, item, pre, ctxYm){
       <div class="field"><label for="f-desc">${isAg?"O que é":"Descrição"}</label><input id="f-desc" placeholder="${isAg?"Ex.: Aluguel, escola, gás":"Ex.: Mercado do mês"}" value="${esc(isAg?it.title:it.desc)}"></div>
       <div class="two"><div class="field"><label for="f-cat">Categoria</label><select id="f-cat">${catOptions(type, it.cat)}</select></div>
         <div class="field"><label for="f-date">${isAg?"Data (vencimento)":"Data"}</label><input id="f-date" type="date" value="${it.date || (state.ym===ymOf(todayStr())?todayStr():state.ym+"-01")}"></div></div>
+      ${state.tipo !== "pj" && (state.carteiras||[]).length ? `<div class="field"><label for="f-cart">Conta</label><select id="f-cart">${[{id:"", nome:"Conta principal"}, ...state.carteiras].map(c => `<option value="${esc(c.id)}" ${((it.carteira ?? state.cart) || "") === c.id ? "selected" : ""}>${esc(c.nome)}</option>`).join("")}</select></div>` : ""}
       ${isAg ? `<div class="two"><div class="field"><label for="f-rec">Repete</label><select id="f-rec"><option value="unica" ${it.rec!=="mensal"?"selected":""}>Só uma vez</option><option value="mensal" ${it.rec==="mensal"?"selected":""}>Todo mês</option></select></div>
         <div class="field"><label for="f-ate">Até (opcional)</label><input id="f-ate" type="month" value="${it.ate||""}"></div></div>` : ""}
       <p class="note" id="f-err" hidden></p>
@@ -2396,7 +2409,7 @@ function openForm(kind, item, pre, ctxYm){
       <div class="actions"><span class="sp"></span>
         <button type="button" class="btn" data-act="close">Cancelar</button><button class="btn primary" type="submit">Salvar</button></div>
     </form></div>`;
-    modal.querySelectorAll(".seg button").forEach(b => b.onclick = () => { type = b.dataset.type; const keep = {amount:modal.querySelector("#f-amt").value, d:modal.querySelector("#f-desc").value, date:modal.querySelector("#f-date").value}; draw(); modal.querySelector("#f-amt").value = keep.amount; modal.querySelector("#f-desc").value = keep.d; modal.querySelector("#f-date").value = keep.date; });
+    modal.querySelectorAll(".seg button").forEach(b => b.onclick = () => { type = b.dataset.type; const keep = {amount:modal.querySelector("#f-amt").value, d:modal.querySelector("#f-desc").value, date:modal.querySelector("#f-date").value, cart:modal.querySelector("#f-cart")?.value}; draw(); modal.querySelector("#f-amt").value = keep.amount; modal.querySelector("#f-desc").value = keep.d; modal.querySelector("#f-date").value = keep.date; if (keep.cart !== undefined && modal.querySelector("#f-cart")) modal.querySelector("#f-cart").value = keep.cart; });
     const desc = modal.querySelector("#f-desc"), cat = modal.querySelector("#f-cat");
     if (!item) desc.addEventListener("input", () => { cat.value = guessCat(desc.value, type); });
     const arm = (btn, run) => { if (btn) btn.onclick = async () => {
@@ -2426,6 +2439,7 @@ function openForm(kind, item, pre, ctxYm){
       if (isAg) doc = { ...it, ...base, id: it.id || "a-"+rid(), title: desc.value.trim() || cat.value, rec: modal.querySelector("#f-rec").value, ate: modal.querySelector("#f-ate").value || "", pulados: it.pulados || {}, createdAt: it.createdAt || Date.now() };
       else doc = { ...it, ...base, id: it.id || "m-"+rid(), desc: desc.value.trim() || cat.value, src: it.src || "manual", createdAt: it.createdAt || Date.now() };
       delete doc.exemplo;
+      const fc = modal.querySelector("#f-cart"); if (fc) doc.carteira = fc.value;
       const before = buildAlerts(ymOf(todayStr()));
       try { await store.put(isAg?"ag":"tx", doc);
         if (!isAg && item && item.src === "extrato" && item.cat !== doc.cat) learn([[doc.desc, doc.cat]]);
@@ -2435,6 +2449,31 @@ function openForm(kind, item, pre, ctxYm){
     modal.querySelector("#f-amt").focus();
   };
   draw();
+}
+
+function openCart(){
+  modal.innerHTML = `<div class="scrim" data-act="scrim"><form class="sheet" id="cartFrm" novalidate>
+    <h3>Nova conta</h3>
+    <p class="note">Uma conta separada tem saldo próprio: os lançamentos dela não se misturam com a conta principal. Exemplos: ticket alimentação, vale-refeição, carteira, poupança.</p>
+    <div class="field"><label for="c-nome">Nome da conta</label><input id="c-nome" placeholder="Ex.: Vale-refeição" maxlength="40"></div>
+    <div class="field"><label for="c-saldo">Saldo atual (opcional)</label><input id="c-saldo" class="money" inputmode="decimal" placeholder="0,00"></div>
+    <p class="note" id="c-err" hidden></p>
+    <div class="actions"><span class="sp"></span><button type="button" class="btn" data-act="close">Cancelar</button><button class="btn primary" type="submit">Criar conta</button></div>
+  </form></div>`;
+  modal.querySelector("#c-nome").focus();
+  modal.querySelector("#cartFrm").onsubmit = async e => {
+    e.preventDefault();
+    const nome = modal.querySelector("#c-nome").value.trim(), saldo = Math.abs(parseMoney(modal.querySelector("#c-saldo").value) || 0), err = modal.querySelector("#c-err");
+    if (!nome) { err.hidden = false; err.textContent = "Dê um nome para a conta."; return; }
+    const id = "c-" + rid();
+    state.carteiras = [...(state.carteiras||[]), { id, nome }];
+    try {
+      await saveBase();
+      if (saldo) await store.put("tx", { id: "m-" + rid(), type: "entrada", amount: Math.round(saldo*100)/100, cat: "Outras entradas", desc: "Saldo inicial", date: todayStr(), src: "manual", createdAt: Date.now(), carteira: id });
+      state.cart = id; try { localStorage.setItem("nms.cart." + (state.space || "pessoal"), id); } catch {}
+      close(); render(); toast(`Conta "${nome}" criada`);
+    } catch { state.carteiras = state.carteiras.filter(c => c.id !== id); err.hidden = false; err.textContent = "Não foi possível criar a conta agora. Verifique a conexão."; }
+  };
 }
 
 /* ---------- importação de extrato (OFX / CSV) ---------- */
@@ -2810,6 +2849,8 @@ document.addEventListener("click", async e => {
   else if (act === "calItem") openCalItem(el.dataset.kind, el.dataset.id, el.dataset.ym);
   else if (act === "dreMode") { state.dreFull = el.dataset.v === "completo"; render(); }
   else if (act === "space") switchSpace(el.dataset.v);
+  else if (act === "cart") { state.cart = el.dataset.v || ""; state.selDay = null; state.selCat = null; state.fcat = ""; try { localStorage.setItem("nms.cart." + (state.space || "pessoal"), state.cart); } catch {} render(); }
+  else if (act === "cartNew") openCart();
   else if (act === "tipo") { if (state.tipo !== el.dataset.v) { state.tipo = el.dataset.v; applyTipo(state.tipo); render(); saveBase().catch(() => toast("Não foi possível salvar o tipo de conta.")); queueMember(); toast(state.tipo === "pj" ? "Conta PJ: categorias empresariais e indicadores financeiros" : "Conta PF: categorias pessoais e indicadores simples"); } }
   else if (act === "mCat") { state.mCat = el.dataset.cat; render(); }
   else if (act === "tema") { aplicarTema(el.dataset.v); render(); toast(`Tema ${TEMA_NOME[el.dataset.v].toLowerCase()}${el.dataset.v === "auto" ? " (segue o aparelho)" : ""}`); }

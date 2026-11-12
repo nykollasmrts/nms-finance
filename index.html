@@ -1760,7 +1760,7 @@ function renderPJ(){
   const steps = [
     { k:"in",  t:"Faturamento", d:"Tudo o que a empresa recebeu de clientes no mês", v:A.rev },
     { k:"out", t:"Impostos", d:"DAS e outros impostos sobre o que foi faturado", v:A.ded },
-    { k:"out", t:"Custo para entregar o trabalho", d:"Freelas de produção, insumos e materiais", v:A.csp },
+    { k:"out", t:"Custo da operação", d:"Freelas de produção, insumos e materiais", v:A.csp },
     { k:"out", t:"Despesas para a empresa funcionar", d:"Pró-labore, aluguel, sistemas, contador, marketing e tarifas", v:opex },
     { k:"out", t:"Desgaste dos equipamentos", d:`Câmeras, computadores etc. perdem valor aos poucos (1/${DEP_MESES} por mês)`, v:A.dep },
     ...(A.recfin ? [{ k:"in2", t:"Rendimentos", d:"Juros e outras receitas que não são de clientes", v:A.recfin }] : []),

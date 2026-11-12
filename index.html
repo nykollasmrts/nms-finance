@@ -443,8 +443,12 @@ button.mRow:hover{background:var(--sunk)}
 @media (min-width:700px){.pjKpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (min-width:1100px){.pjKpis{grid-template-columns:repeat(5,minmax(0,1fr))}}
 .pjK{background:var(--surface);padding:14px;display:flex;flex-direction:column;gap:4px;min-width:0;box-shadow:inset 0 3px 0 var(--k)}
-.pjK b{font-size:clamp(17px,3.4vw,21px);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pjK small{font-size:12px;color:var(--muted);line-height:1.3}
+.pjK b{font-size:clamp(17px,2.2vw,21px);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pjK small{font-size:12px;color:var(--muted);line-height:1.35}
+.pjHelp{font-size:11.5px;color:var(--muted);line-height:1.3;margin-top:-2px}
+.pjK b.num{margin-top:4px;overflow:visible;text-overflow:clip;white-space:nowrap}
+.pjSpark{display:block;line-height:0}
+.pjSpark svg{width:100%;max-width:140px;height:auto}
 .dre td{padding:7px 8px}
 .dre tr.sub td{font-weight:600;background:var(--sunk)}
 .dre tr.strong td{font-weight:700;border-top:1px solid var(--fg)}
@@ -1722,18 +1726,21 @@ function renderPJ(){
   const ticket = A.nRev ? A.rev / A.nRev : null;
   const hist6 = [...Array(6)].map((_,i) => pjAgg(addMonths(ym, i-5)));
   const sp = { rev: spark(hist6.map(x => x.rev), "var(--k-in)"), out: spark(hist6.map(x => x.out), "var(--k-out)"), res: spark(hist6.map(x => x.res), "var(--k-bal)"), mg: spark(hist6.map(x => x.rev ? x.res/x.rev : 0), "var(--k-proj)") };
-  const kpi = (lbl, val, sub, k, sk="") => `<div class="pjK" style="--k:${k}"><span class="label">${lbl}</span><span class="pjRow"><b class="num">${val}</b>${sk}</span><small>${sub}</small></div>`;
+  const kpi = (lbl, val, sub, k, sk="", help="") => `<div class="pjK" style="--k:${k}"${help ? ` title="${esc(help)}"` : ""}><span class="label">${lbl}</span>${help ? `<span class="pjHelp">${help}</span>` : ""}<b class="num">${val}</b>${sk ? `<span class="pjSpark">${sk}</span>` : ""}<small>${sub}</small></div>`;
+  const mesAnt = new Date(...addMonths(ym,-1).split("-").map((n,i) => i ? +n-1 : +n), 1).toLocaleDateString("pt-BR",{month:"long"});
+  const cmp = (a, b, goodUp=true) => b ? `${dTag(delta(a, b), goodUp)} em relação a ${mesAnt}` : `sem dados de ${mesAnt} para comparar`;
+  const vezes = v => v.toFixed(2).replace(".",",");
   const kpis = `<div class="pjKpis">
-    ${kpi("Receita bruta", money(A.rev), `${dTag(delta(A.rev, P.rev))} vs ${monthShort(addMonths(ym,-1))}`, "var(--k-in)", sp.rev)}
-    ${kpi("Despesas totais", money(A.out), `${dTag(delta(A.out, P.out), false)} vs ${monthShort(addMonths(ym,-1))}`, "var(--k-out)", sp.out)}
-    ${kpi("Resultado líquido", money(A.res), `${A.res >= 0 ? "lucro" : "prejuízo"} no mês`, A.res >= 0 ? "var(--k-in)" : "var(--k-out)", sp.res)}
-    ${kpi("Margem líquida", margem === null ? "—" : pct(margem,1), margem === null ? "sem receita" : margem >= .15 ? "saudável (acima de 15%)" : margem >= 0 ? "baixa (abaixo de 15%)" : "negativa", margem === null ? "var(--muted)" : margem >= .15 ? "var(--k-in)" : margem >= 0 ? "var(--warn)" : "var(--k-out)", sp.mg)}
-    ${kpi("Margem de contribuição", mcPct === null ? "—" : pct(mcPct,1), `${money(A.mc)} para cobrir as fixas`, "var(--k-bal)")}
-    ${kpi("Ponto de equilíbrio", pe === null ? "—" : money(pe), pe === null ? "margem insuficiente" : A.rev >= pe ? `atingido · folga de ${money(A.rev - pe)}` : `faltam ${money(pe - A.rev)} de receita`, pe !== null && A.rev >= pe ? "var(--k-in)" : "var(--warn)")}
-    ${kpi("Burn rate", money(burn), `despesa média de ${base3.length} ${base3.length>1?"meses":"mês"}`, "var(--k-proj)")}
-    ${kpi("Runway", runway === null ? (burnLiq <= 0 ? "Positivo" : "—") : `${runway.toFixed(1).replace(".",",")} meses`, runway === null ? (burnLiq <= 0 ? "receita cobre as despesas" : "sem caixa") : `caixa de ${money(caixa)}`, runway === null || runway >= 6 ? "var(--k-in)" : runway >= 3 ? "var(--warn)" : "var(--k-out)")}
-    ${kpi("Liquidez 30 dias", liq === null ? "—" : liq.toFixed(2).replace(".",","), liq === null ? "nada a pagar em 30 dias" : liq >= 1.5 ? "confortável (≥ 1,5)" : liq >= 1 ? "justa (entre 1 e 1,5)" : "risco: caixa não cobre as contas", liq === null || liq >= 1.5 ? "var(--k-in)" : liq >= 1 ? "var(--warn)" : "var(--k-out)")}
-    ${kpi("Ticket médio", ticket === null ? "—" : money(ticket), `${A.nRev} recebimentos no mês`, "var(--k-bal)")}
+    ${kpi("Receita bruta", money(A.rev), cmp(A.rev, P.rev), "var(--k-in)", sp.rev, "Tudo o que entrou de vendas e serviços no mês")}
+    ${kpi("Despesas totais", money(A.out), cmp(A.out, P.out, false), "var(--k-out)", sp.out, "Tudo o que saiu no mês")}
+    ${kpi("Resultado líquido", money(A.res), A.rev || A.out ? (A.res >= 0 ? "a empresa teve lucro no mês" : "a empresa teve prejuízo no mês") : "sem movimentação no mês", A.res >= 0 ? "var(--k-in)" : "var(--k-out)", sp.res, "Receita menos todas as despesas")}
+    ${kpi("Margem líquida", margem === null ? "—" : pct(margem,1), margem === null ? "aparece quando houver receita" : margem >= .15 ? "saudável (acima de 15%)" : margem >= 0 ? "baixa (abaixo de 15%)" : "negativa: a empresa gastou mais do que vendeu", margem === null ? "var(--muted)" : margem >= .15 ? "var(--k-in)" : margem >= 0 ? "var(--warn)" : "var(--k-out)", sp.mg, "Quanto sobra de lucro a cada R$ 100 vendidos")}
+    ${kpi("Margem de contribuição", mcPct === null ? "—" : pct(mcPct,1), mcPct === null ? "aparece quando houver receita" : `${money(A.mc)} disponíveis para pagar as despesas fixas`, "var(--k-bal)", "", "O que sobra da receita depois dos impostos e custos da operação")}
+    ${kpi("Ponto de equilíbrio", pe === null ? "—" : money(pe), pe === null ? "aparece quando houver receita com margem positiva" : A.rev >= pe ? `meta atingida, com ${money(A.rev - pe)} de folga` : `faltam ${money(pe - A.rev)} de receita`, pe !== null && A.rev >= pe ? "var(--k-in)" : "var(--warn)", "", "Quanto a empresa precisa vender para não ter prejuízo")}
+    ${kpi("Gasto médio mensal", money(burn), `média dos últimos ${base3.length} ${base3.length>1?"meses":"mês"} (burn rate)`, "var(--k-proj)", "", "Quanto a empresa costuma gastar por mês")}
+    ${kpi("Fôlego de caixa", runway === null ? (burnLiq <= 0 ? "Sem risco" : "—") : `${runway.toFixed(1).replace(".",",")} meses`, runway === null ? (burnLiq <= 0 ? "a receita cobre as despesas (runway)" : "sem caixa disponível") : `o caixa atual de ${money(caixa)} dura esse tempo (runway)`, runway === null || runway >= 6 ? "var(--k-in)" : runway >= 3 ? "var(--warn)" : "var(--k-out)", "", "Por quanto tempo o caixa paga as contas se a receita parar")}
+    ${kpi("Liquidez em 30 dias", liq === null ? "—" : `${vezes(liq)}x`, liq === null ? "nenhuma conta a pagar nos próximos 30 dias" : `para cada R$ 1,00 a pagar, há R$ ${vezes(liq)} · ${liq >= 1.5 ? "confortável" : liq >= 1 ? "justo" : "risco: o caixa não cobre as contas"}`, liq === null || liq >= 1.5 ? "var(--k-in)" : liq >= 1 ? "var(--warn)" : "var(--k-out)", "", "Se o caixa e o que vai entrar cobrem as contas do próximo mês")}
+    ${kpi("Ticket médio", ticket === null ? "—" : money(ticket), A.nRev ? `média de ${A.nRev} ${A.nRev > 1 ? "recebimentos" : "recebimento"} no mês` : "nenhum recebimento no mês", "var(--k-bal)", "", "Valor médio de cada venda ou recebimento")}
   </div>`;
   const M2 = pjAgg(addMonths(ym,-2)), yr = ym.slice(0,4), mon = +ym.slice(5);
   const Y = [...Array(mon)].map((_,i) => pjAgg(`${yr}-${pad(i+1)}`)).reduce((acc, x) => { for (const k in x) if (typeof x[k] === "number") acc[k] = (acc[k]||0) + x[k]; return acc; }, {});

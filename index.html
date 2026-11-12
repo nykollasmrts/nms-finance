@@ -802,13 +802,12 @@ body.corp .btn{font-weight:500}
   .cpTbl td.acts .btn[data-act="contaEdit"]{display:inline-flex}
   .cpTbl tfoot tr{display:flex;justify-content:space-between;padding:10px 4px;border-top:2px solid var(--fg)}
   .cpTbl tfoot td{display:block;border:0;padding:0}
-  .cpTbl tfoot td.hideS{display:block}
+  .cpTbl tfoot td.cpCat{display:none}
 }
 @media (max-width:899px){.top > .chip:last-child{width:auto;justify-self:start}}
 .cpTbl td .chip{white-space:nowrap}
 @media (max-width:480px){.two:has(select){grid-template-columns:minmax(0,1fr)}}
 @media (min-width:700px) and (max-width:1099px){.pjKpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (min-width:601px){.mRow.static{grid-template-columns:22px minmax(90px,1.2fr) minmax(60px,2fr) 13ch 5ch}.mRow.static > .num{text-align:right}}
 .ptyContact > *{min-width:0;overflow-wrap:anywhere}
 /* ---------- v1.9: subcategorias e uso mais fácil ---------- */
 .opt{font-weight:400;color:var(--muted);font-size:.9em}
@@ -830,6 +829,20 @@ body.corp .btn{font-weight:500}
 .guiaSteps b{display:block;font-size:15px}
 .guiaSteps p{margin:4px 0 8px;color:var(--muted);font-size:13.5px;line-height:1.4}
 .gNum{width:32px;height:32px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-weight:700}
+/* ---------- v1.9.2: computador sem cortes ---------- */
+.summary > div,.pjK,.pfCards > div,.capHead > div{container-type:inline-size}
+.summary .v{font-size:clamp(15px,10.5cqi,24px)}
+.pjK b.num{font-size:clamp(15px,10cqi,22px)}
+.pfCards b{font-size:clamp(16px,10.5cqi,28px)}
+.capHead b{font-size:clamp(14px,10cqi,18px)}
+@media (min-width:601px){.mRow.static{grid-template-columns:22px minmax(110px,1.4fr) minmax(50px,1.4fr) 8.8em 3.8em}.mRow.static > .num{text-align:right;white-space:nowrap}.mRow.static .mMuted{min-width:0}}
+.mcal .bal{min-width:0}
+.mcal .balV{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+@media (min-width:641px) and (max-width:1180px){.cpTbl .cpCat{display:none}.cpTbl td.pty{min-width:120px}}
+.mcal .cell{container-type:inline-size}
+@container (max-width:118px){.mcal .balL{display:none}.mcal .bal{justify-content:flex-end}}
+.mRank{container-type:inline-size}
+@container (max-width:440px){.mRow.static{grid-template-columns:22px minmax(0,1fr) auto auto}.mRow.static .mBar{display:none}}
 </style>
 
 <div class="lock" id="lock">
@@ -1076,6 +1089,7 @@ const guessCat = (desc, type) => {
 const BRL = new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"});
 const money = v => BRL.format(v || 0);
 const pad = n => String(n).padStart(2,"0");
+const plur = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;
 const ymOf = d => d.slice(0,7);
 const todayStr = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
 const addMonths = (ym, n) => { let [y,m] = ym.split("-").map(Number); m += n; while (m>12){m-=12;y++} while(m<1){m+=12;y--} return `${y}-${pad(m)}`; };
@@ -2127,9 +2141,9 @@ function renderContas(){
   const R = kind === "receber";
   const kpis = `<div class="summary">
     <div class="${R?"k-in":"k-out"}"><span class="label">${R ? "A receber no mês" : "A pagar no mês"}</span><span class="v" style="color:var(${R?"--k-in":"--k-out"})">${money(sum(mes.filter(o=>!o.paid)))}</span><span class="hint">${mes.filter(o=>!o.paid).length} em aberto em ${monthShort(ym)}</span></div>
-    <div class="k-out"><span class="label">${R ? "Em atraso (inadimplência)" : "Vencidas"}</span><span class="v" style="color:var(--k-out)">${money(sum(venc))}</span><span class="hint">${venc.length} ${R ? "cobranças" : "contas"} em atraso</span></div>
-    <div class="k-proj"><span class="label">Próximos 7 dias</span><span class="v">${money(sum(prox7))}</span><span class="hint">${prox7.length} vencimentos</span></div>
-    <div class="k-bal"><span class="label">${R ? "Recebido no mês" : "Pago no mês"}</span><span class="v">${money(sum(mes.filter(o=>o.paid)))}</span><span class="hint">${mes.filter(o=>o.paid).length} ${R ? "recebimentos" : "pagamentos"}</span></div></div>`;
+    <div class="k-out"><span class="label">${R ? "Em atraso (inadimplência)" : "Vencidas"}</span><span class="v" style="color:var(--k-out)">${money(sum(venc))}</span><span class="hint">${R ? plur(venc.length, "cobrança", "cobranças") : plur(venc.length, "conta", "contas")} em atraso</span></div>
+    <div class="k-proj"><span class="label">Próximos 7 dias</span><span class="v">${money(sum(prox7))}</span><span class="hint">${plur(prox7.length, "vencimento", "vencimentos")}</span></div>
+    <div class="k-bal"><span class="label">${R ? "Recebido no mês" : "Pago no mês"}</span><span class="v">${money(sum(mes.filter(o=>o.paid)))}</span><span class="hint">${R ? plur(mes.filter(o=>o.paid).length, "recebimento", "recebimentos") : plur(mes.filter(o=>o.paid).length, "pagamento", "pagamentos")}</span></div></div>`;
   const filtros = [["mes", `Vencimento em ${monthShort(ym)}`], ["abertas", "Todas em aberto"], ["vencidas", R ? "Em atraso" : "Vencidas"], ["pagas", R ? "Recebidas no mês" : "Pagas no mês"]];
   const f = state.cpFiltro;
   let list = f === "mes" ? mes : f === "abertas" ? abertos : f === "vencidas" ? venc : mes.filter(o => o.paid);
@@ -2139,7 +2153,7 @@ function renderContas(){
     return `<tr class="${st.c==="late"?"rowLate":""}">
       <td class="d"><b class="num">${fmtD(o.date)}</b><small>${new Date(o.date+"T12:00").toLocaleDateString("pt-BR",{weekday:"short"}).replace(".","")}</small></td>
       <td class="pty"><b>${esc(pt ? pt.nome : "Sem " + (R ? "cliente" : "fornecedor"))}</b><small>${esc(a.title)}${a.doc ? ` · NF ${esc(a.doc)}` : ""}${a.forma ? ` · ${esc(a.forma)}` : ""}</small></td>
-      <td class="hideS"><span class="tcat" style="color:${catColor(a.cat)}">${catIcon(a.cat, 14)}<span style="color:var(--fg)">${esc(a.cat)}</span></span></td>
+      <td class="hideS cpCat"><span class="tcat" style="color:${catColor(a.cat)}">${catIcon(a.cat, 14)}<span style="color:var(--fg)">${esc(a.cat)}</span></span></td>
       <td class="r num" style="color:${R ? "var(--k-in)" : "var(--k-out)"}">${money(a.amount)}</td>
       <td><span class="chip ${st.c}">${st.t}</span></td>
       <td class="r acts"><button class="btn small ${o.paid ? "" : "primary"}" data-act="${o.paid ? "unpay" : "pay"}" data-id="${esc(a.id)}" data-ym="${o.ym}">${o.paid ? "Estornar" : "Dar baixa"}</button><button class="btn small" data-act="contaEdit" data-id="${esc(a.id)}" data-ym="${o.ym}" aria-label="Editar">Editar</button></td></tr>`;
@@ -2147,8 +2161,8 @@ function renderContas(){
   return nav + kpis + `<section class="panel">
     <h2>${R ? "Contas a receber" : "Contas a pagar"} <small><button class="btn small primary" data-act="contaNew" data-v="${kind}">+ ${R ? "Nova conta a receber" : "Nova conta a pagar"}</button></small></h2>
     <div class="cpFilt">${filtros.map(([k,t]) => `<button class="chipBtn ${f===k?"on":""}" data-act="cpFiltro" data-v="${k}">${t}</button>`).join("")}</div>
-    ${list.length ? `<div class="catTbl"><table class="cpTbl"><thead><tr><th>${R ? "Recebimento" : "Vencimento"}</th><th>${R ? "Cliente · serviço/produto" : "Fornecedor · o que foi comprado"}</th><th class="hideS">Categoria</th><th class="r">Valor</th><th>Situação</th><th class="r"></th></tr></thead><tbody>${rows}</tbody>
-      <tfoot><tr><td colspan="3" class="hideS">Total</td><td class="r num"><b>${money(sum(list))}</b></td><td colspan="2"></td></tr></tfoot></table></div>`
+    ${list.length ? `<div class="catTbl"><table class="cpTbl"><thead><tr><th>${R ? "Recebimento" : "Vencimento"}</th><th>${R ? "Cliente · serviço/produto" : "Fornecedor · o que foi comprado"}</th><th class="hideS cpCat">Categoria</th><th class="r">Valor</th><th>Situação</th><th class="r"></th></tr></thead><tbody>${rows}</tbody>
+      <tfoot><tr><td colspan="2">Total</td><td class="hideS cpCat"></td><td class="r num"><b>${money(sum(list))}</b></td><td colspan="2"></td></tr></tfoot></table></div>`
       : `<div class="empty">Nenhuma conta ${R ? "a receber" : "a pagar"} neste filtro.<br>Use <b>+ ${R ? "Nova conta a receber" : "Nova conta a pagar"}</b> para registrar.</div>`}
   </section>`;
 }
@@ -2340,7 +2354,7 @@ function render(){
   document.getElementById("fab").hidden = state.tab === "chat";
   const spaceBar = state.role === "master" ? `<div class="spaceBar"><span class="label">Conta</span><span class="seg tom" role="group" aria-label="Conta"><button data-act="space" data-v="pessoal" aria-pressed="${state.space!=="nms"}">Nykollas · PF</button><button data-act="space" data-v="nms" aria-pressed="${state.space==="nms"}">NMS · Empresa</button></span></div>`
     : state.role === "empresa" ? `<div class="spaceBar"><span class="chip ap">NMS · Empresa</span></div>` : "";
-  const corpBand = state.tipo === "pj" && state.tab !== "chat" && state.tab !== "master" ? `<div class="corpBand"><b>${state.space === "nms" ? "NMS" : "Empresa"}</b><span>Relatório gerencial</span><span>Período: ${monthName(state.ym)}</span><span>Emitido em ${new Date().toLocaleDateString("pt-BR")} às ${new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}</span></div>` : "";
+  const corpBand = state.tipo === "pj" && state.tab === "dashboard" ? `<div class="corpBand"><b>${state.space === "nms" ? "NMS" : "Empresa"}</b><span>Relatório gerencial</span><span>Período: ${monthName(state.ym)}</span><span>Emitido em ${new Date().toLocaleDateString("pt-BR")} às ${new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}</span></div>` : "";
   const head = spaceBar + corpBand + (state.tab === "chat" ? `<div class="top"><span class="mLogo">${logoHTML(40)}</span><h1>${L("Chat do NMS","Assistente financeiro")}</h1><button class="btn small" data-act="chatClear">Limpar conversa</button></div>` : state.tab === "master" ? `<div class="top"><span class="mLogo">${logoHTML(40)}</span><h1>Painel Master</h1><span class="chip ex">acesso administrador</span></div>` : `<div class="top"><span class="mLogo">${logoHTML(40)}</span><h1>${(state.tipo === "pj" ? {painel:"Visão geral",dashboard:"DRE financeiro e indicadores",lancamentos:"Movimentações",calendario:"Calendário financeiro",agenda:"Contas a pagar e receber"} : {painel:"Painel do mês",dashboard:"Dashboard pessoal",lancamentos:"Lançamentos",calendario:"Calendário financeiro",agenda:"Agenda do dinheiro"})[state.tab]}</h1>
     <span style="display:flex;gap:8px;align-items:center"><div class="month"><button data-act="prev" aria-label="Mês anterior">‹</button><span>${(m => m.charAt(0).toUpperCase() + m.slice(1))(monthName(state.ym))}</span><button data-act="next" aria-label="Próximo mês">›</button></div>${state.tab === "painel" ? `<button class="btn small mTema" data-act="temaCiclo" aria-label="Trocar tema: claro, escuro ou automático">Tema: ${tema()==="auto"?"Auto":TEMA_NOME[tema()]}</button><button class="btn small mLogout" data-act="logout">Sair</button>` : ""}</span></div>`);
   const HINTS = state.tipo === "pj"
@@ -2382,8 +2396,8 @@ function renderPainel(){
   const saldo = s.in - s.out, proj = saldo - pendOut + pendIn;
 
   const summary = `<div class="summary">
-    <div class="k-in"><span class="label">${L("Entradas","Receitas")}</span><span class="v" style="color:var(--k-in)">${money(s.in)}</span><span class="hint">${list.filter(t=>t.type==="entrada").length} lançamentos</span></div>
-    <div class="k-out"><span class="label">${L("Saídas","Despesas")}</span><span class="v" style="color:var(--k-out)">${money(s.out)}</span><span class="hint">${list.filter(t=>t.type!=="entrada").length} ${L("lançamentos","movimentações")}</span></div>
+    <div class="k-in"><span class="label">${L("Entradas","Receitas")}</span><span class="v" style="color:var(--k-in)">${money(s.in)}</span><span class="hint">${plur(list.filter(t=>t.type==="entrada").length, "lançamento", "lançamentos")}</span></div>
+    <div class="k-out"><span class="label">${L("Saídas","Despesas")}</span><span class="v" style="color:var(--k-out)">${money(s.out)}</span><span class="hint">${L(plur(list.filter(t=>t.type!=="entrada").length, "lançamento", "lançamentos"), plur(list.filter(t=>t.type!=="entrada").length, "movimentação", "movimentações"))}</span></div>
     <div class="k-bal"><span class="label">${L("Saldo do mês","Resultado do mês")}</span><span class="v ${saldo<0?"neg":""}">${money(saldo)}</span><span class="hint">${L("entradas − saídas","receitas − despesas")}</span></div>
     <div class="k-proj"><span class="label">${L("Saldo projetado","Resultado projetado")}</span><span class="v ${proj<0?"neg":""}">${money(proj)}</span><span class="hint">com ${occ.length} itens da agenda</span></div>
   </div>`;
@@ -2646,7 +2660,7 @@ function renderCal(){
       ${items.length ? `<span class="mobIcons">${items.slice(0,3).map(x => `<span style="background:${catColor(x.cat)}">${catIcon(x.cat, 10)}</span>`).join("")}</span>` : ""}
       ${items.length > 3 ? `<span class="more">+${items.length-3} itens</span>` : ""}
       ${items.length ? `<span class="mob" style="color:${net>=0?"var(--k-in)":"var(--k-out)"}">${net>=0?"+":"−"}${Math.abs(net)>=1000?(Math.abs(net)/1000).toFixed(1).replace(".",",")+"k":Math.round(Math.abs(net))}</span>` : ""}
-      ${items.length || d===t ? `<span class="bal"><span>saldo</span><span style="color:${bal<0?"var(--k-out)":"var(--k-bal)"}">${money(bal).replace(/,\d\d$/,"")}</span></span>` : ""}
+      ${items.length || d===t ? `<span class="bal" title="Saldo acumulado até este dia: ${money(bal)}"><span class="balL">saldo</span><span class="balV" style="color:${bal<0?"var(--k-out)":"var(--k-bal)"}">${Math.abs(bal) >= 10000 ? (bal < 0 ? "−" : "") + (Math.abs(bal)/1000).toFixed(Math.abs(bal) >= 100000 ? 0 : 1).replace(".",",") + " mil" : money(bal).replace(/,\d\d$/,"")}</span></span>` : ""}
     </div>`;
   });
   const grid = [..."SEG TER QUA QUI SEX SÁB DOM".split(" ")].map(w => `<div class="wd">${w}</div>`).join("")

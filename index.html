@@ -747,7 +747,7 @@ body.corp .btn{font-weight:500}
 
 <div class="lock" id="lock">
   <form class="lockCard" id="lockForm" novalidate autocomplete="on">
-    <div class="lockLogo"><span class="nmsLogo" style="--s:150px" role="img" aria-label="NMS Controle Financeiro"><span class="nmsMark"><b>nms</b></span><i>controle financeiro</i></span></div>
+    <div class="lockLogo"><span class="nmsLogo" style="--s:150px" role="img" aria-label="NMS Controle Financeiro"><span class="nmsMark"><b>nms</b></span></span></div>
     <div class="lockTitle" id="lockTitle">Carregando…</div>
     <div id="lockFields" style="display:flex;flex-direction:column;gap:14px"></div>
     <label class="keep"><input type="checkbox" id="lgKeep"> Manter conectado neste aparelho por 30 dias</label>
@@ -757,7 +757,7 @@ body.corp .btn{font-weight:500}
 </div>
 <div class="app">
   <nav class="nav" aria-label="Seções">
-    <div class="brand"><span class="nmsLogo" style="--s:132px" role="img" aria-label="NMS Controle Financeiro"><span class="nmsMark"><b>nms</b></span><i>controle financeiro</i></span><small id="brandSub" hidden></small></div>
+    <div class="brand"><span class="nmsLogo" style="--s:132px" role="img" aria-label="NMS Controle Financeiro"><span class="nmsMark"><b>nms</b></span></span><small id="brandSub" hidden></small></div>
     <button data-tab="painel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="nl" data-pf="Painel" data-pj="Visão geral" data-pjs="Visão">Painel</span></button>
     <button data-tab="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 13l4-4M8 21h8"/></svg><span class="nl" data-pf="Dashboard" data-pj="DRE financeiro" data-pjs="DRE">Dashboard</span></button>
     <button data-tab="lancamentos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span class="nl" data-pf="Lançamentos" data-pj="Movimentações" data-pjs="Movim.">Lançamentos</span></button>
@@ -1614,7 +1614,7 @@ function renderMaster(){
 
 
 /* ---------- dashboard PF / PJ ---------- */
-const logoHTML = sz => `<span class="nmsLogo" style="--s:${sz}px" role="img" aria-label="NMS Controle Financeiro"><span class="nmsMark"><b>nms</b></span><i>controle financeiro</i></span>`;
+const logoHTML = sz => `<span class="nmsLogo" style="--s:${sz}px" role="img" aria-label="NMS Controle Financeiro"><span class="nmsMark"><b>nms</b></span></span>`;
 const L = (pf, pj) => state.tipo === "pj" ? pj : pf;
 function spark(vals, color){
   const w = 96, h = 26, mx = Math.max(...vals), mn = Math.min(...vals), r = (mx - mn) || 1;

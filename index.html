@@ -2478,21 +2478,25 @@ function renderPainel(){
     ${table}`
     : `<div class="empty">Nenhum gasto em ${monthName(state.ym)}. Adicione um lançamento ou importe o extrato do banco.</div>`}</section>`;
 
-  // histórico 6 meses
+  // histórico 6 meses: barras de entradas e saídas, com o valor em cima de cada barra
   const months = [...Array(6)].map((_,i) => addMonths(state.ym, i-5));
   const data = months.map(m => sums(txOfMonth(m)));
   const max = Math.max(1, ...data.flatMap(d => [d.in,d.out]));
-  const W = window.innerWidth >= 1400 ? 1000 : 520, H = window.innerWidth >= 1400 ? 240 : 190, pl=8,pb=26,pt=22,bw=26, step=(W-pl*2)/6;
+  const hn = window.innerWidth < 640, W = window.innerWidth >= 1400 ? 1000 : hn ? 340 : 520, H = window.innerWidth >= 1400 ? 250 : hn ? 230 : 210, pl=6,pb=26,pt=30,bw=hn ? 22 : 26, gap = hn ? 4 : 2, step=(W-pl*2)/6;
   const y = v => H-pb - v/max*(H-pb-pt);
+  const kfmt = v => v >= 1000 ? (v/1000).toFixed(v >= 10000 ? 0 : 1).replace(".",",").replace(/,0$/,"") + (hn ? "k" : " mil") : String(Math.round(v));
   const histSvg = `<svg class="hist" viewBox="0 0 ${W} ${H}" role="img" aria-label="Entradas e saídas dos últimos 6 meses">
     <line x1="0" x2="${W}" y1="${H-pb}" y2="${H-pb}" stroke="var(--line)"/>
-    <text x="0" y="12">máx. ${money(max)}</text>
-    ${data.map((d,i) => { const cx = pl + step*i + step/2; return `
-      <rect x="${cx-bw-2}" y="${y(d.in)}" width="${bw}" height="${H-pb-y(d.in)}" rx="3" fill="var(--k-in)" opacity="${months[i]===state.ym?1:.55}"/>
-      <rect x="${cx+2}" y="${y(d.out)}" width="${bw}" height="${H-pb-y(d.out)}" rx="3" fill="var(--k-out)" opacity="${months[i]===state.ym?1:.55}"/>
-      <text x="${cx}" y="${H-8}" text-anchor="middle" style="${months[i]===state.ym?"fill:var(--fg);font-weight:600":""}">${monthShort(months[i])}</text>`; }).join("")}
+    ${data.map((d,i) => { const cx = pl + step*i + step/2, cur = months[i]===state.ym; return `
+      <rect x="${cx-bw-gap}" y="${y(d.in)}" width="${bw}" height="${H-pb-y(d.in)}" rx="3" fill="var(--k-in)" opacity="${cur?1:.55}"><title>${monthShort(months[i])}: entrou ${money(d.in)}</title></rect>
+      <rect x="${cx+gap}" y="${y(d.out)}" width="${bw}" height="${H-pb-y(d.out)}" rx="3" fill="var(--k-out)" opacity="${cur?1:.55}"><title>${monthShort(months[i])}: saiu ${money(d.out)}</title></rect>
+      ${d.in ? `<text x="${cx-gap-bw/2}" y="${y(d.in)-6}" text-anchor="middle" style="fill:var(--k-in);font-weight:600">${kfmt(d.in)}</text>` : ""}
+      ${d.out ? `<text x="${cx+gap+bw/2}" y="${y(d.out)-6}" text-anchor="middle" style="fill:var(--k-out);font-weight:600">${kfmt(d.out)}</text>` : ""}
+      <text x="${cx}" y="${H-8}" text-anchor="middle" style="${cur?"fill:var(--fg);font-weight:600":""}">${monthShort(months[i])}</text>`; }).join("")}
   </svg>`;
-  const histPanel = `<section class="panel"><h2>Últimos 6 meses <small><span style="color:var(--k-in)">■</span> entradas <span style="color:var(--k-out)">■</span> saídas</small></h2>${histSvg}</section>`;
+  const dc = data[5], comDados = data.filter(d => d.in || d.out).length, sob = dc.in - dc.out;
+  const histNote = `<p class="note" style="margin:8px 0 0">Cada mês tem duas barras: <b style="color:var(--k-in)">verde</b> é o que entrou e <b style="color:var(--k-out)">vermelha</b> é o que saiu. Se a verde é mais alta, sobrou dinheiro.${dc.in || dc.out ? ` Em ${monthShort(state.ym)}: entrou ${money(dc.in)}, saiu ${money(dc.out)} e ${sob >= 0 ? `sobrou <b>${money(sob)}</b>` : `faltou <b>${money(-sob)}</b>`}.` : ""}${comDados <= 1 ? " Os meses anteriores vão aparecendo aqui conforme você usa o app." : ""}</p>`;
+  const histPanel = `<section class="panel"><h2>${L("Entrou x saiu","Receitas x despesas")} nos últimos 6 meses <small><span style="color:var(--k-in)">■</span> ${L("entradas","receitas")} <span style="color:var(--k-out)">■</span> ${L("saídas","despesas")}</small></h2>${histSvg}${histNote}</section>`;
 
   // agenda em destaque
   const all = occurrences(state.ym), t0 = todayStr();

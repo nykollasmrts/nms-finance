@@ -155,7 +155,8 @@ main{min-width:0;padding-block:16px 110px;padding-left:max(16px,env(safe-area-in
 
 /* histórico */
 .hist{width:100%;height:auto;display:block}
-.hist text{fill:var(--muted);font-family:var(--f-body);font-size:11px}
+.hist{font-size:11px}
+.hist text{fill:var(--muted);font-family:var(--f-body);font-size:1em}
 
 /* listas */
 .list{display:flex;flex-direction:column}
@@ -229,6 +230,7 @@ select.search{flex:0 1 auto}
 .capHead{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 @media (min-width:700px){.capHead{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .capHead div{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--k);padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.capSub{font-size:12px;color:var(--muted)}
 .capHead b{font-family:var(--f-num);font-weight:500;font-size:17px;color:var(--k);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mcalBox{overflow-x:auto}
 .mcal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-top:1px solid var(--line);border-left:1px solid var(--line);background:var(--surface)}
@@ -449,7 +451,8 @@ button.mRow:hover{background:var(--sunk)}
 .thEx{display:block;font-weight:400;font-size:10.5px;color:var(--muted);text-transform:none;letter-spacing:0}
 .lgEx{grid-template-columns:minmax(0,1fr)}
 .lgT{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pfSmall .pjHelp{display:block}
+.pfSmall @supports (grid-template-rows:subgrid){.pjK{display:grid;grid-row:span 5;grid-template-rows:subgrid;row-gap:4px;align-content:start}.pjK .num{align-self:end}}
+.pjHelp{display:block}
 .dreFoot .pjHelp{display:block}
 .pjHelp{font-size:11.5px;color:var(--muted);line-height:1.3;margin-top:-2px}
 .pjK b.num{margin-top:4px;overflow:visible;text-overflow:clip;white-space:nowrap}
@@ -762,6 +765,51 @@ body.corp .btn{font-weight:500}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(150px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:60;font-size:14px;font-weight:600}
 @media (min-width:900px){.toast{bottom:28px}}
 @media (prefers-reduced-motion:no-preference){.sheet{animation:up .18s ease-out}@keyframes up{from{transform:translateY(16px);opacity:.6}}}
+
+/* ---------- checkup v1.8: proporção em tela cheia, celular e computador ---------- */
+.wrap{max-width:1680px}
+.hist{max-height:340px}
+.month span{white-space:nowrap}
+@media (max-width:420px){.month button{width:30px;height:32px}.month span{font-size:14px}}
+.legend.lgEx{grid-template-columns:minmax(0,1fr)}
+@media (min-width:700px){.legend.lgEx{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.lgT{white-space:normal;overflow:visible}
+@media (max-width:699px){
+  select.search{flex:1 1 100%}
+  .tools > .note.sp{flex:1 1 100%}
+  .row .t b{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.25}
+}
+
+@media (max-width:640px){
+  .cpTabs{display:grid;grid-template-columns:1fr 1fr;border-bottom:0;margin-inline:0;padding-inline:0;gap:0;overflow:visible}
+  .cpTabs button{justify-content:center;border-bottom:2px solid var(--line);margin-bottom:0;padding:10px 6px;font-size:13.5px}
+  .cpTabs button[aria-selected="true"]{border-bottom:3px solid var(--accent)}
+  .cpFilt{flex-wrap:wrap;overflow:visible;margin-inline:0;padding-inline:0}
+  .catTbl:has(.cpTbl){margin-inline:0;padding-inline:0;overflow:visible}
+  .cpTbl thead{display:none}
+  .cpTbl,.cpTbl tbody,.cpTbl tfoot{display:block;width:100%}
+  .cpTbl tbody tr{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"d pty val" "d st st" "d acts acts";gap:6px 12px;align-items:start;padding:12px 4px;border-bottom:1px solid var(--line)}
+  .cpTbl tbody tr.rowLate{box-shadow:inset 3px 0 0 var(--k-out);padding-left:12px}
+  .cpTbl tr.rowLate td:first-child{box-shadow:none}
+  .cpTbl tbody td{display:block;padding:0;border:0;background:none !important}
+  .cpTbl td.d{grid-area:d}.cpTbl td.pty{grid-area:pty;min-width:0}
+  .cpTbl tbody td:nth-child(3){display:none}
+  .cpTbl tbody td:nth-child(4){grid-area:val;font-weight:600}
+  .cpTbl tbody td:nth-child(5){grid-area:st;align-self:center}
+  .cpTbl td.acts{grid-area:acts;justify-self:end;margin-top:2px}
+  .cpTbl tfoot td:last-child{display:none}
+  .cpTbl td .chip{white-space:nowrap}
+  .cpTbl td.acts .btn[data-act="contaEdit"]{display:inline-flex}
+  .cpTbl tfoot tr{display:flex;justify-content:space-between;padding:10px 4px;border-top:2px solid var(--fg)}
+  .cpTbl tfoot td{display:block;border:0;padding:0}
+  .cpTbl tfoot td.hideS{display:block}
+}
+@media (max-width:899px){.top > .chip:last-child{width:auto;justify-self:start}}
+.cpTbl td .chip{white-space:nowrap}
+@media (max-width:480px){.two:has(select){grid-template-columns:minmax(0,1fr)}}
+@media (min-width:700px) and (max-width:1099px){.pjKpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:601px){.mRow.static{grid-template-columns:22px minmax(90px,1.2fr) minmax(60px,2fr) 13ch 5ch}.mRow.static > .num{text-align:right}}
+.ptyContact > *{min-width:0;overflow-wrap:anywhere}
 </style>
 
 <div class="lock" id="lock">
@@ -779,7 +827,7 @@ body.corp .btn{font-weight:500}
     <div class="brand"><span class="nmsLogo" style="--s:132px" role="img" aria-label="NMS Controle Financeiro"><span class="nmsMark"><b>nms</b></span></span><small id="brandSub" hidden></small></div>
     <button data-tab="painel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="nl" data-pf="Painel" data-pj="Visão geral" data-pjs="Visão">Painel</span></button>
     <button data-tab="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 13l4-4M8 21h8"/></svg><span class="nl" data-pf="Dashboard" data-pj="DRE financeiro" data-pjs="DRE">Dashboard</span></button>
-    <button data-tab="lancamentos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span class="nl" data-pf="Lançamentos" data-pj="Movimentações" data-pjs="Movim.">Lançamentos</span></button>
+    <button data-tab="lancamentos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span class="nl" data-pf="Lançamentos" data-pfs="Extrato" data-pj="Movimentações" data-pjs="Movim.">Lançamentos</span></button>
     <button data-tab="calendario"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="1"/><path d="M3 9h18M3 15h18M9 9v12M15 9v12"/></svg><span class="nl" data-pf="Calendário" data-pj="Calendário financeiro" data-pjs="Calendário">Calendário</span></button>
     <button data-tab="master" id="navMaster" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.8c1.7.8 2.7 2.5 3 5.2"/></svg><span class="nl" data-pf="Master" data-pj="Master">Master</span></button>
     <button data-tab="agenda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span class="nl" data-pf="Agenda" data-pj="Pagar e receber" data-pjs="Contas">Agenda</span></button>
@@ -964,6 +1012,7 @@ const parseMoney = s => {
   const neg = /^-|^\(.*\)$|-$/.test(s); s = s.replace(/[()\-+]/g,"");
   if (s.includes(",") && s.includes(".")) s = s.lastIndexOf(",") > s.lastIndexOf(".") ? s.replace(/\./g,"").replace(",",".") : s.replace(/,/g,"");
   else if (s.includes(",")) s = s.replace(",",".");
+  else if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g,""); /* "1.400" = mil e quatrocentos */
   const v = parseFloat(s); return neg ? -v : v;
 };
 const toast = (msg, kind) => { const t = document.getElementById("toast"); t.textContent = msg; t.className = "toast" + (kind ? " " + kind : ""); t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, kind ? 5200 : 2600); };
@@ -1648,7 +1697,7 @@ function spark(vals, color){
 }
 const pct = (v, d=0) => isFinite(v) ? `${(v*100).toFixed(d).replace(".",",")}%` : "—";
 const delta = (a, b) => b ? (a-b)/Math.abs(b) : null;
-const dTag = (d, goodUp=true) => d === null ? `<span class="dl">—</span>` : `<span class="dl" style="color:${(d>=0)===goodUp?"var(--k-in)":"var(--k-out)"}">${d>=0?"▲":"▼"} ${pct(Math.abs(d))}</span>`;
+const dTag = (d, goodUp=true) => d === null ? `<span class="dl">—</span>` : Math.abs(d) < .005 ? `<span class="dl" style="color:var(--muted)">= 0%</span>` : `<span class="dl" style="color:${(d>=0)===goodUp?"var(--k-in)":"var(--k-out)"}">${d>=0?"▲":"▼"} ${pct(Math.abs(d))}</span>`;
 const DEP_MESES = 60; // depreciação linear de equipamentos em 5 anos
 function pjAgg(ym){
   const l = txOfMonth(ym), a = { rev:0, nRev:0, ded:0, csp:0, com:0, mkt:0, pes:0, adm:0, fin:0, recfin:0, capex:0, out:0 };
@@ -1705,9 +1754,9 @@ function renderPF(){
     <div class="pfMsg"><span class="alTag">Saúde do mês</span><b>${semT}</b><p>${semM}</p></div>
   </section>
   <div class="pfCards">
-    <div style="--k:var(--k-in)"><span>Entrou</span><b class="num">${money(s0.in)}</b><small>${dTag(delta(s0.in, prev.in))} vs mês passado</small></div>
-    <div style="--k:var(--k-out)"><span>Saiu</span><b class="num">${money(s0.out)}</b><small>${dTag(dOut, false)} vs mês passado</small></div>
-    <div style="--k:${sobra<0?"var(--k-out)":"var(--k-bal)"}"><span>Sobrou</span><b class="num">${money(sobra)}</b><small>até agora</small></div>
+    <div style="--k:var(--k-in)"><span>Entrou</span><b class="num">${money(s0.in)}</b><small>${prev.in ? `${dTag(delta(s0.in, prev.in))} vs mês passado` : "sem dados do mês passado"}</small></div>
+    <div style="--k:var(--k-out)"><span>Saiu</span><b class="num">${money(s0.out)}</b><small>${prev.out ? `${dTag(dOut, false)} vs mês passado` : "sem dados do mês passado"}</small></div>
+    <div style="--k:${sobra<0?"var(--k-out)":"var(--k-bal)"}"><span>Sobrou</span><b class="num">${money(sobra)}</b><small>${ym === ymOf(todayStr()) ? "até agora" : "no mês"}</small></div>
     <div style="--k:var(--k-proj)"><span>Pode gastar por dia</span><b class="num">${porDia === null ? "—" : money(Math.max(0, porDia))}</b><small>${porDia === null ? "mês encerrado" : `por ${daysLeft} dias, já contando as contas da agenda`}</small></div>
   </div>
   <div class="grid2">
@@ -1733,18 +1782,18 @@ function renderPJ(){
   const ticket = A.nRev ? A.rev / A.nRev : null;
   const hist6 = [...Array(6)].map((_,i) => pjAgg(addMonths(ym, i-5)));
   const sp = { rev: spark(hist6.map(x => x.rev), "var(--k-in)"), out: spark(hist6.map(x => x.out), "var(--k-out)"), res: spark(hist6.map(x => x.res), "var(--k-bal)"), mg: spark(hist6.map(x => x.rev ? x.res/x.rev : 0), "var(--k-proj)") };
-  const kpi = (lbl, val, sub, k, sk="", help="") => `<div class="pjK" style="--k:${k}"${help ? ` title="${esc(help)}"` : ""}><span class="label">${lbl}</span>${help ? `<span class="pjHelp">${help}</span>` : ""}<b class="num">${val}</b>${sk ? `<span class="pjSpark">${sk}</span>` : ""}<small>${sub}</small></div>`;
+  const kpi = (lbl, val, sub, k, sk="", help="") => `<div class="pjK" style="--k:${k}"${help ? ` title="${esc(help)}"` : ""}><span class="label">${lbl}</span>${help ? `<span class="pjHelp">${help}</span>` : ""}<b class="num">${val}</b><span class="pjSpark">${sk}</span><small>${sub}</small></div>`;
   const mesAnt = new Date(...addMonths(ym,-1).split("-").map((n,i) => i ? +n-1 : +n), 1).toLocaleDateString("pt-BR",{month:"long"});
   const cmp = (a, b, goodUp=true) => b ? `${dTag(delta(a, b), goodUp)} em relação a ${mesAnt}` : `sem dados de ${mesAnt} para comparar`;
   const vezes = v => v.toFixed(2).replace(".",",");
   const kpis = `<div class="pjKpis">
     ${kpi("Receita bruta", money(A.rev), cmp(A.rev, P.rev), "var(--k-in)", sp.rev, "Tudo o que entrou de vendas e serviços no mês")}
-    ${kpi("Despesas totais", money(A.out), cmp(A.out, P.out, false), "var(--k-out)", sp.out, "Tudo o que saiu no mês")}
-    ${kpi("Resultado líquido", money(A.res), A.rev || A.out ? (A.res >= 0 ? "a empresa teve lucro no mês" : "a empresa teve prejuízo no mês") : "sem movimentação no mês", A.res >= 0 ? "var(--k-in)" : "var(--k-out)", sp.res, "Receita menos todas as despesas")}
+    ${kpi("Despesas totais", money(A.out), cmp(A.out, P.out, false), "var(--k-out)", sp.out, "Tudo o que saiu no mês, inclusive compra de equipamentos")}
+    ${kpi("Resultado líquido", money(A.res), A.rev || A.out ? (A.res >= 0 ? "a empresa teve lucro no mês" : "a empresa teve prejuízo no mês") : "sem movimentação no mês", A.res >= 0 ? "var(--k-in)" : "var(--k-out)", sp.res, "O lucro do mês, como na DRE: equipamentos entram aos poucos (depreciação)")}
     ${kpi("Margem líquida", margem === null ? "—" : pct(margem,1), margem === null ? "aparece quando houver receita" : margem >= .15 ? "saudável (acima de 15%)" : margem >= 0 ? "baixa (abaixo de 15%)" : "negativa: a empresa gastou mais do que vendeu", margem === null ? "var(--muted)" : margem >= .15 ? "var(--k-in)" : margem >= 0 ? "var(--warn)" : "var(--k-out)", sp.mg, "Quanto sobra de lucro a cada R$ 100 vendidos")}
     ${kpi("Margem de contribuição", mcPct === null ? "—" : pct(mcPct,1), mcPct === null ? "aparece quando houver receita" : `${money(A.mc)} disponíveis para pagar as despesas fixas`, "var(--k-bal)", "", "O que sobra da receita depois dos impostos e custos da operação")}
     ${kpi("Ponto de equilíbrio", pe === null ? "—" : money(pe), pe === null ? "aparece quando houver receita com margem positiva" : A.rev >= pe ? `meta atingida, com ${money(A.rev - pe)} de folga` : `faltam ${money(pe - A.rev)} de receita`, pe !== null && A.rev >= pe ? "var(--k-in)" : "var(--warn)", "", "Quanto a empresa precisa vender para não ter prejuízo")}
-    ${kpi("Burn rate", money(burn), `média dos últimos ${base3.length} ${base3.length>1?"meses":"mês"}`, "var(--k-proj)", "", "Quanto a empresa gasta por mês, em média")}
+    ${kpi("Burn rate", money(burn), base3.length > 1 ? `média dos últimos ${base3.length} meses` : "com base em 1 mês de dados", "var(--k-proj)", "", "Quanto a empresa gasta por mês, em média")}
     ${kpi("Runway", runway === null ? (burnLiq <= 0 ? "Sem risco" : "—") : `${runway.toFixed(1).replace(".",",")} meses`, runway === null ? (burnLiq <= 0 ? "a receita cobre as despesas" : "sem caixa disponível") : `o caixa atual de ${money(caixa)} dura esse tempo`, runway === null || runway >= 6 ? "var(--k-in)" : runway >= 3 ? "var(--warn)" : "var(--k-out)", "", "Por quanto tempo o caixa paga as contas se a receita parar")}
     ${kpi("Liquidez 30 dias", liq === null ? "—" : `${vezes(liq)}x`, liq === null ? "nenhuma conta a pagar nos próximos 30 dias" : `para cada R$ 1,00 a pagar, há R$ ${vezes(liq)} · ${liq >= 1.5 ? "confortável" : liq >= 1 ? "justo" : "risco: o caixa não cobre as contas"}`, liq === null || liq >= 1.5 ? "var(--k-in)" : liq >= 1 ? "var(--warn)" : "var(--k-out)", "", "Se o caixa e o que vai entrar cobrem as contas do próximo mês")}
     ${kpi("Ticket médio", ticket === null ? "—" : money(ticket), A.nRev ? `média de ${A.nRev} ${A.nRev > 1 ? "recebimentos" : "recebimento"} no mês` : "nenhum recebimento no mês", "var(--k-bal)", "", "Valor médio de cada venda ou recebimento")}
@@ -1813,7 +1862,7 @@ function renderPJ(){
   }).join("");
   const lucro = A.lucro, lucroL = (Math.min(0, lucro) - lo) / span * 100, lucroW = Math.abs(lucro) / span * 100;
   const dl = delta(lucro, P.lucro);
-  const cem = R ? [["Impostos", A.ded, "var(--c8)"], ["Custo do trabalho", A.csp, "var(--c2)"], ["Despesas da empresa", opex, "var(--c7)"], ["Desgaste de equipamentos", A.dep, "var(--c12)"], ["Lucro", Math.max(0, lucro - A.recfin), "var(--k-in)"]].map(([n,x,c]) => [n, x / R * 100, c]) : [];
+  const cem = R ? [["Impostos (Deduções)", A.ded, "var(--c8)"], ["Custo da operação (CSP)", A.csp, "var(--c2)"], ["Despesas da empresa (OPEX)", opex, "var(--c7)"], ["Desgaste de equipamentos (Depreciação)", A.dep, "var(--c12)"], ["Lucro", Math.max(0, lucro - A.recfin), "var(--k-in)"]].map(([n,x,c]) => [n, x / R * 100, c]) : [];
   const dreSimple = `<section class="panel dreBox"><h2>Resultado do mês, de forma simples <small><button class="btn small" data-act="dreMode" data-v="completo">Ver DRE completo</button></small></h2>
     <div class="wf">${bars}
       <div class="wfRow total"><div class="wfTxt"><b>= Lucro do mês</b><small>O que sobrou depois de pagar tudo</small></div>
@@ -1844,7 +1893,7 @@ function renderPJ(){
   const t0 = todayStr(); let bal = caixa; const pts = [];
   for (let i = 0; i <= 30; i++) { const d = new Date(); d.setDate(d.getDate() + i); const ds = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
     p30.filter(o => o.date === ds || (i === 0 && o.date < t0)).forEach(o => bal += (o.ag.type === "entrada" ? 1 : -1) * (+o.ag.amount||0)); pts.push([i, bal, ds]); }
-  const fmin = Math.min(0, ...pts.map(p => p[1])), fmax = Math.max(1, ...pts.map(p => p[1])), FW = 620, FH = 170, fx = i => 54 + i/30*(FW-66), fy = v => 14 + (fmax - v)/(fmax - fmin)*(FH - 40);
+  const fmin = Math.min(0, ...pts.map(p => p[1])), fmax = Math.max(1, ...pts.map(p => p[1])), FW = window.innerWidth >= 1400 ? 1100 : 620, FH = window.innerWidth < 640 ? 300 : window.innerWidth >= 1400 ? 220 : 170, fx = i => 54 + i/30*(FW-66), fy = v => 14 + (fmax - v)/(fmax - fmin)*(FH - (window.innerWidth < 640 ? 64 : 40));
   const low = pts.reduce((a,p) => p[1] < a[1] ? p : a, pts[0]);
   const flow = `<section class="panel"><h2>Fluxo de caixa projetado <small>próximos 30 dias</small></h2>
     <div class="pfSmall" style="margin:0 0 10px"><div><span class="label">Caixa hoje</span><b class="num">${money(caixa)}</b></div><div><span class="label">A receber</span><b class="num" style="color:var(--k-in)">+ ${money(aRec)}</b></div><div><span class="label">A pagar</span><b class="num" style="color:var(--k-out)">− ${money(aPag)}</b></div><div><span class="label">Em 30 dias</span><b class="num" style="color:${bal<0?"var(--k-out)":"var(--k-bal)"}">${money(bal)}</b></div></div>
@@ -1854,15 +1903,15 @@ function renderPJ(){
       <path d="M${fx(0)},${fy(0).toFixed(1)} ${pts.map(p => `L${fx(p[0]).toFixed(1)},${fy(p[1]).toFixed(1)}`).join(" ")} L${fx(30)},${fy(0).toFixed(1)} Z" fill="var(--k-bal)" opacity=".12"/>
       <polyline fill="none" stroke="var(--k-bal)" stroke-width="2.5" stroke-linejoin="round" points="${pts.map(p => `${fx(p[0]).toFixed(1)},${fy(p[1]).toFixed(1)}`).join(" ")}"/>
       <circle cx="${fx(low[0]).toFixed(1)}" cy="${fy(low[1]).toFixed(1)}" r="5" fill="${low[1]<0?"var(--k-out)":"var(--warn)"}" stroke="var(--surface)" stroke-width="2"/>
-      <text x="${Math.min(FW-80, fx(low[0])+8).toFixed(1)}" y="${(fy(low[1])-8).toFixed(1)}" style="fill:var(--fg);font-weight:600">menor: ${money(low[1])} em ${fmtD(low[2])}</text>
-      ${[0,10,20,30].map(i => `<text x="${fx(i).toFixed(1)}" y="${FH-6}" text-anchor="middle">${fmtD(pts[i][2])}</text>`).join("")}
+      <text class="flowLow" x="${(fx(low[0]) > FW*.55 ? fx(low[0])-8 : fx(low[0])+8).toFixed(1)}" y="${(fy(low[1]) + 22 < FH - 22 ? fy(low[1]) + 20 : Math.max(14, fy(low[1]) - 10)).toFixed(1)}" text-anchor="${fx(low[0]) > FW*.55 ? "end" : "start"}" style="fill:var(--fg);font-weight:600">menor: ${money(low[1])} em ${fmtD(low[2])}</text>
+      ${[0,10,20,30].map(i => `<text x="${fx(i).toFixed(1)}" y="${FH-6}" text-anchor="${i === 0 ? "start" : i === 30 ? "end" : "middle"}">${fmtD(pts[i][2])}</text>`).join("")}
     </svg>${low[1] < 0 ? `<p class="pfTip" style="color:var(--k-out)"><b>Atenção:</b> o caixa fica negativo em ${fmtD(low[2])}. Antecipe recebimentos ou renegocie pagamentos.</p>` : ""}</section>`;
 
   // estrutura de custos
   const tot = A.out || 1, parts = [["Deduções", A.ded, "var(--c8)", "impostos sobre vendas"], ["CSP", A.csp, "var(--c2)", "custo da operação"], ["Pessoal", A.pes, "var(--c1)", "salários e pró-labore"], ["Comerciais", A.despCom, "var(--c4)", "vendas e marketing"], ["Administrativas", A.adm, "var(--c7)", "aluguel, sistemas, contador"], ["Financeiras", A.fin, "var(--c11)", "juros e tarifas"], ["CAPEX", A.capex, "var(--c12)", "compra de equipamentos"]];
   const by = {}; txOfMonth(ym).filter(t => t.type !== "entrada").forEach(t => by[t.cat] = (by[t.cat]||0) + (+t.amount||0));
   const topC = Object.entries(by).sort((a,b) => b[1]-a[1]).slice(0,3), conc = topC.reduce((a,c) => a + c[1], 0) / tot;
-  const estr = `<section class="panel"><h2>Estrutura de custos${ex("para onde vai o dinheiro da empresa")} <small>${money(A.out)}</small></h2>
+  const estr = `<section class="panel"><h2>Estrutura de custos <small>${money(A.out)}</small></h2><p class="pjHelp" style="margin:-6px 0 12px">Para onde vai o dinheiro da empresa</p>
     <div class="stack" style="height:18px">${parts.filter(p => p[1]).map(p => `<i style="width:${(p[1]/tot*100).toFixed(1)}%;background:${p[2]}" title="${p[0]}"></i>`).join("")}</div>
     <div class="legend lgEx" style="margin-top:10px">${parts.map(p => `<div><span class="dot" style="background:${p[2]}"></span><span class="lgT"><b>${p[0]}</b>${ex(p[3])}</span><span class="amt">${pct(p[1]/tot)}</span></div>`).join("")}</div>
     <div class="pfSmall" style="margin-top:14px"><div><span class="label">Fixas / receita</span><span class="pjHelp">quanto da receita vai para despesas fixas</span><b class="num">${A.rev ? pct(A.fix/A.rev) : "—"}</b></div><div><span class="label">Concentração top 3</span><span class="pjHelp">peso das 3 maiores despesas no total</span><b class="num">${pct(conc)}</b></div></div>
@@ -2080,7 +2129,7 @@ function openConta(kind, item, pre){
     <h3>${item ? "Editar" : "Nova"} conta a ${R ? "receber" : "pagar"}</h3>
     <div class="field"><label for="c-p">${R ? "Cliente" : "Fornecedor"}</label><select id="c-p"><option value="">Selecione…</option>${parties.map(p => `<option value="${esc(p.id)}" ${p.id===selP?"selected":""}>${esc(p.nome)}</option>`).join("")}<option value="__novo">+ Cadastrar novo ${R ? "cliente" : "fornecedor"}…</option></select></div>
     <div class="field"><label for="c-item">${R ? "Serviço ou produto vendido" : "O que foi comprado"}</label><input id="c-item" value="${esc(it.title || it.item)}" placeholder="${R ? "Ex.: Vídeo institucional" : "Ex.: Aluguel de lente 70-200mm"}"></div>
-    <div class="two"><div class="field"><label for="c-v">${item ? "Valor (R$)" : "Valor total (R$)"}</label><input id="c-v" class="money" inputmode="decimal" placeholder="0,00" value="${it.amount ? String(it.amount).replace(".",",") : (it.valor || "")}"></div>
+    <div class="two"><div class="field"><label for="c-v">${item ? "Valor (R$)" : "Valor total (R$)"}</label><input id="c-v" class="money" inputmode="decimal" placeholder="0,00" value="${it.amount ? (+it.amount).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}) : (it.valor || "")}"></div>
       <div class="field"><label for="c-d">${R ? "Data que o cliente irá pagar" : "Data de pagamento"}</label><input id="c-d" type="date" value="${it.date || todayStr()}"></div></div>
     ${item ? "" : `<div class="two"><div class="field"><label for="c-rep">Forma de cobrança</label><select id="c-rep"><option value="unica">Pagamento único</option><option value="parc">Parcelado</option><option value="mensal">Todo mês (contrato)</option></select></div>
       <div class="field" id="c-pwrap" hidden><label for="c-n">Número de parcelas</label><select id="c-n">${[2,3,4,5,6,7,8,9,10,11,12].map(n => `<option>${n}</option>`).join("")}</select></div></div>`}
@@ -2141,6 +2190,19 @@ function openConta(kind, item, pre){
 
 /* ---------- movimento ---------- */
 let lastAnimKey = "", animT = null;
+/* re-desenha os gráficos quando a tela cruza o limite celular/computador (girar o celular, redimensionar a janela) */
+const bpKey = () => `${window.innerWidth < 640}|${window.innerWidth < 900}|${window.innerWidth >= 1400}`;
+let bpLast = bpKey(), resizeT = null;
+/* texto dos gráficos sempre com ~12px na tela, seja no celular ou num monitor grande */
+function fitCharts(){
+  document.querySelectorAll("#view svg.hist").forEach(svg => {
+    const vb = svg.viewBox && svg.viewBox.baseVal, r = svg.getBoundingClientRect();
+    if (!vb || !vb.width || !r.width) return;
+    const sc = Math.min(r.width / vb.width, r.height / vb.height);
+    if (sc > 0) svg.style.fontSize = ((r.width < 500 ? 10.5 : 12) / sc).toFixed(2) + "px";
+  });
+}
+window.addEventListener("resize", () => { clearTimeout(resizeT); resizeT = setTimeout(() => { const k = bpKey(); if (k !== bpLast) { bpLast = k; if (!document.querySelector("#modal .scrim")) { render(); return; } } fitCharts(); }, 150); });
 const reduceMotion = (() => { try { return matchMedia("(prefers-reduced-motion: reduce)").matches; } catch { return false; } })();
 function runEnter(){
   view.classList.remove("anim"); void view.offsetWidth; view.classList.add("anim");
@@ -2178,7 +2240,7 @@ function render(){
   const corp = state.tipo === "pj";
   document.body.classList.toggle("corp", corp);
   const curto = window.matchMedia("(max-width:899px)").matches;
-  document.querySelectorAll(".nav .nl").forEach(n => n.textContent = corp ? (curto && n.dataset.pjs || n.dataset.pj) : n.dataset.pf);
+  document.querySelectorAll(".nav .nl").forEach(n => n.textContent = corp ? (curto && n.dataset.pjs || n.dataset.pj) : (curto && n.dataset.pfs || n.dataset.pf));
   
   const isMaster = state.role === "master";
   const ns = document.getElementById("navSpace");
@@ -2212,6 +2274,7 @@ function render(){
   lastAnimKey = animKey;
   view.innerHTML = head + (state.tab === "chat" || state.tab === "master" ? "" : banner + cartBar) + body;
   if (doAnim) runEnter();
+  fitCharts();
   if (state.tab === "chat") { const ci = document.getElementById("chatIn"); if (ci && keep) { ci.value = keep.v; if (!keep.blur) ci.focus(); } const box = document.getElementById("chatLog"); if (box) box.scrollTop = box.scrollHeight; }
 }
 
@@ -2225,7 +2288,7 @@ function renderPainel(){
   const summary = `<div class="summary">
     <div class="k-in"><span class="label">${L("Entradas","Receitas")}</span><span class="v" style="color:var(--k-in)">${money(s.in)}</span><span class="hint">${list.filter(t=>t.type==="entrada").length} lançamentos</span></div>
     <div class="k-out"><span class="label">${L("Saídas","Despesas")}</span><span class="v" style="color:var(--k-out)">${money(s.out)}</span><span class="hint">${list.filter(t=>t.type!=="entrada").length} ${L("lançamentos","movimentações")}</span></div>
-    <div class="k-bal"><span class="label">${L("Saldo do mês","Resultado do mês")}</span><span class="v ${saldo<0?"neg":""}">${money(saldo)}</span><span class="hint">entradas − saídas</span></div>
+    <div class="k-bal"><span class="label">${L("Saldo do mês","Resultado do mês")}</span><span class="v ${saldo<0?"neg":""}">${money(saldo)}</span><span class="hint">${L("entradas − saídas","receitas − despesas")}</span></div>
     <div class="k-proj"><span class="label">${L("Saldo projetado","Resultado projetado")}</span><span class="v ${proj<0?"neg":""}">${money(proj)}</span><span class="hint">com ${occ.length} itens da agenda</span></div>
   </div>`;
 
@@ -2237,7 +2300,7 @@ function renderPainel(){
   const prevBy = {}; prevList.forEach(t => prevBy[t.cat] = (prevBy[t.cat]||0) + (+t.amount||0));
   const cnt = {}; list.filter(t => t.type !== "entrada").forEach(t => cnt[t.cat] = (cnt[t.cat]||0) + 1);
   if (state.selCat && !byCat[state.selCat]) state.selCat = null;
-  const PW = 600, PH = 340, PCX = PW/2, PCY = PH/2, PR = 112; let a0 = -Math.PI/2;
+  const pieNarrow = window.innerWidth < 640, PW = pieNarrow ? 300 : 680, PH = pieNarrow ? 260 : 340, PCX = PW/2, PCY = PH/2, PR = pieNarrow ? 118 : 112; let a0 = -Math.PI/2;
   const polar = (r, a, ox=0, oy=0) => [PCX + ox + r*Math.cos(a), PCY + oy + r*Math.sin(a)];
   const sl = cats.map(([k,v]) => {
     const frac = v/total, a1 = a0 + frac*2*Math.PI, mid = (a0+a1)/2, o = { k, v, frac, a0, a1, mid, pct: frac*100 }; a0 = a1; return o; });
@@ -2252,7 +2315,7 @@ function renderPainel(){
       ${x.frac >= .9999 ? `<circle cx="${PCX}" cy="${PCY}" r="${PR}" fill="${catColor(x.k)}"/>` : `<path d="${d}" fill="${catColor(x.k)}" stroke="var(--surface)" stroke-width="2" stroke-linejoin="round"/>`}${inner}
       <title>${esc(x.k)}: ${fmtPct(x.pct)} · ${money(x.v)}</title></g>`; }).join("");
   // rótulos externos com linha-guia, espaçados por lado
-  const labs = sl.filter(x => x.pct >= 2).map(x => ({ ...x, right: Math.cos(x.mid) >= 0, y: PCY + (PR+22)*Math.sin(x.mid) }));
+  const labs = pieNarrow ? [] : sl.filter(x => x.pct >= 2).map(x => ({ ...x, right: Math.cos(x.mid) >= 0, y: PCY + (PR+22)*Math.sin(x.mid) }));
   for (const side of [true,false]) {
     const g = labs.filter(l => l.right === side).sort((a,b) => a.y - b.y), gap = 34;
     for (let i=1;i<g.length;i++) if (g[i].y - g[i-1].y < gap) g[i].y = g[i-1].y + gap;
@@ -2267,7 +2330,7 @@ function renderPainel(){
     return `<g class="lead" data-act="pie" data-cat="${esc(l.k)}" style="opacity:${state.selCat && !sel ? .35 : 1}">
       <polyline points="${ax.toFixed(1)},${ay.toFixed(1)} ${bx.toFixed(1)},${l.y.toFixed(1)} ${ex.toFixed(1)},${l.y.toFixed(1)}" fill="none" stroke="${catColor(l.k)}" stroke-width="1.5"/>
       <circle cx="${ax.toFixed(1)}" cy="${ay.toFixed(1)}" r="2.5" fill="${catColor(l.k)}"/>
-      <text x="${tx.toFixed(1)}" y="${(l.y-3).toFixed(1)}" text-anchor="${anchor}" class="leadName">${esc(l.k)}</text>
+      <text x="${tx.toFixed(1)}" y="${(l.y-3).toFixed(1)}" text-anchor="${anchor}" class="leadName">${esc(l.k.length > 21 ? l.k.slice(0,20).trimEnd() + "…" : l.k)}</text>
       <text x="${tx.toFixed(1)}" y="${(l.y+12).toFixed(1)}" text-anchor="${anchor}" class="leadVal"><tspan style="fill:${catColor(l.k)};font-weight:600">${fmtPct(l.pct)}</tspan> · ${money(l.v)}</text></g>`; }).join("");
 
   // painel lateral: destaques ou detalhe da categoria escolhida
@@ -2301,13 +2364,13 @@ function renderPainel(){
       <p class="note">Toque em uma fatia ou linha da tabela para ver o detalhe da categoria.</p>
     </div>`;
 
-  const table = `<div class="catTbl"><table><thead><tr><th>Categoria</th><th class="r">Valor</th><th class="r">%</th><th class="r hideS">Lanç.</th><th class="r hideS">Média</th><th class="r">vs ${monthShort(addMonths(state.ym,-1))}</th></tr></thead><tbody>
+  const table = `<div class="catTbl"><table><thead><tr><th>Categoria</th><th class="r">Valor</th><th class="r">%</th><th class="r hideS">Lanç.</th><th class="r hideS">Média</th><th class="r hideS">vs ${monthShort(addMonths(state.ym,-1))}</th></tr></thead><tbody>
     ${cats.map(([k,v]) => { const pv = prevBy[k]||0, dv = pv ? (v-pv)/pv*100 : null, p = v/total*100;
       return `<tr class="${state.selCat===k?"sel":""}" data-act="pie" data-cat="${esc(k)}">
         <td><span class="tcat"><span class="dot" style="background:${catColor(k)}"></span>${esc(k)}</span><span class="tbar"><i style="width:${(v/cats[0][1]*100).toFixed(1)}%;background:${catColor(k)}"></i></span></td>
         <td class="r num">${money(v)}</td><td class="r num"><b>${fmtPct(p)}</b></td><td class="r num hideS">${cnt[k]}</td><td class="r num hideS">${money(v/cnt[k])}</td>
-        <td class="r num" style="color:${dv===null?"var(--muted)":dv>0?"var(--k-out)":"var(--k-in)"}">${dv===null?"novo":`${dv>0?"▲":"▼"} ${Math.abs(dv).toFixed(0)}%`}</td></tr>`; }).join("")}
-    <tr class="tot"><td>Total</td><td class="r num">${money(s.out)}</td><td class="r num">100%</td><td class="r num hideS">${outs.length}</td><td class="r num hideS">${money(s.out/Math.max(1,outs.length))}</td><td class="r num">${(() => { const pt0 = prevList.reduce((a,t)=>a+(+t.amount||0),0); if (!pt0) return "—"; const d = (s.out-pt0)/pt0*100; return `<span style="color:${d>0?"var(--k-out)":"var(--k-in)"}">${d>0?"▲":"▼"} ${Math.abs(d).toFixed(0)}%</span>`; })()}</td></tr>
+        <td class="r num hideS" style="color:${dv===null||Math.abs(dv)<.5?"var(--muted)":dv>0?"var(--k-out)":"var(--k-in)"}">${dv===null?"novo":Math.abs(dv) < .5 ? "= 0%" : `${dv>0?"▲":"▼"} ${Math.abs(dv).toFixed(0)}%`}</td></tr>`; }).join("")}
+    <tr class="tot"><td>Total</td><td class="r num">${money(s.out)}</td><td class="r num">100%</td><td class="r num hideS">${outs.length}</td><td class="r num hideS">${money(s.out/Math.max(1,outs.length))}</td><td class="r num hideS">${(() => { const pt0 = prevList.reduce((a,t)=>a+(+t.amount||0),0); if (!pt0) return "—"; const d = (s.out-pt0)/pt0*100; return `<span style="color:${d>0?"var(--k-out)":"var(--k-in)"}">${d>0?"▲":"▼"} ${Math.abs(d).toFixed(0)}%</span>`; })()}</td></tr>
   </tbody></table></div>`;
 
   const catPanel = `<section class="panel"><h2>${L("Gastos por categoria","Despesas por categoria")} <small>${money(s.out)} em ${cats.length} categorias</small></h2>${cats.length ? `
@@ -2322,7 +2385,7 @@ function renderPainel(){
   const months = [...Array(6)].map((_,i) => addMonths(state.ym, i-5));
   const data = months.map(m => sums(txOfMonth(m)));
   const max = Math.max(1, ...data.flatMap(d => [d.in,d.out]));
-  const W=520,H=190,pl=8,pb=26,pt=22,bw=26, step=(W-pl*2)/6;
+  const W = window.innerWidth >= 1400 ? 1000 : 520, H = window.innerWidth >= 1400 ? 240 : 190, pl=8,pb=26,pt=22,bw=26, step=(W-pl*2)/6;
   const y = v => H-pb - v/max*(H-pb-pt);
   const histSvg = `<svg class="hist" viewBox="0 0 ${W} ${H}" role="img" aria-label="Entradas e saídas dos últimos 6 meses">
     <line x1="0" x2="${W}" y1="${H-pb}" y2="${H-pb}" stroke="var(--line)"/>
@@ -2464,12 +2527,13 @@ function renderCal(){
   const linked = new Set(occ.map(o => linkId(o.ag.id, o.ym)));
   txs.forEach(x => { const c = info[x.date]; if (!c) return; if (!linked.has(x.id)) c.tx.push(x); if (x.type==="entrada") c.rin += +x.amount||0; else c.rout += +x.amount||0; });
   const maxOut = Math.max(1, ...Object.values(info).map(c => c.pout + c.rout));
-  let bal = 0, minBal = Infinity, minDay = null, peakDay = null, peak = 0;
+  let bal = 0, minBal = Infinity, minDay = null, peakDay = null, peak = 0, mvStarted = false;
   const totPin = occ.filter(o=>!o.paid&&o.ag.type==="entrada").reduce((a,o)=>a+(+o.ag.amount||0),0);
   const totPout = occ.filter(o=>!o.paid&&o.ag.type!=="entrada").reduce((a,o)=>a+(+o.ag.amount||0),0);
   const cells = Object.entries(info).map(([d,c], i) => {
     bal += c.rin - c.rout + c.pin - c.pout;
-    if (bal < minBal) { minBal = bal; minDay = d; }
+    if (c.rin || c.rout || c.pin || c.pout) mvStarted = true;
+    if (mvStarted && bal < minBal) { minBal = bal; minDay = d; }
     const out = c.pout + c.rout; if (out > peak) { peak = out; peakDay = d; }
     const heat = out ? `--heat:color-mix(in srgb, var(--k-out) ${Math.round(6 + out/maxOut*20)}%, var(--surface))` : (c.pin||c.rin) ? `--heat:color-mix(in srgb, var(--k-in) 9%, var(--surface))` : "";
     const items = [...c.occ.map(o => ({kind:"ag", id:o.ag.id, cat:o.ag.cat, title:o.ag.title, amt:o.ag.amount, inn:o.ag.type==="entrada", paid:o.paid, late: !o.paid && o.date < t})),
@@ -2498,8 +2562,8 @@ function renderCal(){
   return `<div class="capHead">
       <div style="--k:var(--k-out)"><span class="label">A pagar no mês</span><b>${money(totPout)}</b></div>
       <div style="--k:var(--k-in)"><span class="label">A receber no mês</span><b>${money(totPin)}</b></div>
-      <div style="--k:var(--k-proj)"><span class="label">Dia mais pesado</span><b>${peakDay ? `${peakDay.slice(8)}/${peakDay.slice(5,7)} · ${money(peak)}` : "—"}</b></div>
-      <div style="--k:${minBal<0?"var(--k-out)":"var(--k-bal)"}"><span class="label">Menor saldo previsto</span><b>${minDay ? `${money(minBal)}` : "—"}</b></div>
+      <div style="--k:var(--k-proj)"><span class="label">Dia mais pesado</span><b>${peakDay ? money(peak) : "—"}</b>${peakDay ? `<small class="capSub">em ${peakDay.slice(8)}/${peakDay.slice(5,7)}</small>` : ""}</div>
+      <div style="--k:${minBal<0?"var(--k-out)":"var(--k-bal)"}"><span class="label">Menor saldo previsto</span><b>${minDay ? `${money(minBal)}` : "—"}</b>${minDay ? `<small class="capSub">em ${String(minDay).slice(8)}/${String(minDay).slice(5,7)}</small>` : ""}</div>
     </div>
     <div class="legendRow"><span><i style="background:color-mix(in srgb, var(--k-out) 24%, var(--surface))"></i>dia com saídas (mais forte = maior valor)</span><span><i style="background:color-mix(in srgb, var(--k-in) 14%, var(--surface))"></i>só entradas</span><span>Saldo = acumulado do mês até o dia, contando o que ainda está programado</span></div>
     <div class="mcalBox"><div class="mcal">${grid}</div></div>
@@ -2536,7 +2600,7 @@ function openForm(kind, item, pre, ctxYm){
     modal.innerHTML = `<div class="scrim" data-act="scrim"><form class="sheet" id="frm" novalidate>
       <h3>${isAg ? (item?"Editar programação":"Programar dinheiro") : (item?"Editar lançamento":"Novo lançamento")}</h3>
       <div class="seg"><button type="button" data-type="saida" aria-pressed="${type!=="entrada"}">Saída</button><button type="button" data-type="entrada" aria-pressed="${type==="entrada"}">Entrada</button></div>
-      <div class="field"><label for="f-amt">Valor (R$)</label><input id="f-amt" class="money" inputmode="decimal" placeholder="0,00" value="${it.amount ? String(it.amount).replace(".",",") : ""}" required></div>
+      <div class="field"><label for="f-amt">Valor (R$)</label><input id="f-amt" class="money" inputmode="decimal" placeholder="0,00" value="${it.amount ? (+it.amount).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}) : ""}" required></div>
       <div class="field"><label for="f-desc">${isAg?"O que é":"Descrição"}</label><input id="f-desc" placeholder="${isAg?"Ex.: Aluguel, escola, gás":"Ex.: Mercado do mês"}" value="${esc(isAg?it.title:it.desc)}"></div>
       <div class="two"><div class="field"><label for="f-cat">Categoria</label><select id="f-cat">${catOptions(type, it.cat)}</select></div>
         <div class="field"><label for="f-date">${isAg?"Data (vencimento)":"Data"}</label><input id="f-date" type="date" value="${it.date || (state.ym===ymOf(todayStr())?todayStr():state.ym+"-01")}"></div></div>

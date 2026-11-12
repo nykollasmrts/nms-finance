@@ -344,6 +344,15 @@ select.search{flex:0 1 auto}
 .limGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
 
 .alCtl{display:flex;gap:8px;align-items:center}
+.alMini{display:flex;align-items:center;gap:10px;width:100%;min-width:0;padding:9px 12px;background:var(--surface);border:1px solid var(--line);color:var(--fg);font:inherit;font-size:13px;cursor:pointer;text-align:left}
+.alMini:hover{border-color:var(--fg)}
+.alMini.flat{width:auto;padding:0;background:none;border:0;gap:12px}
+.alMini b{white-space:nowrap}
+.alSum{flex:1;min-width:0;color:var(--muted, var(--fg));opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.alMore{margin-left:auto;font-size:12px;opacity:.7;white-space:nowrap}
+.alMini.flat .alMore{margin-left:0}
+.alDot{width:8px;height:8px;border-radius:50%;background:var(--k);flex:none}
+@media (max-width:600px){.alSum{display:none}}
 .seg.tom{display:inline-grid;grid-template-columns:1fr 1fr;padding:2px}
 .seg.tom button{padding:5px 12px;font-size:13px}
 .seg.tom button[data-v="bravo"][aria-pressed="true"]{background:var(--k-out);color:#fff}
@@ -1148,11 +1157,16 @@ function alertToast(before){
   const hit = after.find(a => a.lvl >= 2 && (seen.get(a.id) || 0) < a.lvl);
   if (hit) toast(state.tom === "bravo" ? `${hit.titulo} ${hit.lvl === 3 ? "Tá gastando demais!" : "Se controla!"}` : `Aviso: ${hit.titulo}`, "grito");
 }
+const ALOPEN = "nms.avisos.aberto";
+const alertsOpen = () => { try { return localStorage.getItem(ALOPEN) === "1"; } catch { return false; } };
 function renderAlerts(){
   const list = activeAlerts(state.ym);
   const pj = state.tipo === "pj", bravo = state.tom === "bravo" && !pj, lv = pj ? { 3:["var(--k-out)","Orçamento excedido"], 2:["var(--warn)","Atenção ao orçamento"], 1:["var(--k-proj)","Tendência"] } : { 3:["var(--k-out)", bravo ? "Estourou!" : "Estourou"], 2:["var(--warn)", bravo ? "Se controla" : "Atenção"], 1:["var(--k-proj)", bravo ? "Pisa no freio" : "De olho"] };
+  const open = alertsOpen(), top = list[0], n = list.length;
+  const resumo = n ? `<span class="alDot" style="--k:${lv[top.lvl][0]}"></span><b>${n} ${pj ? (n > 1 ? "alertas" : "alerta") : (n > 1 ? "avisos" : "aviso")}</b><span class="alSum">${esc(top.titulo)}${n > 1 ? ` e mais ${n-1}` : ""}</span>` : `<span class="alDot" style="--k:var(--k-in)"></span><b>${pj ? "Orçamentos em dia" : "Tudo sob controle"}</b>`;
+  if (!open) return `<section class="alerts mini"><button class="alMini" data-act="alertsToggle" aria-expanded="false"><span class="label">${pj ? "Alertas" : "Avisos"}</span>${resumo}<span class="alMore">Mostrar ▾</span></button></section>`;
   return `<section class="alerts">
-    <div class="alHead"><span class="label">${pj ? "Alertas de orçamento" : "Avisos de gasto"}</span><span class="alCtl">${pj ? "" : `<span class="seg tom" role="group" aria-label="Tom dos avisos"><button data-act="tom" data-v="normal" aria-pressed="${!bravo}">Normal</button><button data-act="tom" data-v="bravo" aria-pressed="${bravo}">Bravo</button></span>`}<button class="btn small" data-act="limits">${pj ? "Orçamentos" : "Limites"}</button></span></div>
+    <div class="alHead"><button class="alMini flat" data-act="alertsToggle" aria-expanded="true"><span class="label">${pj ? "Alertas de orçamento" : "Avisos de gasto"}</span><span class="alMore">Ocultar ▴</span></button><span class="alCtl">${pj ? "" : `<span class="seg tom" role="group" aria-label="Tom dos avisos"><button data-act="tom" data-v="normal" aria-pressed="${!bravo}">Normal</button><button data-act="tom" data-v="bravo" aria-pressed="${bravo}">Bravo</button></span>`}<button class="btn small" data-act="limits">${pj ? "Orçamentos" : "Limites"}</button></span></div>
     ${list.length ? list.map(a => `<div class="alert lvl${a.lvl}" style="--k:${lv[a.lvl][0]}">
       <div class="alIco" aria-hidden="true">${a.lvl === 3 ? "!!" : "!"}</div>
       <div class="alBody"><span class="alTag">${lv[a.lvl][1]}</span><b>${esc(a.titulo)}</b><p>${esc(a.msg)}</p>
@@ -3001,6 +3015,7 @@ document.addEventListener("click", async e => {
   else if (act === "chatClear") { if (!el.dataset.sure) { el.dataset.sure = 1; el.textContent = "Toque de novo para limpar"; return; } state.chat = []; saveChat(); render(); }
   else if (act === "tom") { if (state.tom !== el.dataset.v) { state.tom = el.dataset.v; render(); saveBase().catch(() => toast("Não foi possível salvar o tom agora.")); toast(state.tom === "bravo" ? "Modo bravo ligado. Prepare-se." : "Avisos no tom normal"); } }
   else if (act === "alertOk") { dismiss(el.dataset.k); render(); }
+  else if (act === "alertsToggle") { try { localStorage.setItem(ALOPEN, alertsOpen() ? "0" : "1"); } catch {} render(); }
   else if (act === "alertSee") { const f = el.dataset.f; if (CATS.saida.some(c => c.k === f)) { state.fcat = f; state.q = ""; } else { state.fcat = ""; state.q = /^ifood$/i.test(f) ? "" : f; if (/^ifood$/i.test(f)) state.fcat = "Delivery"; } state.tab = "lancamentos"; render(); window.scrollTo(0,0); }
   else if (act === "pie") { state.selCat = state.selCat === el.dataset.cat ? null : el.dataset.cat; render(); }
   else if (act === "filterCat") { state.fcat = el.dataset.cat; state.tab = "lancamentos"; render(); }

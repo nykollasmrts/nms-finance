@@ -845,7 +845,7 @@ const PJ_CATS = {
     {k:"Marketing", g:"Despesas comerciais", t:"fix", d:"mkt", c:"--c4"},
     {k:"Serviços terceirizados", g:"Custos dos serviços e produtos", t:"var", d:"csp", c:"--c10"},
     {k:"Tarifas bancárias", g:"Despesas financeiras", t:"fix", d:"fin", c:"--c11"},
-    {k:"Equipamentos e investimentos", g:"Investimentos (CAPEX)", t:"inv", d:"capex", c:"--c12"},
+    {k:"Equipamentos e investimentos", g:"Investimentos em equipamentos", t:"inv", d:"capex", c:"--c12"},
     {k:"Outras despesas", g:"Despesas administrativas", t:"fix", d:"adm", c:"--c9"},
   ],
   entrada: [ {k:"Vendas de produtos", d:"rec", c:"--c3"}, {k:"Prestação de serviços", d:"rec", c:"--c1"}, {k:"Outras receitas", d:"recfin", c:"--c9"} ]
@@ -1772,10 +1772,10 @@ function renderPJ(){
     <div><span class="label">Margem bruta</span><b class="num">${A.rev ? pct(A.lucroBruto/A.rev,1) : "—"}</b></div>
     <div><span class="label">Margem EBITDA</span><b class="num">${A.rev ? pct(A.ebitda/A.rev,1) : "—"}</b></div>
     <div><span class="label">Margem líquida</span><b class="num">${A.rev ? pct(A.lucro/A.rev,1) : "—"}</b></div>
-    <div><span class="label">Investimentos (CAPEX)</span><b class="num">${money(A.capex)}</b></div>
+    <div><span class="label">Investimentos em equipamentos</span><b class="num">${money(A.capex)}</b></div>
     <div><span class="label">Geração de caixa</span><b class="num" style="color:${A.caixaOp<0?"var(--k-out)":"var(--k-in)"}">${money(A.caixaOp)}</b></div>
   </div>
-  <p class="note">AV % = participação sobre a receita bruta do mês. AH % = variação em relação a ${monthShort(addMonths(ym,-1))}. Valores entre parênteses são deduções. Equipamentos entram como investimento (CAPEX) e são depreciados em ${DEP_MESES} meses; IRPJ e CSLL estão incluídos no DAS do Simples Nacional. Geração de caixa = lucro líquido + depreciação − CAPEX.</p></section>`;
+  <p class="note">AV % = participação sobre a receita bruta do mês. AH % = variação em relação a ${monthShort(addMonths(ym,-1))}. Valores entre parênteses são deduções. Compras de equipamentos (CAPEX) entram como investimento, e não como despesa do mês: o valor é diluído (depreciado) em ${DEP_MESES} meses; IRPJ e CSLL estão incluídos no DAS do Simples Nacional. Geração de caixa = lucro líquido + depreciação − CAPEX.</p></section>`;
   // ---- DRE fácil ----
   const R = A.rev, opex = A.despOp + A.fin;
   const steps = [
@@ -1852,13 +1852,13 @@ function renderPJ(){
     </svg>${low[1] < 0 ? `<p class="pfTip" style="color:var(--k-out)"><b>Atenção:</b> o caixa fica negativo em ${fmtD(low[2])}. Antecipe recebimentos ou renegocie pagamentos.</p>` : ""}</section>`;
 
   // estrutura de custos
-  const tot = A.out || 1, parts = [["Deduções", A.ded, "var(--c8)"], ["Custos (CSP)", A.csp, "var(--c2)"], ["Pessoal", A.pes, "var(--c1)"], ["Comerciais", A.despCom, "var(--c4)"], ["Administrativas", A.adm, "var(--c7)"], ["Financeiras", A.fin, "var(--c11)"], ["CAPEX", A.capex, "var(--c12)"]];
+  const tot = A.out || 1, parts = [["Impostos sobre vendas", A.ded, "var(--c8)"], ["Custo da operação", A.csp, "var(--c2)"], ["Pessoal e pró-labore", A.pes, "var(--c1)"], ["Vendas e marketing", A.despCom, "var(--c4)"], ["Administrativas", A.adm, "var(--c7)"], ["Juros e tarifas", A.fin, "var(--c11)"], ["Equipamentos (investimento)", A.capex, "var(--c12)"]];
   const by = {}; txOfMonth(ym).filter(t => t.type !== "entrada").forEach(t => by[t.cat] = (by[t.cat]||0) + (+t.amount||0));
   const topC = Object.entries(by).sort((a,b) => b[1]-a[1]).slice(0,3), conc = topC.reduce((a,c) => a + c[1], 0) / tot;
-  const estr = `<section class="panel"><h2>Estrutura de custos <small>${money(A.out)}</small></h2>
+  const estr = `<section class="panel"><h2>Para onde vai o dinheiro da empresa <small>${money(A.out)}</small></h2>
     <div class="stack" style="height:18px">${parts.filter(p => p[1]).map(p => `<i style="width:${(p[1]/tot*100).toFixed(1)}%;background:${p[2]}" title="${p[0]}"></i>`).join("")}</div>
     <div class="legend" style="margin-top:10px">${parts.map(p => `<div><span class="dot" style="background:${p[2]}"></span><span>${p[0]}</span><span class="amt">${pct(p[1]/tot)}</span></div>`).join("")}</div>
-    <div class="pfSmall" style="margin-top:14px"><div><span class="label">Fixas / receita</span><b class="num">${A.rev ? pct(A.fix/A.rev) : "—"}</b></div><div><span class="label">Concentração top 3</span><b class="num">${pct(conc)}</b></div></div>
+    <div class="pfSmall" style="margin-top:14px"><div><span class="label" title="Quanto da receita vai para despesas fixas (pessoal, aluguel, sistemas etc.)">Despesas fixas sobre a receita</span><b class="num">${A.rev ? pct(A.fix/A.rev) : "—"}</b></div><div><span class="label" title="Quanto as 3 maiores despesas representam do total gasto">Peso das 3 maiores despesas</span><b class="num">${pct(conc)}</b></div></div>
     <p class="note">${topC.length ? `Maiores despesas: ${topC.map(([k,v]) => `${esc(k)} (${money(v)})`).join(", ")}.` : "Sem despesas neste mês."}</p></section>`;
 
   const ins = [];
@@ -1866,7 +1866,7 @@ function renderPJ(){
   if (A.rev || P.rev) ins.push(dr === null ? `Receita bruta de ${money(A.rev)} no período.` : `Receita bruta de ${money(A.rev)}, ${dr >= 0 ? "alta" : "queda"} de ${pct(Math.abs(dr))} em relação a ${monthShort(addMonths(ym,-1))}.`);
   if (margem !== null) ins.push(`Margem líquida de ${pct(margem,1)}: ${margem >= .15 ? "patamar saudável para a operação" : margem >= 0 ? "positiva, porém abaixo da referência de 15%" : "a operação fechou o período com prejuízo"}.`);
   if (A.rev) ins.push(`EBITDA de ${money(A.ebitda)} (margem de ${pct(A.ebitda/A.rev,1)}) e lucro líquido de ${money(A.lucro)} no período.`);
-  if (A.capex) ins.push(`Investimentos (CAPEX) de ${money(A.capex)} não reduzem o lucro, mas consomem caixa: a geração de caixa do mês ficou em ${money(A.caixaOp)}.`);
+  if (A.capex) ins.push(`Os ${money(A.capex)} investidos em equipamentos não reduzem o lucro do mês, mas saíram do caixa: a geração de caixa do mês ficou em ${money(A.caixaOp)}.`);
   if (pe !== null) ins.push(A.rev >= pe ? `Ponto de equilíbrio superado em ${money(A.rev - pe)}.` : `Faltam ${money(pe - A.rev)} de receita para atingir o ponto de equilíbrio de ${money(pe)}.`);
   if (liq !== null) ins.push(`Liquidez de 30 dias em ${liq.toFixed(2).replace(".",",")}: ${liq >= 1.5 ? "caixa confortável para os compromissos" : liq >= 1 ? "caixa cobre os compromissos com pouca folga" : "risco de descasamento entre recebimentos e pagamentos"}.`);
   if (runway !== null) ins.push(`Com o caixa atual de ${money(caixa)}, a operação se sustenta por ${runway.toFixed(1).replace(".",",")} meses no ritmo médio de despesas.`);

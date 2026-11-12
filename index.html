@@ -445,6 +445,12 @@ button.mRow:hover{background:var(--sunk)}
 .pjK{background:var(--surface);padding:14px;display:flex;flex-direction:column;gap:4px;min-width:0;box-shadow:inset 0 3px 0 var(--k)}
 .pjK b{font-size:clamp(17px,2.2vw,21px);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pjK small{font-size:12px;color:var(--muted);line-height:1.35}
+.expl{font-weight:400;font-size:.86em;color:var(--muted);letter-spacing:0;text-transform:none}
+.thEx{display:block;font-weight:400;font-size:10.5px;color:var(--muted);text-transform:none;letter-spacing:0}
+.lgEx{grid-template-columns:minmax(0,1fr)}
+.lgT{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pfSmall .pjHelp{display:block}
+.dreFoot .pjHelp{display:block}
 .pjHelp{font-size:11.5px;color:var(--muted);line-height:1.3;margin-top:-2px}
 .pjK b.num{margin-top:4px;overflow:visible;text-overflow:clip;white-space:nowrap}
 .pjSpark{display:block;line-height:0}
@@ -845,7 +851,7 @@ const PJ_CATS = {
     {k:"Marketing", g:"Despesas comerciais", t:"fix", d:"mkt", c:"--c4"},
     {k:"Serviços terceirizados", g:"Custos dos serviços e produtos", t:"var", d:"csp", c:"--c10"},
     {k:"Tarifas bancárias", g:"Despesas financeiras", t:"fix", d:"fin", c:"--c11"},
-    {k:"Equipamentos e investimentos", g:"Investimentos em equipamentos", t:"inv", d:"capex", c:"--c12"},
+    {k:"Equipamentos e investimentos", g:"Investimentos (CAPEX)", t:"inv", d:"capex", c:"--c12"},
     {k:"Outras despesas", g:"Despesas administrativas", t:"fix", d:"adm", c:"--c9"},
   ],
   entrada: [ {k:"Vendas de produtos", d:"rec", c:"--c3"}, {k:"Prestação de serviços", d:"rec", c:"--c1"}, {k:"Outras receitas", d:"recfin", c:"--c9"} ]
@@ -1713,6 +1719,7 @@ function renderPF(){
   </div>`;
 }
 
+const ex = t => ` <span class="expl">· ${t}</span>`;
 function renderPJ(){
   const ym = state.ym, A = pjAgg(ym), P = pjAgg(addMonths(ym,-1));
   const mcPct = A.rev ? A.mc / A.rev : null, margem = A.rev ? A.res / A.rev : null;
@@ -1737,9 +1744,9 @@ function renderPJ(){
     ${kpi("Margem líquida", margem === null ? "—" : pct(margem,1), margem === null ? "aparece quando houver receita" : margem >= .15 ? "saudável (acima de 15%)" : margem >= 0 ? "baixa (abaixo de 15%)" : "negativa: a empresa gastou mais do que vendeu", margem === null ? "var(--muted)" : margem >= .15 ? "var(--k-in)" : margem >= 0 ? "var(--warn)" : "var(--k-out)", sp.mg, "Quanto sobra de lucro a cada R$ 100 vendidos")}
     ${kpi("Margem de contribuição", mcPct === null ? "—" : pct(mcPct,1), mcPct === null ? "aparece quando houver receita" : `${money(A.mc)} disponíveis para pagar as despesas fixas`, "var(--k-bal)", "", "O que sobra da receita depois dos impostos e custos da operação")}
     ${kpi("Ponto de equilíbrio", pe === null ? "—" : money(pe), pe === null ? "aparece quando houver receita com margem positiva" : A.rev >= pe ? `meta atingida, com ${money(A.rev - pe)} de folga` : `faltam ${money(pe - A.rev)} de receita`, pe !== null && A.rev >= pe ? "var(--k-in)" : "var(--warn)", "", "Quanto a empresa precisa vender para não ter prejuízo")}
-    ${kpi("Gasto médio mensal", money(burn), `média dos últimos ${base3.length} ${base3.length>1?"meses":"mês"} (burn rate)`, "var(--k-proj)", "", "Quanto a empresa costuma gastar por mês")}
-    ${kpi("Fôlego de caixa", runway === null ? (burnLiq <= 0 ? "Sem risco" : "—") : `${runway.toFixed(1).replace(".",",")} meses`, runway === null ? (burnLiq <= 0 ? "a receita cobre as despesas (runway)" : "sem caixa disponível") : `o caixa atual de ${money(caixa)} dura esse tempo (runway)`, runway === null || runway >= 6 ? "var(--k-in)" : runway >= 3 ? "var(--warn)" : "var(--k-out)", "", "Por quanto tempo o caixa paga as contas se a receita parar")}
-    ${kpi("Liquidez em 30 dias", liq === null ? "—" : `${vezes(liq)}x`, liq === null ? "nenhuma conta a pagar nos próximos 30 dias" : `para cada R$ 1,00 a pagar, há R$ ${vezes(liq)} · ${liq >= 1.5 ? "confortável" : liq >= 1 ? "justo" : "risco: o caixa não cobre as contas"}`, liq === null || liq >= 1.5 ? "var(--k-in)" : liq >= 1 ? "var(--warn)" : "var(--k-out)", "", "Se o caixa e o que vai entrar cobrem as contas do próximo mês")}
+    ${kpi("Burn rate", money(burn), `média dos últimos ${base3.length} ${base3.length>1?"meses":"mês"}`, "var(--k-proj)", "", "Quanto a empresa gasta por mês, em média")}
+    ${kpi("Runway", runway === null ? (burnLiq <= 0 ? "Sem risco" : "—") : `${runway.toFixed(1).replace(".",",")} meses`, runway === null ? (burnLiq <= 0 ? "a receita cobre as despesas" : "sem caixa disponível") : `o caixa atual de ${money(caixa)} dura esse tempo`, runway === null || runway >= 6 ? "var(--k-in)" : runway >= 3 ? "var(--warn)" : "var(--k-out)", "", "Por quanto tempo o caixa paga as contas se a receita parar")}
+    ${kpi("Liquidez 30 dias", liq === null ? "—" : `${vezes(liq)}x`, liq === null ? "nenhuma conta a pagar nos próximos 30 dias" : `para cada R$ 1,00 a pagar, há R$ ${vezes(liq)} · ${liq >= 1.5 ? "confortável" : liq >= 1 ? "justo" : "risco: o caixa não cobre as contas"}`, liq === null || liq >= 1.5 ? "var(--k-in)" : liq >= 1 ? "var(--warn)" : "var(--k-out)", "", "Se o caixa e o que vai entrar cobrem as contas do próximo mês")}
     ${kpi("Ticket médio", ticket === null ? "—" : money(ticket), A.nRev ? `média de ${A.nRev} ${A.nRev > 1 ? "recebimentos" : "recebimento"} no mês` : "nenhum recebimento no mês", "var(--k-bal)", "", "Valor médio de cada venda ou recebimento")}
   </div>`;
   const M2 = pjAgg(addMonths(ym,-2)), yr = ym.slice(0,4), mon = +ym.slice(5);
@@ -1750,40 +1757,40 @@ function renderPJ(){
     const n = A[k] || 0, dv = delta(n, P[k] || 0), good = !opt.cost;
     return `<tr class="${opt.cls || ""}"><td class="${opt.ind ? "ind" : ""}">${lbl}</td>${cols.map(([,x], i) => `<td class="r num ${i===2?"cur":"hideS"}">${v(x, k, opt.cost)}</td>`).join("")}<td class="r num mMuted">${A.rev ? pct(n/A.rev,1) : "—"}</td><td class="r num">${dTag(dv, good)}</td><td class="r num hideM">${v(Y, k, opt.cost)}</td></tr>`;
   };
-  const dreFull = `<section class="panel dreBox"><h2>DRE completo (contábil) <small><button class="btn small" data-act="dreMode" data-v="simples">Voltar ao DRE fácil</button></small></h2><div class="catTbl"><table class="dre"><thead><tr><th>Conta</th>${cols.map(([n],i) => `<th class="r ${i===2?"cur":"hideS"}">${n}</th>`).join("")}<th class="r">AV %</th><th class="r">AH %</th><th class="r hideM">Acum. ${yr}</th></tr></thead><tbody>
+  const dreFull = `<section class="panel dreBox"><h2>DRE completo (contábil) <small><button class="btn small" data-act="dreMode" data-v="simples">Voltar ao DRE fácil</button></small></h2><div class="catTbl"><table class="dre"><thead><tr><th>Conta</th>${cols.map(([n],i) => `<th class="r ${i===2?"cur":"hideS"}">${n}</th>`).join("")}<th class="r" title="Análise vertical: quanto a conta representa da receita bruta">AV %<span class="thEx">% da receita</span></th><th class="r" title="Análise horizontal: variação em relação ao mês anterior">AH %<span class="thEx">vs mês anterior</span></th><th class="r hideM">Acum. ${yr}</th></tr></thead><tbody>
     ${line("Receita operacional bruta", "rev", { cls:"strong" })}
-    ${line("(−) Deduções da receita (impostos s/ faturamento)", "ded", { cost:true, ind:true })}
+    ${line("(−) Deduções da receita"+ex("impostos sobre o faturamento"), "ded", { cost:true, ind:true })}
     ${line("= Receita operacional líquida", "recLiq", { cls:"sub" })}
-    ${line("(−) Custos dos serviços prestados e produtos (CSP/CMV)", "csp", { cost:true, ind:true })}
-    ${line("= Lucro bruto", "lucroBruto", { cls:"sub" })}
+    ${line("(−) CSP/CMV"+ex("custo da operação: serviços e produtos vendidos"), "csp", { cost:true, ind:true })}
+    ${line("= Lucro bruto"+ex("receita líquida menos o custo da operação"), "lucroBruto", { cls:"sub" })}
     ${line("(−) Despesas com pessoal", "pes", { cost:true, ind:true })}
     ${line("(−) Despesas comerciais e marketing", "despCom", { cost:true, ind:true })}
     ${line("(−) Despesas administrativas", "adm", { cost:true, ind:true })}
-    ${line("= EBITDA", "ebitda", { cls:"sub" })}
-    ${line("(−) Depreciação e amortização", "dep", { cost:true, ind:true })}
-    ${line("= Resultado operacional (EBIT)", "ebit", { cls:"sub" })}
+    ${line("= EBITDA"+ex("lucro da operação, antes de juros e depreciação"), "ebitda", { cls:"sub" })}
+    ${line("(−) Depreciação e amortização"+ex("desgaste dos equipamentos"), "dep", { cost:true, ind:true })}
+    ${line("= EBIT"+ex("resultado operacional, depois do desgaste dos equipamentos"), "ebit", { cls:"sub" })}
     ${line("(+) Receitas financeiras", "recfin", { ind:true })}
     ${line("(−) Despesas financeiras", "fin", { cost:true, ind:true })}
-    ${line("= Resultado antes dos tributos (LAIR)", "lair", { cls:"sub" })}
-    <tr><td class="ind">(−) IRPJ e CSLL</td>${cols.map((c,i) => `<td class="r num ${i===2?"cur":"hideS"}">—</td>`).join("")}<td class="r mMuted" colspan="2">incluídos no DAS</td><td class="r num hideM">—</td></tr>
+    ${line("= LAIR"+ex("lucro antes do imposto de renda"), "lair", { cls:"sub" })}
+    <tr><td class="ind">(−) IRPJ e CSLL${ex("imposto de renda e contribuição social da empresa")}</td>${cols.map((c,i) => `<td class="r num ${i===2?"cur":"hideS"}">—</td>`).join("")}<td class="r mMuted" colspan="2">incluídos no DAS</td><td class="r num hideM">—</td></tr>
     ${line("= Lucro líquido do exercício", "lucro", { cls:"strong total " + (A.lucro < 0 ? "neg" : "pos") })}
   </tbody></table></div>
   <div class="dreFoot">
-    <div><span class="label">Margem bruta</span><b class="num">${A.rev ? pct(A.lucroBruto/A.rev,1) : "—"}</b></div>
-    <div><span class="label">Margem EBITDA</span><b class="num">${A.rev ? pct(A.ebitda/A.rev,1) : "—"}</b></div>
-    <div><span class="label">Margem líquida</span><b class="num">${A.rev ? pct(A.lucro/A.rev,1) : "—"}</b></div>
-    <div><span class="label">Investimentos em equipamentos</span><b class="num">${money(A.capex)}</b></div>
-    <div><span class="label">Geração de caixa</span><b class="num" style="color:${A.caixaOp<0?"var(--k-out)":"var(--k-in)"}">${money(A.caixaOp)}</b></div>
+    <div><span class="label">Margem bruta</span><span class="pjHelp">lucro depois dos custos da operação</span><b class="num">${A.rev ? pct(A.lucroBruto/A.rev,1) : "—"}</b></div>
+    <div><span class="label">Margem EBITDA</span><span class="pjHelp">lucro da operação, antes de juros e depreciação</span><b class="num">${A.rev ? pct(A.ebitda/A.rev,1) : "—"}</b></div>
+    <div><span class="label">Margem líquida</span><span class="pjHelp">o que sobra de cada R$ 100 vendidos</span><b class="num">${A.rev ? pct(A.lucro/A.rev,1) : "—"}</b></div>
+    <div><span class="label">CAPEX</span><span class="pjHelp">compras de equipamentos (investimento)</span><b class="num">${money(A.capex)}</b></div>
+    <div><span class="label">Geração de caixa</span><span class="pjHelp">dinheiro que de fato sobrou no caixa</span><b class="num" style="color:${A.caixaOp<0?"var(--k-out)":"var(--k-in)"}">${money(A.caixaOp)}</b></div>
   </div>
-  <p class="note">AV % = participação sobre a receita bruta do mês. AH % = variação em relação a ${monthShort(addMonths(ym,-1))}. Valores entre parênteses são deduções. Compras de equipamentos (CAPEX) entram como investimento, e não como despesa do mês: o valor é diluído (depreciado) em ${DEP_MESES} meses; IRPJ e CSLL estão incluídos no DAS do Simples Nacional. Geração de caixa = lucro líquido + depreciação − CAPEX.</p></section>`;
+  <p class="note">AV % (análise vertical) = quanto cada conta representa da receita bruta do mês. AH % (análise horizontal) = variação em relação a ${monthShort(addMonths(ym,-1))}. Valores entre parênteses são deduções. Compras de equipamentos (CAPEX) entram como investimento, e não como despesa do mês: o valor é diluído (depreciado) em ${DEP_MESES} meses; IRPJ e CSLL estão incluídos no DAS do Simples Nacional. Geração de caixa = lucro líquido + depreciação − CAPEX.</p></section>`;
   // ---- DRE fácil ----
   const R = A.rev, opex = A.despOp + A.fin;
   const steps = [
-    { k:"in",  t:"Faturamento", d:"Tudo o que a empresa recebeu de clientes no mês", v:A.rev },
-    { k:"out", t:"Impostos", d:"DAS e outros impostos sobre o que foi faturado", v:A.ded },
-    { k:"out", t:"Custo da operação", d:"Mão de obra direta, insumos e serviços terceirizados", v:A.csp },
-    { k:"out", t:"Despesas para a empresa funcionar", d:"Pró-labore, aluguel, sistemas, contador, marketing e tarifas", v:opex },
-    { k:"out", t:"Desgaste dos equipamentos", d:`Câmeras, computadores etc. perdem valor aos poucos (1/${DEP_MESES} por mês)`, v:A.dep },
+    { k:"in",  t:"Receita bruta · Faturamento", d:"Tudo o que a empresa recebeu de clientes no mês", v:A.rev },
+    { k:"out", t:"Deduções · Impostos", d:"DAS e outros impostos sobre o que foi faturado", v:A.ded },
+    { k:"out", t:"CSP · Custo da operação", d:"Mão de obra direta, insumos e serviços terceirizados", v:A.csp },
+    { k:"out", t:"OPEX · Despesas para a empresa funcionar", d:"Pró-labore, aluguel, sistemas, contador, marketing e tarifas", v:opex },
+    { k:"out", t:"Depreciação · Desgaste dos equipamentos", d:`Câmeras, computadores etc. perdem valor aos poucos (1/${DEP_MESES} por mês)`, v:A.dep },
     ...(A.recfin ? [{ k:"in2", t:"Rendimentos", d:"Juros e outras receitas que não são de clientes", v:A.recfin }] : []),
   ];
   /* escala do gráfico: cobre do menor ao maior ponto, inclusive prejuízo (sem isso a barra estourava a tela quando não havia faturamento) */
@@ -1852,13 +1859,13 @@ function renderPJ(){
     </svg>${low[1] < 0 ? `<p class="pfTip" style="color:var(--k-out)"><b>Atenção:</b> o caixa fica negativo em ${fmtD(low[2])}. Antecipe recebimentos ou renegocie pagamentos.</p>` : ""}</section>`;
 
   // estrutura de custos
-  const tot = A.out || 1, parts = [["Impostos sobre vendas", A.ded, "var(--c8)"], ["Custo da operação", A.csp, "var(--c2)"], ["Pessoal e pró-labore", A.pes, "var(--c1)"], ["Vendas e marketing", A.despCom, "var(--c4)"], ["Administrativas", A.adm, "var(--c7)"], ["Juros e tarifas", A.fin, "var(--c11)"], ["Equipamentos (investimento)", A.capex, "var(--c12)"]];
+  const tot = A.out || 1, parts = [["Deduções", A.ded, "var(--c8)", "impostos sobre vendas"], ["CSP", A.csp, "var(--c2)", "custo da operação"], ["Pessoal", A.pes, "var(--c1)", "salários e pró-labore"], ["Comerciais", A.despCom, "var(--c4)", "vendas e marketing"], ["Administrativas", A.adm, "var(--c7)", "aluguel, sistemas, contador"], ["Financeiras", A.fin, "var(--c11)", "juros e tarifas"], ["CAPEX", A.capex, "var(--c12)", "compra de equipamentos"]];
   const by = {}; txOfMonth(ym).filter(t => t.type !== "entrada").forEach(t => by[t.cat] = (by[t.cat]||0) + (+t.amount||0));
   const topC = Object.entries(by).sort((a,b) => b[1]-a[1]).slice(0,3), conc = topC.reduce((a,c) => a + c[1], 0) / tot;
-  const estr = `<section class="panel"><h2>Para onde vai o dinheiro da empresa <small>${money(A.out)}</small></h2>
+  const estr = `<section class="panel"><h2>Estrutura de custos${ex("para onde vai o dinheiro da empresa")} <small>${money(A.out)}</small></h2>
     <div class="stack" style="height:18px">${parts.filter(p => p[1]).map(p => `<i style="width:${(p[1]/tot*100).toFixed(1)}%;background:${p[2]}" title="${p[0]}"></i>`).join("")}</div>
-    <div class="legend" style="margin-top:10px">${parts.map(p => `<div><span class="dot" style="background:${p[2]}"></span><span>${p[0]}</span><span class="amt">${pct(p[1]/tot)}</span></div>`).join("")}</div>
-    <div class="pfSmall" style="margin-top:14px"><div><span class="label" title="Quanto da receita vai para despesas fixas (pessoal, aluguel, sistemas etc.)">Despesas fixas sobre a receita</span><b class="num">${A.rev ? pct(A.fix/A.rev) : "—"}</b></div><div><span class="label" title="Quanto as 3 maiores despesas representam do total gasto">Peso das 3 maiores despesas</span><b class="num">${pct(conc)}</b></div></div>
+    <div class="legend lgEx" style="margin-top:10px">${parts.map(p => `<div><span class="dot" style="background:${p[2]}"></span><span class="lgT"><b>${p[0]}</b>${ex(p[3])}</span><span class="amt">${pct(p[1]/tot)}</span></div>`).join("")}</div>
+    <div class="pfSmall" style="margin-top:14px"><div><span class="label">Fixas / receita</span><span class="pjHelp">quanto da receita vai para despesas fixas</span><b class="num">${A.rev ? pct(A.fix/A.rev) : "—"}</b></div><div><span class="label">Concentração top 3</span><span class="pjHelp">peso das 3 maiores despesas no total</span><b class="num">${pct(conc)}</b></div></div>
     <p class="note">${topC.length ? `Maiores despesas: ${topC.map(([k,v]) => `${esc(k)} (${money(v)})`).join(", ")}.` : "Sem despesas neste mês."}</p></section>`;
 
   const ins = [];
@@ -1866,7 +1873,7 @@ function renderPJ(){
   if (A.rev || P.rev) ins.push(dr === null ? `Receita bruta de ${money(A.rev)} no período.` : `Receita bruta de ${money(A.rev)}, ${dr >= 0 ? "alta" : "queda"} de ${pct(Math.abs(dr))} em relação a ${monthShort(addMonths(ym,-1))}.`);
   if (margem !== null) ins.push(`Margem líquida de ${pct(margem,1)}: ${margem >= .15 ? "patamar saudável para a operação" : margem >= 0 ? "positiva, porém abaixo da referência de 15%" : "a operação fechou o período com prejuízo"}.`);
   if (A.rev) ins.push(`EBITDA de ${money(A.ebitda)} (margem de ${pct(A.ebitda/A.rev,1)}) e lucro líquido de ${money(A.lucro)} no período.`);
-  if (A.capex) ins.push(`Os ${money(A.capex)} investidos em equipamentos não reduzem o lucro do mês, mas saíram do caixa: a geração de caixa do mês ficou em ${money(A.caixaOp)}.`);
+  if (A.capex) ins.push(`O CAPEX (compra de equipamentos) de ${money(A.capex)} não reduz o lucro do mês, mas saiu do caixa: a geração de caixa do mês ficou em ${money(A.caixaOp)}.`);
   if (pe !== null) ins.push(A.rev >= pe ? `Ponto de equilíbrio superado em ${money(A.rev - pe)}.` : `Faltam ${money(pe - A.rev)} de receita para atingir o ponto de equilíbrio de ${money(pe)}.`);
   if (liq !== null) ins.push(`Liquidez de 30 dias em ${liq.toFixed(2).replace(".",",")}: ${liq >= 1.5 ? "caixa confortável para os compromissos" : liq >= 1 ? "caixa cobre os compromissos com pouca folga" : "risco de descasamento entre recebimentos e pagamentos"}.`);
   if (runway !== null) ins.push(`Com o caixa atual de ${money(caixa)}, a operação se sustenta por ${runway.toFixed(1).replace(".",",")} meses no ritmo médio de despesas.`);

@@ -843,6 +843,41 @@ body.corp .btn{font-weight:500}
 @container (max-width:118px){.mcal .balL{display:none}.mcal .bal{justify-content:flex-end}}
 .mRank{container-type:inline-size}
 @container (max-width:440px){.mRow.static{grid-template-columns:22px minmax(0,1fr) auto auto}.mRow.static .mBar{display:none}}
+/* ---------- v1.9.3: checagem aguçada ---------- */
+@media (min-width:1000px) and (max-width:1199px){.grid2{grid-template-columns:minmax(0,1fr)}}
+@media (min-width:900px) and (max-width:1099px){.calWrap{grid-template-columns:minmax(0,1fr)}}
+@media (min-width:1100px) and (max-width:1279px){.calWrap{grid-template-columns:minmax(0,300px) minmax(0,1fr)}}
+.cal button{max-height:64px;aspect-ratio:auto;min-height:40px}
+@media (max-width:899px){.cal button{aspect-ratio:1;max-height:none}}
+@media (min-width:900px) and (max-width:1099px){.summary,.pfCards,.capHead{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:900px) and (max-width:1060px){.catTbl .hideS{display:none}}
+.ptyStats > div,.psStats > div{container-type:inline-size}
+.ptyStats b{font-size:clamp(11.5px,13.5cqi,14px)}
+.psStats b.num{font-size:clamp(12px,12.5cqi,16px)}
+.psBig{white-space:nowrap}
+@media (min-width:900px) and (max-width:1060px){
+  .catTbl:has(.cpTbl){margin-inline:0;padding-inline:0;overflow:visible}
+  .cpTbl thead{display:none}
+  .cpTbl,.cpTbl tbody,.cpTbl tfoot{display:block;width:100%}
+  .cpTbl tbody tr{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"d pty val" "d st st" "d acts acts";gap:6px 12px;align-items:start;padding:12px 4px;border-bottom:1px solid var(--line)}
+  .cpTbl tbody tr.rowLate{box-shadow:inset 3px 0 0 var(--k-out);padding-left:12px}
+  .cpTbl tr.rowLate td:first-child{box-shadow:none}
+  .cpTbl tbody td{display:block;padding:0;border:0;background:none !important}
+  .cpTbl td.d{grid-area:d}.cpTbl td.pty{grid-area:pty;min-width:0}
+  .cpTbl tbody td:nth-child(3){display:none}
+  .cpTbl tbody td:nth-child(4){grid-area:val;font-weight:600}
+  .cpTbl tbody td:nth-child(5){grid-area:st;align-self:center}
+  .cpTbl td.acts{grid-area:acts;justify-self:end;margin-top:2px}
+  .cpTbl tfoot td:last-child{display:none}
+  .cpTbl td .chip{white-space:nowrap}
+  .cpTbl td.acts .btn[data-act="contaEdit"]{display:inline-flex}
+  .cpTbl tfoot tr{display:flex;justify-content:space-between;padding:10px 4px;border-top:2px solid var(--fg)}
+  .cpTbl tfoot td{display:block;border:0;padding:0}
+  .cpTbl tfoot td.cpCat{display:none}
+}
+.pieWrap svg.pie{max-height:400px;width:100%}
+.panel:has(> .lgEx){container-type:inline-size}
+@container (max-width:640px){.legend.lgEx{grid-template-columns:minmax(0,1fr)}}
 </style>
 
 <div class="lock" id="lock">
@@ -1089,6 +1124,7 @@ const guessCat = (desc, type) => {
 const BRL = new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"});
 const money = v => BRL.format(v || 0);
 const pad = n => String(n).padStart(2,"0");
+const kAxis = v => { const a = Math.abs(v), sg = v < 0 ? "−" : ""; return a >= 1e6 ? sg + (a/1e6).toFixed(1).replace(".",",").replace(/,0$/,"") + " mi" : a >= 1e4 ? sg + Math.round(a/1000) + "k" : a >= 1000 ? sg + (a/1000).toFixed(1).replace(".",",").replace(/,0$/,"") + "k" : sg + Math.round(a); };
 const plur = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;
 const ymOf = d => d.slice(0,7);
 const todayStr = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
@@ -1976,7 +2012,7 @@ function renderPJ(){
   const yv = v => pt + (mx - v) / (mx - mn) * (H - pt - pb), step = (W - pl - pr) / 6, bw = Math.min(22, step/3);
   const ticks = [mn, 0, mx/2, mx].filter((v,i,a) => a.indexOf(v) === i);
   const chart = `<svg viewBox="0 0 ${W} ${H}" class="hist" role="img" aria-label="Receita, despesa e resultado dos últimos 6 meses">
-    ${ticks.map(v => `<line x1="${pl}" x2="${W-pr}" y1="${yv(v).toFixed(1)}" y2="${yv(v).toFixed(1)}" stroke="var(--line)" ${v===0?"":'stroke-dasharray="3 4"'}/><text x="${pl-6}" y="${(yv(v)+4).toFixed(1)}" text-anchor="end">${(v/1000).toFixed(1).replace(".",",")}k</text>`).join("")}
+    ${ticks.map(v => `<line x1="${pl}" x2="${W-pr}" y1="${yv(v).toFixed(1)}" y2="${yv(v).toFixed(1)}" stroke="var(--line)" ${v===0?"":'stroke-dasharray="3 4"'}/><text x="${pl-6}" y="${(yv(v)+4).toFixed(1)}" text-anchor="end">${kAxis(v)}</text>`).join("")}
     ${data.map((d,i) => { const cx = pl + step*i + step/2; return `<rect x="${cx-bw-2}" y="${yv(d.rev).toFixed(1)}" width="${bw}" height="${(yv(0)-yv(d.rev)).toFixed(1)}" fill="var(--k-in)" opacity="${ms[i]===ym?1:.6}"/><rect x="${cx+2}" y="${yv(d.out).toFixed(1)}" width="${bw}" height="${(yv(0)-yv(d.out)).toFixed(1)}" fill="var(--k-out)" opacity="${ms[i]===ym?1:.6}"/><text x="${cx}" y="${H-8}" text-anchor="middle" style="${ms[i]===ym?"fill:var(--fg);font-weight:600":""}">${monthShort(ms[i])}</text>`; }).join("")}
     <polyline fill="none" stroke="var(--k-bal)" stroke-width="2.5" points="${data.map((d,i) => `${(pl + step*i + step/2).toFixed(1)},${yv(d.res).toFixed(1)}`).join(" ")}"/>
     ${data.map((d,i) => `<circle cx="${(pl + step*i + step/2).toFixed(1)}" cy="${yv(d.res).toFixed(1)}" r="${ms[i]===ym?5:3.5}" fill="var(--k-bal)" stroke="var(--surface)" stroke-width="2"><title>${monthShort(ms[i])}: resultado ${money(d.res)}</title></circle>`).join("")}
@@ -1993,7 +2029,7 @@ function renderPJ(){
     <div class="pfSmall" style="margin:0 0 10px"><div><span class="label">Caixa hoje</span><b class="num">${money(caixa)}</b></div><div><span class="label">A receber</span><b class="num" style="color:var(--k-in)">+ ${money(aRec)}</b></div><div><span class="label">A pagar</span><b class="num" style="color:var(--k-out)">− ${money(aPag)}</b></div><div><span class="label">Em 30 dias</span><b class="num" style="color:${bal<0?"var(--k-out)":"var(--k-bal)"}">${money(bal)}</b></div></div>
     <svg viewBox="0 0 ${FW} ${FH}" class="hist" role="img" aria-label="Saldo de caixa projetado nos próximos 30 dias">
       <line x1="54" x2="${FW-12}" y1="${fy(0).toFixed(1)}" y2="${fy(0).toFixed(1)}" stroke="var(--fg)" stroke-opacity=".4"/>
-      <text x="48" y="${(fy(fmax)+4).toFixed(1)}" text-anchor="end">${(fmax/1000).toFixed(1).replace(".",",")}k</text><text x="48" y="${(fy(0)+4).toFixed(1)}" text-anchor="end">0</text>
+      <text x="48" y="${(fy(fmax)+4).toFixed(1)}" text-anchor="end">${kAxis(fmax)}</text><text x="48" y="${(fy(0)+4).toFixed(1)}" text-anchor="end">0</text>
       <path d="M${fx(0)},${fy(0).toFixed(1)} ${pts.map(p => `L${fx(p[0]).toFixed(1)},${fy(p[1]).toFixed(1)}`).join(" ")} L${fx(30)},${fy(0).toFixed(1)} Z" fill="var(--k-bal)" opacity=".12"/>
       <polyline fill="none" stroke="var(--k-bal)" stroke-width="2.5" stroke-linejoin="round" points="${pts.map(p => `${fx(p[0]).toFixed(1)},${fy(p[1]).toFixed(1)}`).join(" ")}"/>
       <circle cx="${fx(low[0]).toFixed(1)}" cy="${fy(low[1]).toFixed(1)}" r="5" fill="${low[1]<0?"var(--k-out)":"var(--warn)"}" stroke="var(--surface)" stroke-width="2"/>

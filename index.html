@@ -810,6 +810,26 @@ body.corp .btn{font-weight:500}
 @media (min-width:700px) and (max-width:1099px){.pjKpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (min-width:601px){.mRow.static{grid-template-columns:22px minmax(90px,1.2fr) minmax(60px,2fr) 13ch 5ch}.mRow.static > .num{text-align:right}}
 .ptyContact > *{min-width:0;overflow-wrap:anywhere}
+/* ---------- v1.9: subcategorias e uso mais fácil ---------- */
+.opt{font-weight:400;color:var(--muted);font-size:.9em}
+.catHelp{display:block;margin:4px 0 0;font-size:12.5px;color:var(--muted);line-height:1.35}
+.catHelp:empty{display:none}
+.pageHint{margin:-8px 0 0;color:var(--muted);font-size:14px;line-height:1.4;max-width:70ch}
+.segTipo button{font-weight:600}
+.segTipo button[data-type="saida"][aria-pressed="true"]{background:var(--k-out);color:#fff;border-color:var(--k-out)}
+.segTipo button[data-type="entrada"][aria-pressed="true"]{background:var(--k-in);color:#fff;border-color:var(--k-in)}
+.subList{display:flex;flex-direction:column;gap:6px}
+.subList > div{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(40px,1fr) auto;gap:8px;align-items:center;font-size:13px}
+.subList span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.subBar{height:6px;background:var(--sunk);display:block}
+.subBar i{display:block;height:100%}
+.guia{border-left:4px solid var(--k-in)}
+.guiaSteps{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+@media (min-width:900px){.guiaSteps{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.guiaSteps li{display:grid;grid-template-columns:32px minmax(0,1fr);gap:12px;align-items:start}
+.guiaSteps b{display:block;font-size:15px}
+.guiaSteps p{margin:4px 0 8px;color:var(--muted);font-size:13.5px;line-height:1.4}
+.gNum{width:32px;height:32px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-weight:700}
 </style>
 
 <div class="lock" id="lock">
@@ -856,6 +876,7 @@ const CATS = {
     {k:"Padaria e lanches", g:"Alimentação", c:"--c6"},
     {k:"Moradia", g:"Casa", c:"--c1"},
     {k:"Contas e assinaturas", g:"Casa", c:"--c5"},
+    {k:"Serviços domésticos", g:"Casa", c:"--c13"},
     {k:"Móveis e eletrodomésticos", g:"Casa", c:"--c12"},
     {k:"Reforma e manutenção da casa", g:"Casa", c:"--c7"},
     {k:"IPTU e impostos", g:"Casa", c:"--c14"},
@@ -865,6 +886,7 @@ const CATS = {
     {k:"Despesas com filhos", g:"Família", c:"--c11"},
     {k:"Educação", g:"Família", c:"--c11"},
     {k:"Pets", g:"Família", c:"--c6"},
+    {k:"Apoio à família", g:"Família", c:"--c15"},
     {k:"Saúde", g:"Saúde e bem-estar", c:"--c4"},
     {k:"Esporte e academia", g:"Saúde e bem-estar", c:"--c10"},
     {k:"Cuidados pessoais", g:"Saúde e bem-estar", c:"--c15"},
@@ -872,19 +894,71 @@ const CATS = {
     {k:"Vestuário", g:"Compras e lazer", c:"--c2"},
     {k:"Lazer", g:"Compras e lazer", c:"--c15"},
     {k:"Viagens", g:"Compras e lazer", c:"--c10"},
-    {k:"Presentes e doações", g:"Compras e lazer", c:"--c4"},
+    {k:"Presentes e doações", g:"Presentes, festas e doações", c:"--c4"},
     {k:"Seguros", g:"Banco e finanças", c:"--c16"},
     {k:"Tarifas e juros", g:"Banco e finanças", c:"--c14"},
     {k:"Empréstimos e financiamentos", g:"Banco e finanças", c:"--c1"},
     {k:"Investimentos", g:"Banco e finanças", c:"--c3"},
     {k:"Transferências", g:"Banco e finanças", c:"--c13"},
+    {k:"Trabalho e MEI", g:"Trabalho", c:"--c5"},
     {k:"Outros gastos", g:"Outros", c:"--c9"},
   ],
   entrada: [
-    {k:"Salário", c:"--c3"}, {k:"Freelas e extras", c:"--c1"}, {k:"Ticket e vale-refeição", c:"--c6"}, {k:"Transferências recebidas", c:"--c13"},
-    {k:"Rendimentos e resgates", c:"--c10"}, {k:"Aluguéis recebidos", c:"--c5"}, {k:"Venda de bens", c:"--c12"}, {k:"Estornos e devoluções", c:"--c11"}, {k:"Outras entradas", c:"--c9"},
+    {k:"Salário", g:"Trabalho", c:"--c3"}, {k:"Freelas e extras", g:"Trabalho", c:"--c1"}, {k:"Ticket e vale-refeição", g:"Trabalho", c:"--c6"},
+    {k:"Benefícios e auxílios", g:"Benefícios", c:"--c16"},
+    {k:"Rendimentos e resgates", g:"Rendas e investimentos", c:"--c10"}, {k:"Aluguéis recebidos", g:"Rendas e investimentos", c:"--c5"}, {k:"Venda de bens", g:"Rendas e investimentos", c:"--c12"},
+    {k:"Presentes recebidos", g:"Outras entradas", c:"--c4"}, {k:"Transferências recebidas", g:"Outras entradas", c:"--c13"}, {k:"Estornos e devoluções", g:"Outras entradas", c:"--c11"}, {k:"Outras entradas", g:"Outras entradas", c:"--c9"},
   ]
 };
+/* subcategorias da pessoa física: [nome, palavras que ajudam a reconhecer na descrição (sem acento)] */
+const SUBS = {
+  "Mercado": [["Atacadão e atacarejo","atacad|assai|makro|sams club|atacarejo"],["Supermercado","supermerc|hipermerc|carrefour|pao de acucar|bretas|extra|mercado"],["Hortifrúti e feira","hortifr|feira|sacolao|verdur|frutas"],["Açougue e peixaria","acougue|peixaria|carne|frango"],["Bebidas","bebida|cerveja|refrigerante|vinho|adega|distribuidora de bebidas"],["Produtos de limpeza e higiene","limpeza|detergente|sabao|papel higienico"]],
+  "Restaurante": [["Almoço","almoco|self.?service|marmita|prato feito|\\bpf\\b"],["Jantar","jantar|janta"],["Bar e happy hour","\\bbar\\b|boteco|choperia|cervejaria|happy"],["Pizzaria","pizza"],["Lanchonete e hambúrguer","hamburg|burger|lanchonete|mc ?donald|\\bbk\\b|subway"],["Comida japonesa","sushi|temaki|japones"],["Churrascaria","churrasc"]],
+  "Delivery": [["iFood","ifood|\\bifd\\b|ifd\\*"],["Rappi","rappi"],["99 Food","99 ?food"],["Zé Delivery (bebidas)","ze delivery|ze entrega"],["Pizza","pizza"],["Lanche e hambúrguer","lanche|burger|hamburg"],["Outros apps","aiqfome|keeta|uber ?eats|james"]],
+  "Padaria e lanches": [["Padaria","padaria|panific|pao"],["Café e cafeteria","cafe|cafeteria|starbucks"],["Lanche e salgado","lanche|salgad|pastel|coxinha"],["Doces, bolo e sorvete","doce|bolo|sorvet|gelato|chocolat|cacau show|kopenhagen|confeitar"],["Açaí","acai"]],
+  "Moradia": [["Aluguel","aluguel|imobiliar"],["Condomínio","condomin"],["Energia elétrica","energia|enel|equatorial|cemig|copel|light s|coelba|celpe|cpfl|neoenergia|luz"],["Água e esgoto","agua|saneago|sabesp|copasa|embasa|sanepar|esgoto"],["Gás","\\bgas\\b|ultragaz|liquigas|supergasbras|botijao"],["Prestação do imóvel","prestacao (do )?(apto|apartamento|imovel|casa)|financiamento imob"],["Seguro residencial","seguro resid"]],
+  "Contas e assinaturas": [["Internet","internet|fibra|banda larga|\\boi fibra|vivo fibra|claro net"],["Celular","celular|\\btim\\b|\\bvivo\\b|\\bclaro\\b|recarga|plano movel"],["TV por assinatura","\\bsky\\b|tv por assinatura|claro tv"],["Streaming de vídeo","netflix|disney|prime video|hbo|\\bmax\\b|globoplay|paramount|youtube premium"],["Música","spotify|deezer|apple music|youtube music"],["Apps, nuvem e software","icloud|google one|microsoft|dropbox|chatgpt|openai|canva|adobe|apple\\.com|apple com"],["Jogos","xbox|playstation|steam|nintendo|game pass"],["Jornais e revistas","jornal|revista|assinatura digital"]],
+  "Serviços domésticos": [["Diarista","diarista|faxina"],["Empregada mensalista","empregada|mensalista|domestica"],["Babá e cuidador","baba\\b|cuidador"],["Lavanderia","lavanderia|lavagem de roupa"],["Jardineiro e piscineiro","jardin|piscin"],["Dedetização","dedetiz"]],
+  "Móveis e eletrodomésticos": [["Móveis","moveis|mobilia|sofa|cama|guarda.?roupa|mesa|cadeira|colchao"],["Eletrodomésticos","eletrodomest|geladeira|fogao|maquina de lavar|micro.?ondas|ar condicionado|airfryer"],["Eletrônicos","tv\\b|televis|notebook|computador|tablet|som\\b"],["Decoração","decorac|quadro|tapete|cortina"],["Cama, mesa e banho","cama mesa|toalha|lencol|edredom"],["Utensílios de cozinha","panela|utensil|talher|copo"]],
+  "Reforma e manutenção da casa": [["Material de construção","material de constr|leroy|telhanorte|cimento|tijolo|porcelanato|tintas|ferrag"],["Mão de obra (pedreiro, eletricista...)","pedreiro|eletricista|encanador|pintor|marcen|serralher|vidracar|mao de obra"],["Consertos","conserto|reparo|manutencao"],["Jardim","jardim|plantas|vaso"],["Ferramentas","ferrament"]],
+  "IPTU e impostos": [["IPTU","iptu"],["Imposto de renda","imposto de renda|irpf|\\bdarf\\b"],["Taxa de lixo","taxa de lixo|coleta"],["Outros impostos e taxas","imposto|taxa"]],
+  "Transporte": [["Combustível","posto|combust|gasolina|etanol|alcool|diesel|shell|ipiranga|petrobras|br mania"],["Uber e 99","uber|\\b99\\b|99 ?tecnologia|99pop|99app|cabify|indrive"],["Ônibus e metrô","onibus|metro|cptm|sitpass|bilhete|\\bbrt\\b|vlt|cartao transporte"],["Estacionamento","estacion|estapar|zona azul"],["Pedágio e tag","pedagio|sem parar|conectcar|veloe"],["Táxi","taxi"],["Bicicleta e patinete","bike|bicicleta|patinete"]],
+  "Manutenção do veículo": [["Revisão","revisao"],["Troca de óleo","oleo"],["Pneus","pneu|borrachar"],["Peças","pecas|autopec|auto ?pecas"],["Lavagem","lava ?jato|lavagem"],["Funilaria e pintura","funilar|lanternag|pintura"],["Mecânico","oficina|mecanic|auto ?center"]],
+  "IPVA e documentos do veículo": [["IPVA","ipva"],["Licenciamento","licenciamento|crlv"],["Multas","multa"],["Vistoria e transferência","vistoria|transferencia de veic"],["Carteira de motorista (CNH)","cnh|autoescola|habilitac"]],
+  "Despesas com filhos": [["Fraldas e higiene","fralda|lenco umedecido|higiene"],["Roupas e calçados","roupa infantil|calcado infantil|roupinha"],["Brinquedos","brinquedo|ri ?happy|pbkids"],["Mesada","mesada"],["Festa infantil","festa infantil|aniversario do|buffet infantil"],["Atividades e cursos","natacao|ballet|judo|escolinha|curso infantil"],["Pediatra e remédios","pediatr"]],
+  "Educação": [["Mensalidade escolar","escola|colegio|mensalidade escolar"],["Faculdade","faculdade|universidad|pos.?gradu|mba"],["Cursos","curso|udemy|alura|hotmart|kiwify"],["Idiomas","ingles|espanhol|idioma|wizard|ccaa|fisk|cultura inglesa"],["Material escolar","material escolar|papelaria|caderno|mochila"],["Livros","livro|livrar|saraiva|amazon livros"],["Transporte escolar","transporte escolar|van escolar"]],
+  "Pets": [["Ração e petiscos","racao|petisco"],["Veterinário","veterinar|clinica vet"],["Banho e tosa","banho e tosa|banho|tosa"],["Remédios do pet","remedio pet|vermifugo|antipulgas"],["Acessórios e brinquedos","coleira|caminha|brinquedo pet"],["Pet shop","pet ?shop|petz|cobasi|petlove"]],
+  "Apoio à família": [["Ajuda aos pais e parentes","ajuda|mae|pai|avo|parente"],["Pensão alimentícia","pensao"],["Mesada para família","mesada"],["Cuidador de idoso","cuidador|casa de repouso"]],
+  "Saúde": [["Plano de saúde","plano de saude|unimed|hapvida|amil|bradesco saude|sulamerica saude|notredame"],["Farmácia e remédios","farmac|drogaria|drogasil|droga ?raia|pague menos|panvel|pacheco|nissei|remedio"],["Consultas","consulta|medic|clinica|consultorio"],["Exames","exame|laborator"],["Dentista","dentist|odonto"],["Terapia e psicólogo","psicolog|terapia|psiquiatr"],["Ótica e óculos","otica|optica|oculos|lente de contato"],["Hospital e emergência","hospital|pronto.?socorro|emergencia"],["Fisioterapia","fisioter"],["Vacinas","vacina"]],
+  "Esporte e academia": [["Academia","academia|fitness|smart ?fit|bluefit|bodytech|selfit|gympass|wellhub|totalpass"],["Aulas e esportes","crossfit|pilates|natacao|futebol|futsal|quadra|society|jiu.?jitsu|muay|karate|judo|boxe|yoga|danca"],["Personal trainer","personal"],["Roupas e equipamentos esportivos","centauro|decathlon|netshoes|tenis de corrida"],["Corridas e inscrições","corrida|maratona|ticket sports|inscric"],["Suplementos","suplemento|whey|creatina"]],
+  "Cuidados pessoais": [["Cabelo e barbearia","salao|cabel|barbear"],["Unhas e manicure","manicure|pedicure|unha"],["Estética e depilação","estetica|depilac|sobrancelha|limpeza de pele"],["Cosméticos e maquiagem","cosmetic|maquiag|boticario|natura|sephora|avon|eudora"],["Perfumes","perfum"],["Higiene pessoal","higiene|shampoo|sabonete|desodorante"]],
+  "Compras": [["Compras online","shopee|mercado ?livre|mercadolivre|magalu|americanas|amazon|aliexpress|temu|shein"],["Celular e eletrônicos","celular|iphone|samsung|fone|carregador|kabum|fast shop"],["Utilidades e casa","utilidad|havan|casa"],["Livros e papelaria","livro|papelaria"],["Shopping e lojas","shopping|loja"]],
+  "Vestuário": [["Roupas","roupa|renner|riachuelo|\\bc ?& ?a\\b|\\bcea\\b|zara|hering|marisa|youcom"],["Calçados","calcad|sapat|tenis|havaianas|arezzo"],["Acessórios e bolsas","bolsa|acessorio|relogio|bijuter|oculos de sol"],["Roupa íntima e pijama","intima|lingerie|cueca|pijama"],["Joias","joia|ourives"]],
+  "Lazer": [["Cinema","cinema|cinemark|kinoplex"],["Shows, teatro e eventos","show|teatro|ingresso|sympla|eventim|ticketmaster|evento"],["Bares e baladas","balada|\\bbar\\b|boate|pub"],["Passeios e parques","parque|passeio|museu|zoologico|clube"],["Jogos e games","jogo|game|playstation|xbox|steam|nintendo"],["Hobbies","hobby|instrumento|artesanato|pesca"],["Apostas e loteria","loteria|mega.?sena|aposta|bet"]],
+  "Viagens": [["Passagens","passagem|latam|gol linhas|azul linh|rodoviaria|aerea"],["Hospedagem","hotel|pousada|airbnb|booking|hostel|resort"],["Passeios e ingressos","passeio|ingresso|tour"],["Alimentação na viagem","restaurante viagem"],["Aluguel de carro","localiza|movida|unidas|aluguel de carro"],["Seguro viagem","seguro viagem"],["Pacote de viagem","pacote|cvc|decolar|hurb|123 ?milhas"]],
+  "Presentes e doações": [["Presente de aniversário","aniversario|niver"],["Presente de Natal","natal"],["Dia das Mães e dos Pais","dia das maes|dia dos pais"],["Dia dos Namorados","namorad"],["Casamento, chá de bebê e chá de panela","casamento|cha de bebe|cha de panela|cha revelacao|lista de presente"],["Amigo secreto","amigo secreto|amigo oculto"],["Flores e cartões","flores|floricultura|cartao de presente"],["Festas e comemorações","festa|comemorac|confraterniz"],["Dízimo e ofertas","dizimo|oferta|igreja"],["Doações e vaquinhas","doacao|vaquinha|ong|caridade"]],
+  "Seguros": [["Seguro de vida","seguro de vida|vida"],["Seguro do carro","seguro auto|seguro do carro|porto seguro auto"],["Seguro residencial","residencial"],["Seguro do celular","seguro celular|seguro do celular"],["Seguro viagem","seguro viagem"]],
+  "Tarifas e juros": [["Tarifa bancária","tarifa|cesta de servic|pacote de servic|taxa de manut"],["Anuidade do cartão","anuidade"],["Juros","juros|encargo|rotativo"],["IOF","\\biof\\b|i\\.o\\.f"],["Multa por atraso","multa|mora "],["Saque","saque"]],
+  "Empréstimos e financiamentos": [["Financiamento do carro","parcela do carro|financiamento (do )?(carro|veic)"],["Financiamento imobiliário","financiamento imob|prestacao (do )?(apto|apartamento|imovel|casa)"],["Empréstimo pessoal","emprestimo|credito pessoal"],["Consignado","consignado"],["Parcelamento da fatura","parcelamento de fatura|fatura parcelada"],["Crediário","crediario|carne"]],
+  "Investimentos": [["Poupança","poupanca"],["Reserva de emergência","reserva|caixinha|rende ?facil"],["Renda fixa (CDB, Tesouro)","\\bcdb\\b|\\blci\\b|\\blca\\b|tesouro|renda fixa"],["Ações e fundos","acoes|fundo|\\bfii\\b|corretora|xp inv|nuinvest|\\bbtg\\b"],["Previdência privada","previdencia"],["Criptomoedas","cripto|bitcoin|binance"],["Consórcio","consorcio"]],
+  "Transferências": [["Para outra conta minha","mesma titularidade|entre contas|propria"],["Para familiares","mae|pai|irma|irmao|filho|filha|esposa|marido"],["Para outras pessoas","pix|transfer"]],
+  "Trabalho e MEI": [["DAS do MEI","\\bdas\\b|mei|simples nacional"],["Material de trabalho","material de trabalho|ferramenta de trabalho"],["Contador","contador|contabil"],["Cursos profissionais","curso profissional|certificac"],["Equipamentos de trabalho","equipamento"]],
+  "Outros gastos": [["Saque em dinheiro","saque"],["Fatura do cartão","fatura|cartao de credito"],["Diversos","diversos"]],
+  "Salário": [["13º salário","\\b13|decimo terceiro"],["Férias","ferias"],["Adiantamento (vale)","adiantamento|\\bvale\\b"],["Horas extras","hora extra|horas extras"],["PLR e bônus","plr|bonus|participacao nos lucros"],["Comissões","comissao"],["Salário mensal","salario|folha|vencimentos|remunerac"]],
+  "Freelas e extras": [["Freela e bico","freela|bico|job"],["Serviço prestado","servico|honorar"],["Venda de produtos","venda"],["Cachê","cache"],["Aulas particulares","aula"]],
+  "Ticket e vale-refeição": [["Vale-refeição","refeic|\\bvr\\b"],["Vale-alimentação","alimentac|\\bva\\b"]],
+  "Benefícios e auxílios": [["Aposentadoria e INSS","aposentad|inss|beneficio previd"],["Pensão recebida","pensao"],["Bolsa Família e auxílios do governo","bolsa familia|auxilio|bpc|loas"],["Seguro-desemprego","seguro.?desemprego"],["FGTS","fgts"],["Restituição do imposto de renda","restituic|irpf"],["Bolsa de estudos","bolsa de estudo|bolsa"]],
+  "Rendimentos e resgates": [["Rendimento","rendiment|juros"],["Resgate de investimento","resgate"],["Dividendos","dividend|\\bjcp\\b|proventos"],["Cashback","cashback"]],
+  "Aluguéis recebidos": [["Aluguel de imóvel","aluguel|inquilino"],["Aluguel de temporada","airbnb|temporada"]],
+  "Venda de bens": [["Venda de veículo","carro|moto|veiculo"],["Venda de objetos usados","usado|olx|enjoei|marketplace"],["Venda de imóvel","imovel|casa|apartamento|lote"]],
+  "Presentes recebidos": [["Presente em dinheiro","presente"],["Mesada recebida","mesada"],["Herança","heranca"],["Prêmios e sorteios","premio|sorteio|loteria"]],
+  "Transferências recebidas": [["De outra conta minha","mesma titularidade|entre contas|propria"],["De familiares","mae|pai|irma|irmao|filho|filha|esposa|marido"],["Pix recebido","pix"]],
+  "Estornos e devoluções": [["Estorno","estorno|chargeback"],["Reembolso","reembolso"],["Devolução de compra","devolu|cancelamento"],["Pix devolvido","pix devolvido"]],
+  "Outras entradas": [["Empréstimo recebido","emprestimo"],["Saldo inicial","saldo inicial"],["Diversas","diversa"]],
+};
+const SUB_RE = {}; for (const [k, l] of Object.entries(SUBS)) SUB_RE[k] = l.map(([n, re]) => [n, new RegExp(re)]);
+const subsOf = cat => state.tipo === "pj" ? [] : (SUBS[cat] || []).map(x => x[0]);
+const guessSub = (cat, desc) => { if (state.tipo === "pj") return ""; const t = plain(desc); if (!t) return ""; for (const [n, re] of SUB_RE[cat] || []) if (re.test(t)) return n; return ""; };
 const FOOD = ["Mercado","Restaurante","Delivery","Padaria e lanches"];
 const PF_CATS = { saida: CATS.saida.slice(), entrada: CATS.entrada.slice() };
 const PJ_CATS = {
@@ -936,6 +1010,10 @@ const catInfo = k => [...CATS.saida, ...CATS.entrada].find(c => c.k === k) || [.
 const catColor = k => `var(${catInfo(k).c})`;
 // dicionário de palavras (descrição normalizada: minúsculas, sem acento). A ordem importa: o mais específico vem antes.
 const RULES = [
+  [/diarista|faxineira|faxina|empregada domest|mensalista|lavanderia|passadeira|dedetiz|piscineiro|jardineiro/, "Serviços domésticos"],
+  [/pensao alimenticia|ajuda (para|pra|a) (mae|pai|avo)|casa de repouso|cuidador de idoso/, "Apoio à família"],
+  [/\bdas\b.*mei|mei\b.*\bdas\b|das mei|pgmei|simples nacional/, "Trabalho e MEI"],
+  [/presente|aniversario de|amigo secreto|amigo oculto|cha de bebe|cha de panela|lista de casamento|dia das maes|dia dos pais|dia dos namorados/, "Presentes e doações"],
   [/emprestimo|financiamento|consignado|credito pessoal|crediario|parcela do carro|prestacao do (carro|apto|apartamento|imovel)/, "Empréstimos e financiamentos"],
   [/ipva|detran|licenciamento|dpvat|multa de transito|vistoria veic|transferencia de veic/, "IPVA e documentos do veículo"],
   [/oficina|mecanic|auto ?pecas?|autopec|pneu|borrachar|funilar|lanternag|alinhamento|balanceamento|troca de oleo|lava ?jato|auto ?center|retifica|bateria (de|do) carro/, "Manutenção do veículo"],
@@ -965,6 +1043,8 @@ const RULES = [
   [/shopee|mercado ?livre|mercadolivre|magalu|magazine|americanas|shein|amazon|aliexpress|temu|renner|riachuelo|c ?& ?a\b|\bcea\b|zara|hering|marisa|casas bahia|ponto frio|kabum|fast shop|havan|\bloja|shopping|boticario|natura|sephora|perfumar|pet ?shop|petz|cobasi|presente|roupa|calcado|sapato/, "Compras"],
 ];
 const ENTRY_RULES = [
+  [/aposentad|\binss\b|bolsa familia|auxilio|seguro.?desemprego|\bfgts\b|restituic|\bbpc\b|\bloas\b|pensao/, "Benefícios e auxílios"],
+  [/presente|heranca|premio|sorteio|mesada/, "Presentes recebidos"],
   [/ticket|vale.?refei|vale.?alimenta|alelo|sodexo|pluxee|flash benef|\bcaju\b|\bvr benef/, "Ticket e vale-refeição"],
   [/aluguel recebido|recebimento de aluguel|inquilino/, "Aluguéis recebidos"],
   [/devolvid|devolucao|estorno|reembolso|chargeback|cancelamento|cashback/, "Estornos e devoluções"],
@@ -1496,7 +1576,7 @@ async function runAction(a){
     const ym = /^\d{4}-\d{2}$/.test(a.mes||"") ? a.mes : ymOf(todayStr()), occ = occurrences(ym).find(o => o.ag.id === ag.id);
     const id = linkId(ag.id, ym);
     if (state.tx.some(t => t.id === id)) return { label:`${ag.title} já estava pago`, detail:fmtD(occ ? occ.date : ym+"-01") };
-    await store.put("tx", { id, type:ag.type||"saida", amount:ag.amount, cat:ag.cat, desc:ag.title, date: occ ? occ.date : todayStr(), src:"agenda", createdAt:Date.now() });
+    await store.put("tx", { id, type:ag.type||"saida", amount:ag.amount, cat:ag.cat, ...(ag.sub ? { sub: ag.sub } : {}), desc:ag.title, date: occ ? occ.date : todayStr(), src:"agenda", createdAt:Date.now() });
     return { entrada: ag.type === "entrada", label:`${ag.type==="entrada"?"Recebido":"Pago"}: ${ag.title}`, detail:`${money(ag.amount)} · ${monthShort(ym)}`, ids:[["tx", id]] };
   }
   if (a.tipo === "excluir_programacao") {
@@ -1950,7 +2030,7 @@ const ICON_PATHS = {
   wrench:"M14.5 5.5a3.5 3.5 0 0 0 4.9 4.9L21 12l-9 9-3-3 9-9zM4 20l5-5", baby:"M12 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM8 22v-6l-3-3 3-3h8l3 3-3 3v6",
   paw:"M12 13c-3 0-5 3-5 6h10c0-3-2-6-5-6zM5 10h.01M9 5h.01M15 5h.01M19 10h.01", shirt:"M8 3l4 2 4-2 5 4-3 3-2-1v11H8V9l-2 1-3-3z",
   sparkle:"M12 3v5M12 16v5M3 12h5M16 12h5M6 6l3 3M15 15l3 3M6 18l3-3M15 9l3-3", gift:"M4 10h16v10H4zM3 7h18v3H3zM12 7v13M12 7c-2-4-6-3-5 0M12 7c2-4 6-3 5 0",
-  plane:"M2 13l19-8-6 16-3-7z", card:"M3 6h18v12H3zM3 10h18M7 15h4",
+  plane:"M2 13l19-8-6 16-3-7z", broom:"M14 3l-4 9M7 12h8l2 9H5zM9 16v5M13 16v5", brief:"M4 8h16v11H4zM9 8V5h6v3M4 13h16", card:"M3 6h18v12H3zM3 10h18M7 15h4",
 };
 const CAT_META = {
   "Móveis e eletrodomésticos":["sofa","Móveis, colchão, geladeira, fogão e outros eletrodomésticos"], "Reforma e manutenção da casa":["hammer","Material de construção, pedreiro, eletricista, pintura e consertos"],
@@ -1958,7 +2038,7 @@ const CAT_META = {
   "IPVA e documentos do veículo":["doc","IPVA, licenciamento, Detran e multas"], "Despesas com filhos":["baby","Fraldas, roupas, brinquedos, babá e outros gastos com os filhos"],
   "Pets":["paw","Ração, pet shop, veterinário, banho e tosa"], "Cuidados pessoais":["sparkle","Salão, barbearia, manicure, cosméticos e perfumes"],
   "Vestuário":["shirt","Roupas, calçados e acessórios"], "Viagens":["plane","Passagens, hotéis, hospedagem e pacotes de viagem"],
-  "Presentes e doações":["gift","Presentes, doações, dízimo e vaquinhas"], "Empréstimos e financiamentos":["card","Parcelas de empréstimo, financiamento e crediário"],
+  "Presentes e doações":["gift","Presentes (aniversário, Natal, casamento, amigo secreto), festas, dízimo e doações"], "Serviços domésticos":["broom","Diarista, empregada, babá, lavanderia e outros serviços da casa"], "Apoio à família":["people","Ajuda aos pais e parentes, pensão alimentícia e cuidador"], "Trabalho e MEI":["brief","DAS do MEI, material e equipamentos de trabalho, contador"], "Benefícios e auxílios":["shield","Aposentadoria, INSS, auxílios do governo, FGTS e restituição do IR"], "Presentes recebidos":["gift","Presentes em dinheiro, mesada, prêmios e heranças"], "Empréstimos e financiamentos":["card","Parcelas de empréstimo, financiamento e crediário"],
   "Ticket e vale-refeição":["food","Crédito do ticket alimentação ou vale-refeição"], "Aluguéis recebidos":["home","Aluguel de imóvel que você recebe"], "Venda de bens":["money","Venda de carro, móveis, eletrônicos e outros bens"],
   "Mercado":["cart","Supermercado, feira, hortifrúti e atacado"], "Restaurante":["food","Refeições fora de casa: restaurantes, bares e lanchonetes"],
   "Delivery":["food","Pedidos por aplicativo: iFood, Rappi e similares"], "Padaria e lanches":["coffee","Padaria, café, lanches e doces do dia a dia"],
@@ -2263,6 +2343,22 @@ function render(){
   const corpBand = state.tipo === "pj" && state.tab !== "chat" && state.tab !== "master" ? `<div class="corpBand"><b>${state.space === "nms" ? "NMS" : "Empresa"}</b><span>Relatório gerencial</span><span>Período: ${monthName(state.ym)}</span><span>Emitido em ${new Date().toLocaleDateString("pt-BR")} às ${new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}</span></div>` : "";
   const head = spaceBar + corpBand + (state.tab === "chat" ? `<div class="top"><span class="mLogo">${logoHTML(40)}</span><h1>${L("Chat do NMS","Assistente financeiro")}</h1><button class="btn small" data-act="chatClear">Limpar conversa</button></div>` : state.tab === "master" ? `<div class="top"><span class="mLogo">${logoHTML(40)}</span><h1>Painel Master</h1><span class="chip ex">acesso administrador</span></div>` : `<div class="top"><span class="mLogo">${logoHTML(40)}</span><h1>${(state.tipo === "pj" ? {painel:"Visão geral",dashboard:"DRE financeiro e indicadores",lancamentos:"Movimentações",calendario:"Calendário financeiro",agenda:"Contas a pagar e receber"} : {painel:"Painel do mês",dashboard:"Dashboard pessoal",lancamentos:"Lançamentos",calendario:"Calendário financeiro",agenda:"Agenda do dinheiro"})[state.tab]}</h1>
     <span style="display:flex;gap:8px;align-items:center"><div class="month"><button data-act="prev" aria-label="Mês anterior">‹</button><span>${(m => m.charAt(0).toUpperCase() + m.slice(1))(monthName(state.ym))}</span><button data-act="next" aria-label="Próximo mês">›</button></div>${state.tab === "painel" ? `<button class="btn small mTema" data-act="temaCiclo" aria-label="Trocar tema: claro, escuro ou automático">Tema: ${tema()==="auto"?"Auto":TEMA_NOME[tema()]}</button><button class="btn small mLogout" data-act="logout">Sair</button>` : ""}</span></div>`);
+  const HINTS = state.tipo === "pj"
+    ? { painel:"Resumo da empresa no mês: quanto entrou, quanto saiu, o que vence e onde está o dinheiro.", lancamentos:"Todas as entradas e saídas da empresa, dia a dia. Toque em uma linha para corrigir.", calendario:"Os dias em que a empresa paga e recebe. Toque em um dia para ver os detalhes.", agenda:"O que a empresa tem para pagar e para receber. Quando pagar ou receber, toque em Dar baixa." }
+    : { painel:"Resumo do seu mês: quanto entrou, quanto saiu e as contas que vêm pela frente.", lancamentos:"Tudo o que entrou e saiu do seu bolso, dia a dia. Toque em um item para corrigir.", calendario:"Os dias em que o dinheiro entra e sai. Toque em um dia para ver os detalhes." };
+  const pageHint = state.tab !== "chat" && state.tab !== "master" && HINTS[state.tab] ? `<p class="pageHint">${HINTS[state.tab]}</p>` : "";
+  let guiaOk = false; try { guiaOk = localStorage.getItem("nms.guia.ok." + (state.space || "pessoal")) === "1"; } catch {}
+  const realTx = state.tx.filter(t => !t.exemplo).length;
+  const guia = state.tab === "painel" && state.mode !== "loading" && !guiaOk && realTx < 3 ? `<section class="panel guia"><h2>Comece por aqui <small><button class="btn small" data-act="guiaOk">Já entendi</button></small></h2>
+    <ol class="guiaSteps">${(state.tipo === "pj" ? [
+      ["Cadastre clientes e fornecedores", "Assim cada conta fica ligada a quem paga ou recebe.", `<button class="btn small" data-act="tab" data-tab="agenda">Abrir contas</button>`],
+      ["Lance o que a empresa tem a pagar e a receber", "Boletos, aluguel, impostos, notas de clientes. Quando pagar ou receber, é só dar baixa.", `<button class="btn small primary" data-act="contaNew" data-v="pagar">+ Conta a pagar</button><button class="btn small" data-act="contaNew" data-v="receber">+ Conta a receber</button>`],
+      ["Veja o resultado da empresa", "O DRE mostra quanto a empresa vendeu, gastou e lucrou, com explicação em cada número.", `<button class="btn small" data-act="tab" data-tab="dashboard">Ver DRE</button>`],
+    ] : [
+      ["Anote o que entrou e o que saiu", "Toque em + e escolha Saída (gastei) ou Entrada (recebi). A categoria é sugerida sozinha pela descrição.", `<button class="btn small primary" data-act="newTx">+ Lançamento</button>`],
+      ["Programe as contas fixas", "Aluguel, escola, internet, fatura do cartão. O NMS lembra os vencimentos e mostra quanto vai sobrar.", `<button class="btn small" data-act="tab" data-tab="agenda">Abrir agenda</button>`],
+      ["Ou importe o extrato do banco", "Envie o arquivo do seu banco e o NMS separa tudo em categorias para você.", `<button class="btn small" data-act="import">Importar extrato</button>`],
+    ]).map(([t, d, b], i) => `<li><span class="gNum">${i+1}</span><div><b>${t}</b><p>${d}</p><div class="tools">${b}</div></div></li>`).join("")}</ol></section>` : "";
   const hasEx = state.tx.some(t => t.exemplo) || state.ag.some(a => a.exemplo) || state.forn.some(f => f.exemplo) || state.cli.some(c => c.exemplo);
   const banner = (state.mode === "local" ? `<div class="banner"><span class="sp"><b>Modo local.</b> Os dados ficam só neste navegador. Configure o servidor (arquivo config.js) para sincronizar entre aparelhos e ter contas de usuário.</span></div>` : "")
     + (hasEx ? `<div class="banner"><span class="sp"><b>Dados de exemplo.</b> Os itens marcados como exemplo mostram como o app funciona. Apague quando for começar.</span><button class="btn small" data-act="clearEx">Apagar exemplos</button></div>` : "");
@@ -2272,7 +2368,7 @@ function render(){
   const animKey = `${state.tab}|${state.ym}|${state.space}|${state.cpTab}|${state.mode === "loading" ? 0 : 1}`;
   const doAnim = animKey !== lastAnimKey && state.mode !== "loading" && !reduceMotion;
   lastAnimKey = animKey;
-  view.innerHTML = head + (state.tab === "chat" || state.tab === "master" ? "" : banner + cartBar) + body;
+  view.innerHTML = head + pageHint + (state.tab === "chat" || state.tab === "master" ? "" : banner + guia + cartBar) + body;
   if (doAnim) runEnter();
   fitCharts();
   if (state.tab === "chat") { const ci = document.getElementById("chatIn"); if (ci && keep) { ci.value = keep.v; if (!keep.blur) ci.focus(); } const box = document.getElementById("chatLog"); if (box) box.scrollTop = box.scrollHeight; }
@@ -2350,6 +2446,7 @@ function renderPainel(){
         <div><span class="label">Média</span><b class="num">${money(v/items.length)}</b></div>
         <div><span class="label">vs ${monthShort(addMonths(state.ym,-1))}</span><b class="num" style="color:${dv===null?"var(--muted)":dv>0?"var(--k-out)":"var(--k-in)"}">${dv===null?"—":`${dv>0?"▲":"▼"} ${Math.abs(dv).toFixed(0)}%`}</b></div>
       </div>
+      ${(() => { const bs = {}; items.forEach(t => { const n = t.sub || "Sem subcategoria"; bs[n] = (bs[n] || 0) + (+t.amount || 0); }); const e = Object.entries(bs).sort((a,b) => b[1]-a[1]); return e.length > 1 || (e[0] && e[0][0] !== "Sem subcategoria") ? `<div class="label" style="margin-top:6px">Por subcategoria</div><div class="subList">${e.map(([n, v]) => `<div><span>${esc(n)}</span><span class="subBar"><i style="width:${(v/e[0][1]*100).toFixed(1)}%;background:${catColor(k)}"></i></span><b class="num">${money(v)}</b></div>`).join("")}</div>` : ""; })()}
       <div class="label" style="margin-top:6px">Maiores gastos</div>
       <div class="psList">${items.slice(0,5).map(t => `<button data-act="editTx" data-id="${esc(t.id)}"><span class="num">${t.date.slice(8)}/${t.date.slice(5,7)}</span><span>${esc(t.desc)}</span><b class="num">${money(t.amount)}</b></button>`).join("")}</div>
       <div class="tools"><button class="btn small" data-act="filterCat" data-cat="${esc(k)}">Ver todos os lançamentos</button><button class="btn small" data-act="pie" data-cat="${esc(k)}">Limpar seleção</button></div>
@@ -2429,7 +2526,7 @@ function txRow(t){
   const isIn = t.type === "entrada";
   return `<button class="row" data-act="editTx" data-id="${esc(t.id)}">
     <span class="ico" style="color:${catColor(t.cat)}">${catIcon(t.cat, 18)}</span>
-    <span class="t"><b>${esc(t.desc || t.cat)}</b><span>${esc(t.cat)}${t.src==="extrato"?' <span class="chip">extrato</span>':""}${t.src==="agenda"?(/\(\d+\/\d+\)\s*$/.test(t.desc||"")?' <span class="chip">parcela</span>':' <span class="chip">agenda</span>'):""}${t.exemplo?' <span class="chip ex">exemplo</span>':""}</span></span>
+    <span class="t"><b>${esc(t.desc || t.cat)}</b><span>${esc(t.cat)}${t.sub ? ` · ${esc(t.sub)}` : ""}${t.src==="extrato"?' <span class="chip">extrato</span>':""}${t.src==="agenda"?(/\(\d+\/\d+\)\s*$/.test(t.desc||"")?' <span class="chip">parcela</span>':' <span class="chip">agenda</span>'):""}${t.exemplo?' <span class="chip ex">exemplo</span>':""}</span></span>
     <span class="amt ${isIn?"pos":""}">${isIn?"+":"−"} ${money(t.amount)}</span></button>`;
 }
 /* controle de parcelamentos: agrupa as programações de um mesmo parcelamento */
@@ -2460,13 +2557,13 @@ function renderParcelas(){
 function renderLanc(){
   let list = txOfMonth(state.ym);
   if (state.fcat) list = list.filter(t => t.cat === state.fcat);
-  if (state.q) { const q = state.q.toLowerCase(); list = list.filter(t => (t.desc||"").toLowerCase().includes(q) || (t.cat||"").toLowerCase().includes(q)); }
+  if (state.q) { const q = state.q.toLowerCase(); list = list.filter(t => (t.desc||"").toLowerCase().includes(q) || (t.cat||"").toLowerCase().includes(q) || (t.sub||"").toLowerCase().includes(q)); }
   list.sort((a,b) => b.date.localeCompare(a.date) || (b.createdAt||0)-(a.createdAt||0));
   const groups = {}; list.forEach(t => (groups[t.date] ||= []).push(t));
   const s = sums(list);
   const opts = [...CATS.saida, ...CATS.entrada].map(c => `<option ${state.fcat===c.k?"selected":""}>${c.k}</option>`).join("");
   return `<div class="tools">
-      <input class="search" id="q" type="search" placeholder="Buscar descrição" value="${esc(state.q)}">
+      <input class="search" id="q" type="search" placeholder="Buscar por descrição, categoria ou subcategoria" value="${esc(state.q)}">
       <select class="search" id="fcat" aria-label="Filtrar por categoria"><option value="">Todas as categorias</option>${opts}</select>
       <button class="btn primary" data-act="newTx">+ Lançamento</button>
     </div>
@@ -2485,7 +2582,7 @@ function occRow(o){
   const st = o.paid ? `<span class="chip ok">${isIn?"recebido":"pago"}</span>` : o.date < t ? `<span class="chip late">atrasado</span>` : (new Date(o.date) - new Date(t))/864e5 <= 3 ? `<span class="chip soon">em breve</span>` : `<span class="chip">previsto</span>`;
   return `<div class="row" style="cursor:default">
     <span class="ico icoDay" style="color:${catColor(a.cat)}">${catIcon(a.cat, 16)}<em>${esc(o.date.slice(8,10))}</em></span>
-    <button class="t" data-act="editAg" data-id="${esc(a.id)}" data-ym="${o.ym}" style="background:none;border:0;padding:0;text-align:left;min-width:0"><b>${esc(a.title)}</b><span>${esc(a.cat)} ${a.rec==="mensal"?'<span class="chip">mensal</span>':""} ${st}${a.exemplo?' <span class="chip ex">exemplo</span>':""}</span></button>
+    <button class="t" data-act="editAg" data-id="${esc(a.id)}" data-ym="${o.ym}" style="background:none;border:0;padding:0;text-align:left;min-width:0"><b>${esc(a.title)}</b><span>${esc(a.cat)}${a.sub ? ` · ${esc(a.sub)}` : ""} ${a.rec==="mensal"?'<span class="chip">mensal</span>':""} ${st}${a.exemplo?' <span class="chip ex">exemplo</span>':""}</span></button>
     <span style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="amt ${isIn?"pos":""}">${isIn?"+":"−"} ${money(a.amount)}</span>
     <button class="btn small" data-act="${o.paid?"unpay":"pay"}" data-id="${esc(a.id)}" data-ym="${o.ym}">${o.paid?"Desfazer":isIn?"Recebi":"Paguei"}</button></span></div>`;
 }
@@ -2576,7 +2673,7 @@ const close = () => { modal.innerHTML = ""; };
 function catOptions(type, sel){
   const list = type === "entrada" ? CATS.entrada : CATS.saida, o = c => `<option ${c.k===sel?"selected":""}>${esc(c.k)}</option>`;
   const extra = sel && !list.some(c => c.k === sel) ? `<option selected>${esc(sel)}</option>` : "";
-  if (type === "entrada") return extra + list.map(o).join("");
+  if (!list.some(c => c.g)) return extra + list.map(o).join("");
   const groups = [...new Set(list.map(c => c.g || "Outros"))];
   return extra + groups.map(g => `<optgroup label="${esc(g)}">${list.filter(c => (c.g || "Outros") === g).map(o).join("")}</optgroup>`).join("");
 }
@@ -2599,11 +2696,12 @@ function openForm(kind, item, pre, ctxYm){
   const draw = () => {
     modal.innerHTML = `<div class="scrim" data-act="scrim"><form class="sheet" id="frm" novalidate>
       <h3>${isAg ? (item?"Editar programação":"Programar dinheiro") : (item?"Editar lançamento":"Novo lançamento")}</h3>
-      <div class="seg"><button type="button" data-type="saida" aria-pressed="${type!=="entrada"}">Saída</button><button type="button" data-type="entrada" aria-pressed="${type==="entrada"}">Entrada</button></div>
+      <div class="seg segTipo"><button type="button" data-type="saida" aria-pressed="${type!=="entrada"}">${L("− Saída · gastei","− Despesa · saiu")}</button><button type="button" data-type="entrada" aria-pressed="${type==="entrada"}">${L("+ Entrada · recebi","+ Receita · entrou")}</button></div>
       <div class="field"><label for="f-amt">Valor (R$)</label><input id="f-amt" class="money" inputmode="decimal" placeholder="0,00" value="${it.amount ? (+it.amount).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}) : ""}" required></div>
       <div class="field"><label for="f-desc">${isAg?"O que é":"Descrição"}</label><input id="f-desc" placeholder="${isAg?"Ex.: Aluguel, escola, gás":"Ex.: Mercado do mês"}" value="${esc(isAg?it.title:it.desc)}"></div>
-      <div class="two"><div class="field"><label for="f-cat">Categoria</label><select id="f-cat">${catOptions(type, it.cat)}</select></div>
-        <div class="field"><label for="f-date">${isAg?"Data (vencimento)":"Data"}</label><input id="f-date" type="date" value="${it.date || (state.ym===ymOf(todayStr())?todayStr():state.ym+"-01")}"></div></div>
+      <div class="two"><div class="field"><label for="f-cat">Categoria</label><select id="f-cat">${catOptions(type, it.cat)}</select><small class="catHelp" id="f-cathelp"></small></div>
+        ${state.tipo !== "pj" ? `<div class="field" id="f-subw"><label for="f-sub">Subcategoria <span class="opt">opcional</span></label><select id="f-sub"></select></div>` : `<div class="field"><label for="f-date">${isAg?"Data (vencimento)":"Data"}</label><input id="f-date" type="date" value="${it.date || (state.ym===ymOf(todayStr())?todayStr():state.ym+"-01")}"></div>`}</div>
+      ${state.tipo !== "pj" ? `<div class="field"><label for="f-date">${isAg?"Data (vencimento)":"Data"}</label><input id="f-date" type="date" value="${it.date || (state.ym===ymOf(todayStr())?todayStr():state.ym+"-01")}"></div>` : ""}
       ${state.tipo !== "pj" && (state.carteiras||[]).length ? `<div class="field"><label for="f-cart">Conta</label><select id="f-cart">${[{id:"", nome:"Conta principal"}, ...state.carteiras].map(c => `<option value="${esc(c.id)}" ${((it.carteira ?? state.cart) || "") === c.id ? "selected" : ""}>${esc(c.nome)}</option>`).join("")}</select></div>` : ""}
       ${!isAg && !item ? `<div class="two"><div class="field"><label for="f-pg">${type==="entrada"?"Recebimento":"Pagamento"}</label><select id="f-pg"><option value="vista">À vista</option><option value="parc">Parcelado</option></select></div>
         <div class="field" id="f-pnw" hidden><label for="f-pn">Número de parcelas</label><select id="f-pn">${[...Array(47)].map((_,i) => `<option>${i+2}</option>`).join("")}</select></div></div>
@@ -2619,9 +2717,18 @@ function openForm(kind, item, pre, ctxYm){
       <div class="actions"><span class="sp"></span>
         <button type="button" class="btn" data-act="close">Cancelar</button><button class="btn primary" type="submit">Salvar</button></div>
     </form></div>`;
-    modal.querySelectorAll(".seg button").forEach(b => b.onclick = () => { type = b.dataset.type; const keep = {amount:modal.querySelector("#f-amt").value, d:modal.querySelector("#f-desc").value, date:modal.querySelector("#f-date").value, cart:modal.querySelector("#f-cart")?.value, pg:modal.querySelector("#f-pg")?.value, pn:modal.querySelector("#f-pn")?.value, pv:modal.querySelector("#f-pv")?.value, p1:modal.querySelector("#f-p1")?.value}; draw(); modal.querySelector("#f-amt").value = keep.amount; modal.querySelector("#f-desc").value = keep.d; modal.querySelector("#f-date").value = keep.date; if (keep.cart !== undefined && modal.querySelector("#f-cart")) modal.querySelector("#f-cart").value = keep.cart; ["pg","pn","pv","p1"].forEach(k => { const e = modal.querySelector("#f-" + k); if (e && keep[k]) e.value = keep[k]; }); parcUpd(); });
-    const desc = modal.querySelector("#f-desc"), cat = modal.querySelector("#f-cat");
-    if (!item) desc.addEventListener("input", () => { cat.value = guessCat(desc.value, type); });
+    modal.querySelectorAll(".seg button").forEach(b => b.onclick = () => { type = b.dataset.type; const keep = {amount:modal.querySelector("#f-amt").value, d:modal.querySelector("#f-desc").value, date:modal.querySelector("#f-date").value, cart:modal.querySelector("#f-cart")?.value, pg:modal.querySelector("#f-pg")?.value, pn:modal.querySelector("#f-pn")?.value, pv:modal.querySelector("#f-pv")?.value, p1:modal.querySelector("#f-p1")?.value}; draw(); modal.querySelector("#f-amt").value = keep.amount; modal.querySelector("#f-desc").value = keep.d; modal.querySelector("#f-date").value = keep.date; if (keep.cart !== undefined && modal.querySelector("#f-cart")) modal.querySelector("#f-cart").value = keep.cart; ["pg","pn","pv","p1"].forEach(k => { const e = modal.querySelector("#f-" + k); if (e && keep[k]) e.value = keep[k]; }); if (keep.d) { const c = modal.querySelector("#f-cat"); c.value = guessCat(keep.d, type); c.dispatchEvent(new Event("change")); } parcUpd(); });
+    const desc = modal.querySelector("#f-desc"), cat = modal.querySelector("#f-cat"), subSel = modal.querySelector("#f-sub"), catHelp = modal.querySelector("#f-cathelp");
+    const fillSub = val => {
+      if (catHelp) catHelp.textContent = (CAT_META[cat.value] || [])[1] || "";
+      if (!subSel) return;
+      const l = subsOf(cat.value), cur = val || "";
+      subSel.innerHTML = `<option value="">Sem subcategoria</option>` + l.map(n => `<option ${n === cur ? "selected" : ""}>${esc(n)}</option>`).join("") + (cur && !l.includes(cur) ? `<option selected>${esc(cur)}</option>` : "");
+      modal.querySelector("#f-subw").hidden = !l.length && !cur;
+    };
+    fillSub(it.sub || (!item ? guessSub(cat.value, desc.value) : ""));
+    cat.addEventListener("change", () => fillSub(guessSub(cat.value, desc.value)));
+    if (!item) desc.addEventListener("input", () => { cat.value = guessCat(desc.value, type); fillSub(guessSub(cat.value, desc.value)); });
     ["#f-pg","#f-pn","#f-pv","#f-p1","#f-amt","#f-date"].forEach(q => { const e = modal.querySelector(q); if (e) { e.addEventListener("change", parcUpd); e.addEventListener("input", parcUpd); } });
     parcUpd();
     const arm = (btn, run) => { if (btn) btn.onclick = async () => {
@@ -2649,15 +2756,15 @@ function openForm(kind, item, pre, ctxYm){
       const err = modal.querySelector("#f-err");
       if (!amount) { err.hidden = false; err.textContent = "Informe um valor maior que zero, por exemplo 89,90."; return; }
       if (!date) { err.hidden = false; err.textContent = "Escolha a data."; return; }
-      const base = { type, amount: Math.round(amount*100)/100, cat: cat.value, date };
+      const base = { type, amount: Math.round(amount*100)/100, cat: cat.value, date, ...(subSel && subSel.value ? { sub: subSel.value } : {}) };
       const fc0 = modal.querySelector("#f-cart");
       if (!isAg && !item && modal.querySelector("#f-pg")?.value === "parc") {
         const n = +modal.querySelector("#f-pn").value, porParc = modal.querySelector("#f-pv").value === "parc", paga = modal.querySelector("#f-p1").value === "paga";
         const total = Math.round((porParc ? amount * n : amount) * 100) / 100, parts = splitParc(total, n), grp = rid(), nome = desc.value.trim() || cat.value, now = Date.now();
-        const ags = parts.map((v, i) => ({ id: "a-" + rid(), type, amount: v, cat: cat.value, title: `${nome} (${i+1}/${n})`, date: parcDate(date, i), rec: "unica", ate: "", pulados: {}, grupo: grp, parcela: { i: i+1, n, total }, createdAt: now + i, ...(fc0 ? { carteira: fc0.value } : {}) }));
+        const ags = parts.map((v, i) => ({ id: "a-" + rid(), type, amount: v, cat: cat.value, title: `${nome} (${i+1}/${n})`, ...(base.sub ? { sub: base.sub } : {}), date: parcDate(date, i), rec: "unica", ate: "", pulados: {}, grupo: grp, parcela: { i: i+1, n, total }, createdAt: now + i, ...(fc0 ? { carteira: fc0.value } : {}) }));
         try {
           await putMany("ag", ags);
-          if (paga) { const a = ags[0]; await store.put("tx", { id: linkId(a.id, ymOf(a.date)), type, amount: a.amount, cat: a.cat, desc: a.title, date: a.date, src: "agenda", createdAt: now, ...(fc0 ? { carteira: fc0.value } : {}) }); }
+          if (paga) { const a = ags[0]; await store.put("tx", { id: linkId(a.id, ymOf(a.date)), type, amount: a.amount, cat: a.cat, ...(a.sub ? { sub: a.sub } : {}), desc: a.title, date: a.date, src: "agenda", createdAt: now, ...(fc0 ? { carteira: fc0.value } : {}) }); }
           close(); toast(`${n} parcelas de ${money(parts[0])} registradas`);
         } catch { err.hidden = false; err.textContent = "Não foi possível salvar agora. Verifique a conexão e tente de novo."; }
         return;
@@ -2666,6 +2773,7 @@ function openForm(kind, item, pre, ctxYm){
       if (isAg) doc = { ...it, ...base, id: it.id || "a-"+rid(), title: desc.value.trim() || cat.value, rec: modal.querySelector("#f-rec").value, ate: modal.querySelector("#f-ate").value || "", pulados: it.pulados || {}, createdAt: it.createdAt || Date.now() };
       else doc = { ...it, ...base, id: it.id || "m-"+rid(), desc: desc.value.trim() || cat.value, src: it.src || "manual", createdAt: it.createdAt || Date.now() };
       delete doc.exemplo;
+      if (!base.sub) delete doc.sub;
       const fc = modal.querySelector("#f-cart"); if (fc) doc.carteira = fc.value;
       const before = buildAlerts(ymOf(todayStr()));
       try { await store.put(isAg?"ag":"tx", doc);
@@ -3037,7 +3145,7 @@ ${text.slice(0, 120000)}`, { modelTier: "default", signal: busy.signal });
     const pick = rows.filter(r => r.on && !r.dup);
     btn.disabled = true; phase = 3; drawSteps();
     const before = buildAlerts(ymOf(todayStr()));
-    const docs = pick.map(r => ({ id:r.id, date:r.date, type:r.type, amount:r.amount, desc:r.desc, cat:r.cat, src: r.match ? "agenda" : "extrato", createdAt: Date.now() }));
+    const docs = pick.map(r => ({ id:r.id, date:r.date, type:r.type, amount:r.amount, desc:r.desc, cat:r.cat, ...(guessSub(r.cat, r.desc) ? { sub: guessSub(r.cat, r.desc) } : {}), src: r.match ? "agenda" : "extrato", createdAt: Date.now() }));
     try {
       await putMany("tx", docs, n => btn.textContent = `Importando ${n}/${docs.length}…`);
       await learn(pick.filter(r => r.edited || r.how === "ia").map(r => [r.desc, r.cat]));
@@ -3059,6 +3167,7 @@ document.addEventListener("click", async e => {
   if (act === "tab") { state.tab = el.dataset.tab; state.selDay = null; try { history.replaceState(null,"","#"+state.tab); } catch {} render(); window.scrollTo(0,0); }
   else if (act === "prev" || act === "next") { state.ym = addMonths(state.ym, act==="prev"?-1:1); state.selDay = null; render(); }
   else if (act === "newTx") openForm("tx");
+  else if (act === "guiaOk") { try { localStorage.setItem("nms.guia.ok." + (state.space || "pessoal"), "1"); } catch {} render(); }
   else if (act === "newAg") openForm("ag", null, el.dataset.day ? {date: el.dataset.day} : null);
   else if (act === "cday") { state.selDay = el.dataset.day === state.selDay ? null : el.dataset.day; render(); }
   else if (act === "editTx") openForm("tx", state.tx.find(t => t.id === el.dataset.id));
@@ -3104,7 +3213,7 @@ document.addEventListener("click", async e => {
     try {
       if (act === "pay") {
         const pn = a.forn ? state.forn.find(f => f.id === a.forn)?.nome : a.cli ? state.cli.find(c => c.id === a.cli)?.nome : "";
-        await store.put("tx", { id:txId, type:a.type||"saida", amount:a.amount, cat:a.cat, desc: pn ? `${a.title} · ${pn}` : a.title, date: occ ? occ.date : `${ym}-01`, src:"agenda", createdAt:Date.now(), ...(a.forn?{forn:a.forn}:{}), ...(a.cli?{cli:a.cli}:{}), ...(a.exemplo?{exemplo:true}:{}) });
+        await store.put("tx", { id:txId, type:a.type||"saida", amount:a.amount, cat:a.cat, ...(a.sub ? { sub: a.sub } : {}), desc: pn ? `${a.title} · ${pn}` : a.title, date: occ ? occ.date : `${ym}-01`, src:"agenda", createdAt:Date.now(), ...(a.forn?{forn:a.forn}:{}), ...(a.cli?{cli:a.cli}:{}), ...(a.exemplo?{exemplo:true}:{}) });
         toast(a.type==="entrada" ? "Marcado como recebido" : "Marcado como pago");
       } else {
         await store.remove("tx", txId);

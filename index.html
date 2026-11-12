@@ -878,6 +878,29 @@ body.corp .btn{font-weight:500}
 .pieWrap svg.pie{max-height:400px;width:100%}
 .panel:has(> .lgEx){container-type:inline-size}
 @container (max-width:640px){.legend.lgEx{grid-template-columns:minmax(0,1fr)}}
+/* ---------- v1.9.4: DRE compacto no celular ---------- */
+@media (max-width:639px){
+  .wfRow{padding:8px 0;gap:4px 10px}
+  .wfTxt b{font-size:14.5px;line-height:1.25}
+  .wfTxt small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px}
+  .wfBar{height:8px}
+  .wfVal{font-size:14px;min-width:0}
+  .cem{padding:12px;margin-top:12px;gap:8px}
+  .cemHead{font-size:14px}
+  .cemBar{height:14px}
+  .cemLeg{gap:4px 12px;font-size:12px}
+  .cemLeg span{white-space:nowrap}
+  .dreSay{font-size:14px}
+  .panel.fold > h2{cursor:pointer;margin-bottom:0;padding-bottom:0;border-bottom:0;flex-wrap:wrap}
+  .panel.fold > h2::after{content:"Mostrar ▾";margin-left:auto;font-size:12px;font-weight:600;color:var(--fg);text-transform:none;letter-spacing:0;border:1px solid var(--line);padding:4px 10px;border-radius:var(--r)}
+  .panel.fold.open > h2{margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+  .panel.fold.open > h2::after{content:"Ocultar ▴"}
+  .panel.fold:not(.open) > :not(h2){display:none}
+  body .panel.fold:not(.open) > h2{border-bottom:0 !important;padding-bottom:0 !important;margin-bottom:0 !important}
+  .panel.fold > h2 small{order:3;flex-basis:100%;margin-top:4px}
+  .pjKpis.mini > .pjK:nth-child(n+5){display:none}
+  .kpiMore{width:100%;justify-content:center;margin-top:-6px}
+}
 </style>
 
 <div class="lock" id="lock">
@@ -2323,6 +2346,27 @@ let lastAnimKey = "", animT = null;
 /* re-desenha os gráficos quando a tela cruza o limite celular/computador (girar o celular, redimensionar a janela) */
 const bpKey = () => `${window.innerWidth < 640}|${window.innerWidth < 900}|${window.innerWidth >= 1400}`;
 let bpLast = bpKey(), resizeT = null;
+/* DRE no celular: seções secundárias recolhidas (toque no título para abrir) e só 4 indicadores de início */
+const FOLD_OPEN = new Set();
+function mobileFold(){
+  if (state.tipo !== "pj" || state.tab !== "dashboard" || window.innerWidth >= 640) return;
+  const view = document.getElementById("view");
+  view.querySelectorAll(".panel.execSum, .panel:has(> .lgEx), .panel:has(svg.hist)").forEach(sec => {
+    const h = sec.querySelector(":scope > h2"); if (!h) return;
+    const key = h.firstChild ? h.firstChild.textContent.trim() : h.textContent.trim();
+    sec.classList.add("fold"); sec.classList.toggle("open", FOLD_OPEN.has(key));
+    h.setAttribute("role", "button"); h.setAttribute("tabindex", "0"); h.setAttribute("aria-expanded", FOLD_OPEN.has(key));
+    const tog = e => { if (e.target.closest("button")) return; if (FOLD_OPEN.has(key)) FOLD_OPEN.delete(key); else FOLD_OPEN.add(key); const o = FOLD_OPEN.has(key); sec.classList.toggle("open", o); h.setAttribute("aria-expanded", o); if (o) fitCharts(); };
+    h.addEventListener("click", tog); h.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tog(e); } });
+  });
+  const k = view.querySelector(".pjKpis");
+  if (k && !FOLD_OPEN.has("kpi")) {
+    k.classList.add("mini");
+    const b = document.createElement("button"); b.className = "btn kpiMore"; b.textContent = `Ver todos os ${k.children.length} indicadores ▾`;
+    b.onclick = () => { FOLD_OPEN.add("kpi"); k.classList.remove("mini"); b.remove(); };
+    k.after(b);
+  }
+}
 /* texto dos gráficos sempre com ~12px na tela, seja no celular ou num monitor grande */
 function fitCharts(){
   document.querySelectorAll("#view svg.hist").forEach(svg => {
@@ -2420,6 +2464,7 @@ function render(){
   lastAnimKey = animKey;
   view.innerHTML = head + pageHint + (state.tab === "chat" || state.tab === "master" ? "" : banner + guia + cartBar) + body;
   if (doAnim) runEnter();
+  mobileFold();
   fitCharts();
   if (state.tab === "chat") { const ci = document.getElementById("chatIn"); if (ci && keep) { ci.value = keep.v; if (!keep.blur) ci.focus(); } const box = document.getElementById("chatLog"); if (box) box.scrollTop = box.scrollHeight; }
 }

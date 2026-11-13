@@ -62,6 +62,8 @@
     const { data: s } = await SB.auth.getSession(); const u = s.session && s.session.user; if (!u) return null;
     const { data } = await SB.from("profiles").select("*").eq("id", u.id).maybeSingle();
     window.NMS_PROFILE = data || { id: u.id, nome: (u.user_metadata && u.user_metadata.nome) || "", tipo: (u.user_metadata && u.user_metadata.tipo) || "pf", role: "user" };
+    // conta da empresa (NMS) é uma só, compartilhada entre os Masters
+    try { const { data: e } = await SB.rpc("nms_empresa_uid"); window.NMS_EMPRESA = e || null; } catch { window.NMS_EMPRESA = null; }
     return window.NMS_PROFILE;
   }
   window.NMS_loadProfile = loadProfile;

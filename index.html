@@ -1231,9 +1231,10 @@ async function boot(){
   dbRef = db; userRef = user;
   const uid = user ? await user.id().catch(() => null) : null;
   const owner = user ? await user.isOwner().catch(() => false) : true;
+  const admin = !owner && !!(window.NMS_PROFILE && window.NMS_PROFILE.role === "admin"); /* Admin: conta pessoal + conta NMS (empresa), sem Painel Master */
   if (db && uid) {
-    state.ident = { uid, owner };
-    if (owner) { try { const n = await db.doc(`data/users/${uid}/nms`).get(); state.nmsHash = n.exists ? n.data().senhaHash || null : null; } catch {} }
+    state.ident = { uid, owner, admin };
+    if (owner || admin) { try { const n = await db.doc(`data/users/${window.NMS_EMPRESA || uid}/nms`).get(); state.nmsHash = n.exists ? n.data().senhaHash || null : null; } catch {} }
     else { try { const d = await db.doc(`data/users/${uid}/conta`).get(); const b = d.exists ? d.data() : {}; state.senhaHash = b.senhaHash || null; state.userTipo = b.tipo === "pj" ? "pj" : "pf"; } catch {} }
   } else {
     state.ident = { uid: "local", owner: true };
@@ -1260,8 +1261,9 @@ async function openSpace(space){
   if (!dbRef || state.ident.uid === "local") {
     const d = local.load(); state.tx = d.tx; state.ag = d.ag; state.forn = d.forn; state.cli = d.cli; applyBase(d, space); state.mode = "local"; render(); return;
   }
-  const uid = state.ident.uid, base = baseDoc = dbRef.doc(`data/users/${uid}/${space === "nms" ? "nms" : "conta"}`);
-  memberPath = space === "nms" ? `membros/${uid}/perfis/nms` : `membros/${uid}`;
+  const uid = state.ident.uid, emp = window.NMS_EMPRESA || uid; /* a conta NMS é da empresa: a mesma para todos os Masters */
+  const base = baseDoc = dbRef.doc(space === "nms" ? `data/users/${emp}/nms` : `data/users/${uid}/conta`);
+  memberPath = space === "nms" ? `membros/${emp}/perfis/nms` : `membros/${uid}`;
   state.mode = "loading"; render();
   try { const d = await base.get(); if (state.space === space) applyBase(d.exists ? d.data() : {}, space); } catch {}
   if (state.space === space) await ticketInicial(space);
@@ -1435,7 +1437,8 @@ function decideLock(){
   const { owner } = state.ident;
   state.profileTipo = (window.NMS_PROFILE && window.NMS_PROFILE.tipo) || "pf";
   if (state.ident.uid === "local") return enter("master", loginTipo === "pj" ? "nms" : "pessoal");
-  enter(owner ? "master" : "user", owner && loginTipo === "pj" ? "nms" : "pessoal");
+  const { admin } = state.ident;
+  enter(owner ? "master" : admin ? "admin" : "user", (owner || admin) && loginTipo === "pj" ? "nms" : "pessoal");
 }
 function enter(role, space){ state.role = role; unlocked = true; showLock(); openSpace(space).then(() => queueMember()); }
 async function drawLock(){
@@ -1540,7 +1543,7 @@ function logout(){
   try { history.replaceState(null, "", location.pathname); } catch {}
   lockMode = "local"; document.getElementById("lgErr").hidden = true; render(); showLock(); drawLock(); window.scrollTo(0, 0);
 }
-function switchSpace(sp){ if (state.role !== "master" || state.space === sp) return; window.scrollTo(0,0); openSpace(sp).then(() => { queueMember(); toast(sp === "nms" ? "Vendo a conta NMS (empresa)" : "Vendo sua conta pessoal"); }); }
+function switchSpace(sp){ if (!(state.role === "master" || state.role === "admin") || state.space === sp) return; window.scrollTo(0,0); openSpace(sp).then(() => { queueMember(); toast(sp === "nms" ? "Vendo a conta NMS (empresa)" : "Vendo sua conta pessoal"); }); }
 async function pwaStart(){
   showLock(); lockMode = "loading"; drawLock();
   if (!SB) { lockMode = "login"; unlocked = true; showLock(); boot(); return; }
@@ -1700,7 +1703,8 @@ state.mAtF = "todos"; state.mAtQ = ""; state.mAtLim = 60;
 let masterOn = false;
 function startMaster(){
   if (masterOn || !dbRef || state.ident.uid === "local") return; masterOn = true;
-  dbRef.doc(`membros/${state.ident.uid}/perfis/nms`).onSnapshot(d => { state.nmsMembro = d.exists ? { id: state.ident.uid + ":nms", ...d.data(), nomeFixo: "NMS (empresa)", master: false, tipo: "pj" } : null; if (state.tab === "master") render(); }, () => {});
+  const emp = window.NMS_EMPRESA || state.ident.uid;
+  dbRef.doc(`membros/${emp}/perfis/nms`).onSnapshot(d => { state.nmsMembro = d.exists ? { id: emp + ":nms", ...d.data(), nomeFixo: "NMS (empresa)", master: false, tipo: "pj" } : null; if (state.tab === "master") render(); }, () => {});
   dbRef.collection("membros").onSnapshot(s => {
     state.membros = s.docs.map(d => ({ id: d.id, ...d.data() }));
     resolveNames(state.membros.map(m => m.id)); if (state.tab === "master") render();
@@ -1880,7 +1884,7 @@ function pendWithin(days){
 }
 function caixaAtual(){ return state.tx.reduce((a,t) => a + (t.type === "entrada" ? 1 : -1) * (+t.amount||0), 0); }
 function tipoToggle(){
-  if (state.role === "master") return `<span class="seg tom" role="group" aria-label="Conta"><button data-act="space" data-v="pessoal" aria-pressed="${state.space!=="nms"}">PF</button><button data-act="space" data-v="nms" aria-pressed="${state.space==="nms"}">PJ</button></span>`;
+  if (state.role === "master" || state.role === "admin") return `<span class="seg tom" role="group" aria-label="Conta"><button data-act="space" data-v="pessoal" aria-pressed="${state.space!=="nms"}">PF</button><button data-act="space" data-v="nms" aria-pressed="${state.space==="nms"}">PJ</button></span>`;
   if (state.space === "nms") return `<span class="chip ap">Empresa · PJ</span>`;
   return `<span class="seg tom" role="group" aria-label="Tipo de conta"><button data-act="tipo" data-v="pf" aria-pressed="${state.tipo!=="pj"}">PF</button><button data-act="tipo" data-v="pj" aria-pressed="${state.tipo==="pj"}">PJ</button></span>`;
 }
@@ -2418,7 +2422,8 @@ function render(){
   
   const isMaster = state.role === "master";
   const ns = document.getElementById("navSpace");
-  if (ns) { ns.hidden = !isMaster; if (isMaster) ns.innerHTML = `<span class="label">Conta</span>${[["pessoal","Pessoal","PF"],["nms","NMS","Empresa"]].concat(typeof USUARIOS !== "undefined" ? Object.entries(USUARIOS).map(([k,u]) => [k, u.nome, u.tipo === "pj" ? "Empresa" : "PF"]) : []).map(([k,n,t]) => `<button data-act="space" data-v="${k}" aria-pressed="${(state.space||"pessoal")===k}"><b>${n}</b><small>${t}</small></button>`).join("")}`; }
+  const temEmpresa = isMaster || state.role === "admin";
+  if (ns) { ns.hidden = !temEmpresa; if (temEmpresa) ns.innerHTML = `<span class="label">Conta</span>${[["pessoal","Pessoal","PF"],["nms","NMS","Empresa"]].concat(typeof USUARIOS !== "undefined" ? Object.entries(USUARIOS).map(([k,u]) => [k, u.nome, u.tipo === "pj" ? "Empresa" : "PF"]) : []).map(([k,n,t]) => `<button data-act="space" data-v="${k}" aria-pressed="${(state.space||"pessoal")===k}"><b>${n}</b><small>${t}</small></button>`).join("")}`; }
   document.getElementById("navMaster").hidden = !isMaster;
   if (state.tab === "master" && !isMaster) state.tab = "painel";
   if (state.tab === "chat") state.tab = "painel";
@@ -2432,7 +2437,7 @@ function render(){
   document.getElementById("fab").setAttribute("aria-label", (state.tab === "agenda" || state.tab === "calendario") ? "Nova programação" : "Novo lançamento");
   const keep = document.activeElement?.id === "chatIn" ? { v: document.activeElement.value } : (document.getElementById("chatIn") ? { v: document.getElementById("chatIn").value, blur: true } : null);
   document.getElementById("fab").hidden = state.tab === "chat";
-  const spaceBar = state.role === "master" ? `<div class="spaceBar"><span class="label">Conta</span><span class="seg tom" role="group" aria-label="Conta"><button data-act="space" data-v="pessoal" aria-pressed="${state.space!=="nms"}">Nykollas · PF</button><button data-act="space" data-v="nms" aria-pressed="${state.space==="nms"}">NMS · Empresa</button></span></div>`
+  const spaceBar = state.role === "master" || state.role === "admin" ? `<div class="spaceBar"><span class="label">Conta</span><span class="seg tom" role="group" aria-label="Conta"><button data-act="space" data-v="pessoal" aria-pressed="${state.space!=="nms"}">${esc((window.NMS_PROFILE && window.NMS_PROFILE.nome) || "Pessoal")} · PF</button><button data-act="space" data-v="nms" aria-pressed="${state.space==="nms"}">NMS · Empresa</button></span></div>`
     : state.role === "empresa" ? `<div class="spaceBar"><span class="chip ap">NMS · Empresa</span></div>` : "";
   const corpBand = state.tipo === "pj" && state.tab === "dashboard" ? `<div class="corpBand"><b>${state.space === "nms" ? "NMS" : "Empresa"}</b><span>Relatório gerencial</span><span>Período: ${monthName(state.ym)}</span><span>Emitido em ${new Date().toLocaleDateString("pt-BR")} às ${new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}</span></div>` : "";
   const head = spaceBar + corpBand + (state.tab === "chat" ? `<div class="top"><span class="mLogo">${logoHTML(40)}</span><h1>${L("Chat do NMS","Assistente financeiro")}</h1><button class="btn small" data-act="chatClear">Limpar conversa</button></div>` : state.tab === "master" ? `<div class="top"><span class="mLogo">${logoHTML(40)}</span><h1>Painel Master</h1><span class="chip ex">acesso administrador</span></div>` : `<div class="top"><span class="mLogo">${logoHTML(40)}</span><h1>${(state.tipo === "pj" ? {painel:"Visão geral",dashboard:"DRE financeiro e indicadores",lancamentos:"Movimentações",calendario:"Calendário financeiro",agenda:"Contas a pagar e receber"} : {painel:"Painel do mês",dashboard:"Dashboard pessoal",lancamentos:"Lançamentos",calendario:"Calendário financeiro",agenda:"Agenda do dinheiro"})[state.tab]}</h1>

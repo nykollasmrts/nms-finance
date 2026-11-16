@@ -589,11 +589,11 @@ body.corp .btn{font-weight:500}
 .isParty{display:flex;flex-direction:column;gap:2px;padding:10px 12px;background:var(--sunk)}
 .isParty small{color:var(--muted);font-size:12px}
 
-/* logo NMS — modelo C: círculo com "nms" e ponto verde */
-.nmsLogo{--s:120px;--logo-ink:var(--nav-bg);--logo-dot:#16A34A;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--s)*.09);flex:none;color:inherit;font-family:"Inter","Helvetica Neue",Arial,sans-serif;user-select:none;line-height:1}
-.nmsMark{position:relative;display:grid;place-items:center;width:calc(var(--s)*.56);height:calc(var(--s)*.56);border-radius:50%;background:currentColor;flex:none}
-.nmsMark b{color:var(--logo-ink);font-weight:600;font-size:calc(var(--s)*.2);letter-spacing:.01em;margin-top:calc(var(--s)*-.01)}
-.nmsMark::after{content:"";position:absolute;right:16%;top:15%;width:10.7%;height:10.7%;border-radius:50%;background:var(--logo-dot)}
+/* logo NMS — modelo D: círculo em contorno com "nms" e ponto sólido (monocromática) */
+.nmsLogo{--s:120px;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--s)*.09);flex:none;color:inherit;font-family:"Inter","Helvetica Neue",Arial,sans-serif;user-select:none;line-height:1}
+.nmsMark{position:relative;display:grid;place-items:center;box-sizing:border-box;width:calc(var(--s)*.56);height:calc(var(--s)*.56);border-radius:50%;border:max(1.5px,calc(var(--s)*.012)) solid currentColor;background:transparent;flex:none}
+.nmsMark b{color:currentColor;font-weight:600;font-size:calc(var(--s)*.2);letter-spacing:-.02em;margin-top:calc(var(--s)*-.01)}
+.nmsMark::after{content:"";position:absolute;right:6%;top:6%;width:14.6%;height:14.6%;border-radius:50%;background:currentColor}
 .nmsLogo i{font-style:normal;font-weight:300;font-size:calc(var(--s)*.105);letter-spacing:.02em;white-space:nowrap;opacity:.9}
 .brand .nmsLogo,.lockLogo .nmsLogo{margin:0 auto;color:var(--nav-fg);--logo-ink:var(--nav-bg)}
 @media (min-width:900px){.brand{display:flex !important;justify-content:center;padding:4px 0 28px !important}}

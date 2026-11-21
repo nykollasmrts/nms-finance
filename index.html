@@ -22,11 +22,11 @@
 </head>
 <body>
 <style>
-/* Layout: corporativo preto e branco — barra lateral preta no computador, abas no rodapé no celular; números em mono tabular */
+/* Layout: corporativo preto e branco com azul da marca (#7CC8F2) — barra lateral preta no computador, abas no rodapé no celular; números em mono tabular */
 :root{
   --bg:#F5F5F4; --surface:#FFFFFF; --sunk:#ECECEB; --line:#D9D9D7;
-  --fg:#0A0A0A; --muted:#6B6B69; --accent:#0A0A0A; --on-accent:#FFFFFF; --accent-soft:#E6E6E4;
-  --nav-bg:#0A0A0A; --nav-fg:#FFFFFF; --nav-muted:#9A9A97; --nav-sel:#262626;
+  --fg:#0A0A0A; --muted:#6B6B69; --accent:#1F6FA8; --on-accent:#FFFFFF; --accent-soft:#E3EFF8; --brand-blue:#7CC8F2;
+  --nav-bg:#0A0A0A; --nav-fg:#FFFFFF; --nav-muted:#9A9A97; --nav-sel:#13212C;
   --in:#1E8A55; --in-soft:#E4F0E9; --out:#B3261E; --out-soft:#F6E4E2; --warn:#7A5A00; --warn-soft:#F1EBDC;
   --c1:#2F5BEA; --c2:#E8892B; --c3:#1E9E62; --c4:#C2459B; --c5:#1597B8; --c6:#C9A227; --c7:#7B57E0; --c8:#E04A3A; --c9:#8C8C89; --c10:#0F766E; --c11:#A16207; --c12:#9D174D; --c13:#5B7083; --c14:#A0522D; --c15:#6E9F2F; --c16:#3949AB;
   --k-in:#1E9E62; --k-out:#E04A3A; --k-bal:#2F5BEA; --k-proj:#7B57E0;
@@ -37,16 +37,16 @@
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#000000; --surface:#0F0F0F; --sunk:#1A1A1A; --line:#2A2A2A;
-  --fg:#F5F5F4; --muted:#9A9A97; --accent:#F5F5F4; --on-accent:#0A0A0A; --accent-soft:#222222;
-  --nav-bg:#0F0F0F; --nav-fg:#F5F5F4; --nav-muted:#8A8A87; --nav-sel:#222222;
+  --fg:#F5F5F4; --muted:#9A9A97; --accent:#7CC8F2; --on-accent:#0A0A0A; --accent-soft:#11222E; --brand-blue:#7CC8F2;
+  --nav-bg:#0F0F0F; --nav-fg:#F5F5F4; --nav-muted:#8A8A87; --nav-sel:#13222D;
   --in:#5FC48E; --in-soft:#12261B; --out:#F2867D; --out-soft:#2C1513; --warn:#D9B45A; --warn-soft:#2A2312;
   --c1:#7C9BFF; --c2:#F5A75C; --c3:#4FCB8E; --c4:#E47FC4; --c5:#4FC6E0; --c6:#E3C35A; --c7:#A88CFF; --c8:#FF7A6B; --c9:#8A8A87; --c10:#3CC9B8; --c11:#E0A63A; --c12:#F06292; --c13:#9FB3C8; --c14:#E0A07A; --c15:#A5D86E; --c16:#8C9EFF;
   --k-in:#4FCB8E; --k-out:#FF7A6B; --k-bal:#7C9BFF; --k-proj:#A88CFF;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#000000; --surface:#0F0F0F; --sunk:#1A1A1A; --line:#2A2A2A;
-  --fg:#F5F5F4; --muted:#9A9A97; --accent:#F5F5F4; --on-accent:#0A0A0A; --accent-soft:#222222;
-  --nav-bg:#0F0F0F; --nav-fg:#F5F5F4; --nav-muted:#8A8A87; --nav-sel:#222222;
+  --fg:#F5F5F4; --muted:#9A9A97; --accent:#7CC8F2; --on-accent:#0A0A0A; --accent-soft:#11222E; --brand-blue:#7CC8F2;
+  --nav-bg:#0F0F0F; --nav-fg:#F5F5F4; --nav-muted:#8A8A87; --nav-sel:#13222D;
   --in:#5FC48E; --in-soft:#12261B; --out:#F2867D; --out-soft:#2C1513; --warn:#D9B45A; --warn-soft:#2A2312;
   --c1:#7C9BFF; --c2:#F5A75C; --c3:#4FCB8E; --c4:#E47FC4; --c5:#4FC6E0; --c6:#E3C35A; --c7:#A88CFF; --c8:#FF7A6B; --c9:#8A8A87; --c10:#3CC9B8; --c11:#E0A63A; --c12:#F06292; --c13:#9FB3C8; --c14:#E0A07A; --c15:#A5D86E; --c16:#8C9EFF;
   --k-in:#4FCB8E; --k-out:#FF7A6B; --k-bal:#7C9BFF; --k-proj:#A88CFF;
@@ -68,13 +68,14 @@ button{cursor:pointer}
 .nav button{flex:1;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;border-radius:var(--r);color:var(--nav-muted);font-size:12px;font-weight:500;letter-spacing:.02em}
 .nav button svg{width:22px;height:22px}
 .nav button[aria-current="page"]{color:var(--nav-fg)}
+.nav button[aria-current="page"] svg{color:var(--brand-blue)}
 @media (min-width:900px){
   .nav{position:sticky;top:0;height:100vh;height:100dvh;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--nav-muted) transparent;inset:auto;flex-direction:column;justify-content:flex-start;gap:2px;border-top:0;border-right:1px solid var(--line);padding:28px 14px;padding-left:max(14px,env(safe-area-inset-left,0px))}
   .brand{display:flex;align-items:center;gap:12px;padding:0 10px 28px}
   .brand .mark{min-width:40px;height:40px;padding:0 10px;border:2px solid var(--nav-fg);display:grid;place-items:center;font-weight:700;font-size:17px;letter-spacing:.04em}
   .brand small{display:block;font-weight:500;font-size:11px;color:var(--nav-muted);text-transform:uppercase;letter-spacing:.12em;line-height:1.3}
   .nav button{flex:none;flex-direction:row;gap:12px;font-size:14px;padding:11px 12px;justify-content:flex-start;border-left:2px solid transparent;border-radius:0}
-  .nav button[aria-current="page"]{background:var(--nav-sel);border-left-color:var(--nav-fg)}
+  .nav button[aria-current="page"]{background:var(--nav-sel);border-left-color:var(--brand-blue)}
   .nav .sync{margin-top:auto;font-size:12px;color:var(--nav-muted);padding:0 10px}
 }
 .nav .sync{display:none}
@@ -589,17 +590,17 @@ body.corp .btn{font-weight:500}
 .isParty{display:flex;flex-direction:column;gap:2px;padding:10px 12px;background:var(--sunk)}
 .isParty small{color:var(--muted);font-size:12px}
 
-/* logo NMS — modelo D: círculo em contorno com "nms" e ponto sólido (monocromática) */
-.nmsLogo{--s:120px;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--s)*.09);flex:none;color:inherit;font-family:"Inter","Helvetica Neue",Arial,sans-serif;user-select:none;line-height:1}
-.nmsMark{position:relative;display:grid;place-items:center;box-sizing:border-box;width:calc(var(--s)*.56);height:calc(var(--s)*.56);border-radius:50%;border:max(1.5px,calc(var(--s)*.012)) solid currentColor;background:transparent;flex:none}
-.nmsMark b{color:currentColor;font-weight:600;font-size:calc(var(--s)*.2);letter-spacing:-.02em;margin-top:calc(var(--s)*-.01)}
-.nmsMark::after{content:"";position:absolute;right:6%;top:6%;width:14.6%;height:14.6%;border-radius:50%;background:currentColor}
+/* logo NMS — nova marca: "nms" em Inter seminegrito com ponto azul claro no canto, sem círculo */
+.nmsLogo{--s:120px;--nms-dot:#7CC8F2;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--s)*.09);flex:none;color:inherit;font-family:"Inter","Helvetica Neue",Arial,sans-serif;user-select:none;line-height:1}
+.nmsMark{position:relative;display:inline-flex;align-items:flex-start;box-sizing:border-box;padding-right:calc(var(--s)*.085);background:transparent;flex:none}
+.nmsMark b{color:currentColor;font-weight:600;font-size:calc(var(--s)*.3);letter-spacing:-.03em;line-height:1}
+.nmsMark::after{content:"";position:absolute;right:0;top:calc(var(--s)*.012);width:calc(var(--s)*.065);height:calc(var(--s)*.065);border-radius:50%;background:var(--nms-dot)}
 .nmsLogo i{font-style:normal;font-weight:300;font-size:calc(var(--s)*.105);letter-spacing:.02em;white-space:nowrap;opacity:.9}
 .brand .nmsLogo,.lockLogo .nmsLogo{margin:0 auto;color:var(--nav-fg);--logo-ink:var(--nav-bg)}
 @media (min-width:900px){.brand{display:flex !important;justify-content:center;padding:4px 0 28px !important}}
 .lockLogo{display:flex;justify-content:center;margin-bottom:4px}
 .mLogo{display:none}
-@media (max-width:899px){.mLogo{display:inline-flex}.mLogo .nmsLogo{color:var(--fg);--logo-ink:var(--bg)}.mLogo .nmsLogo i{display:none}.mLogo .nmsMark{width:var(--s);height:var(--s)}.mLogo .nmsMark b{font-size:calc(var(--s)*.36)}.top h1{flex:1;min-width:0}.top{flex-wrap:wrap}}
+@media (max-width:899px){.mLogo{display:inline-flex}.mLogo .nmsLogo{color:var(--fg);--logo-ink:var(--bg)}.mLogo .nmsLogo i{display:none}.mLogo .nmsMark{padding-right:calc(var(--s)*.17)}.mLogo .nmsMark b{font-size:calc(var(--s)*.6)}.mLogo .nmsMark::after{width:calc(var(--s)*.13);height:calc(var(--s)*.13);top:calc(var(--s)*.02)}.top h1{flex:1;min-width:0}.top{flex-wrap:wrap}}
 
 .tipoSeg{position:relative;display:grid;grid-template-columns:1fr 1fr;background:var(--sunk);padding:5px;border-radius:14px;isolation:isolate}
 .tipoSeg input{position:absolute;opacity:0;pointer-events:none}

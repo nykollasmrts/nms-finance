@@ -1,0 +1,1473 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="NMS Diagnóstico">
+<title>NMS Diagnóstico</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="icons/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0A0A0A; --ink2:#3A424D; --muted:#5B6470; --line:#E1E5EA; --soft:#F3F5F7; --soft2:#EEF1F4;
+  --blue:#1F6FA8; --blue-l:#7CC8F2; --white:#fff;
+  --ok:#1E8E5A; --ok-bg:#E7F5EE; --warn:#B7791F; --warn-bg:#FDF4E3; --bad:#C0392B; --bad-bg:#FBEAE8;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--soft);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:15px;line-height:1.45}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--blue)}
+header{background:var(--white);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+.bar{margin:0 auto;padding:12px max(20px,env(safe-area-inset-right)) 12px max(20px,env(safe-area-inset-left));display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.logo{display:flex;align-items:baseline;gap:8px;cursor:pointer;user-select:none}
+.logo b{font-weight:600;font-size:24px;letter-spacing:-.04em;position:relative;padding-right:9px}
+.logo b::after{content:"";position:absolute;right:0;top:4px;width:7px;height:7px;border-radius:50%;background:var(--blue-l)}
+.logo span{font-size:13px;color:var(--muted);letter-spacing:.04em}
+nav{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+nav button{background:none;border:0;padding:8px 14px;border-radius:8px;cursor:pointer;color:var(--ink2);font-weight:500}
+nav button.on{background:var(--ink);color:#fff}
+main{margin:0 auto;padding:24px clamp(16px,2.5vw,40px) calc(60px + env(safe-area-inset-bottom))}
+html,body{min-height:100%}
+h1{font-family:Montserrat,Inter,sans-serif;font-weight:600;font-size:26px;letter-spacing:-.02em;margin:0}
+h2{font-size:17px;margin:0 0 12px;font-weight:600}
+h3{font-size:13px;text-transform:uppercase;letter-spacing:.12em;color:var(--blue);margin:20px 0 10px;font-weight:700}
+h3:first-child{margin-top:0}
+.muted{color:var(--muted)} .small{font-size:13px}
+.card{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:20px}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.spread{justify-content:space-between}
+.btn{border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:10px;padding:9px 16px;cursor:pointer;font-weight:600;white-space:nowrap}
+.btn.ghost{background:var(--white);color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{border-color:var(--ink)}
+.btn.danger{background:var(--white);color:var(--bad);border-color:#efc7c2}
+.btn.sm{padding:6px 11px;font-size:13px}
+.grid{display:grid;gap:12px 16px;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--ink2);font-weight:500}
+label.f small{color:var(--muted);font-weight:400}
+input[type=text],input[type=number],input[type=email],input[type=date],input[type=search],select,textarea{border:1px solid var(--line);background:var(--white);border-radius:9px;padding:9px 11px;width:100%;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(31,111,168,.12)}
+textarea{min-height:80px;resize:vertical}
+.money{position:relative}
+.money::before{content:"R$";position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px}
+.money input{padding-left:34px}
+.pct{position:relative}
+.pct::after{content:"%";position:absolute;right:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px}
+.split{display:grid;grid-template-columns:minmax(0,1fr) clamp(380px,30vw,520px);gap:20px;align-items:start}
+.sticky{position:sticky;top:84px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:18px 0 20px;overflow-x:auto}
+.tabs button{background:none;border:0;border-bottom:2px solid transparent;padding:10px 14px;cursor:pointer;font-weight:600;color:var(--muted);white-space:nowrap}
+.tabs button.on{color:var(--ink);border-color:var(--ink)}
+.tabs button i{font-style:normal;display:inline-block;width:20px;height:20px;border-radius:50%;background:var(--soft2);font-size:11px;line-height:20px;text-align:center;margin-right:6px}
+.tabs button.on i{background:var(--ink);color:#fff}
+table{width:100%;border-collapse:collapse}
+td,th{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+td.n,th.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+tr.tot td{font-weight:700;border-bottom:0;border-top:2px solid var(--ink)}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line)}
+.kv:last-child{border-bottom:0}
+.kv b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600;background:var(--soft2);color:var(--ink2);white-space:nowrap}
+.badge::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.ok{color:var(--ok)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+.badge.ok{background:var(--ok-bg)} .badge.warn{background:var(--warn-bg)} .badge.bad{background:var(--bad-bg)}
+.badge.plain::before{display:none}
+.verdict{border-radius:12px;padding:14px 16px;margin:12px 0;border:1px solid}
+.verdict.ok{background:var(--ok-bg);border-color:#bfe3cf}
+.verdict.warn{background:var(--warn-bg);border-color:#f1d9a8}
+.verdict.bad{background:var(--bad-bg);border-color:#efc7c2}
+.verdict strong{display:block;font-size:16px;margin-bottom:3px}
+.verdict p{margin:0;color:var(--ink2);font-size:14px}
+.score{display:flex;align-items:center;gap:16px;margin-bottom:6px}
+.ring{--v:0;--c:var(--muted);width:86px;height:86px;border-radius:50%;background:conic-gradient(var(--c) calc(var(--v)*1%),var(--soft2) 0);display:grid;place-items:center;flex:none}
+.ring div{width:68px;height:68px;border-radius:50%;background:#fff;display:grid;place-items:center;font-weight:700;font-size:22px}
+.meter{height:6px;background:var(--soft2);border-radius:9px;overflow:hidden;margin-top:4px}
+.meter span{display:block;height:100%;border-radius:9px}
+.ind{padding:9px 0;border-bottom:1px solid var(--line)}
+.ind:last-child{border-bottom:0}
+.ind .row{gap:8px}
+.ind .v{margin-left:auto;font-weight:600;font-variant-numeric:tabular-nums}
+.ind p{margin:3px 0 0;font-size:12px;color:var(--muted)}
+.svc{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;background:#fff}
+.svc.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.svc input{margin-top:3px;width:18px;height:18px;accent-color:var(--ink)}
+.svc .t{font-weight:600}
+.svc .d{font-size:13px;color:var(--muted)}
+.svc .p{margin-left:auto;text-align:right;font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.list{display:grid;gap:10px}
+.client{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) 140px 130px 130px;gap:14px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;cursor:pointer}
+.client:hover{border-color:var(--ink)}
+.client .nm{font-weight:600}
+.empty{text-align:center;padding:50px 20px;color:var(--muted)}
+.yn{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.yn select{width:auto;padding:6px 8px}
+.alerts{margin:8px 0 0;padding-left:18px;font-size:13px;color:var(--ink2)}
+.alerts li{margin:3px 0}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:10px;font-size:14px;opacity:0;transition:opacity .15s;pointer-events:none;z-index:50}
+.toast.show{opacity:1}
+.cfgtable input{padding:6px 8px;min-width:70px}
+.cfgtable td{padding:6px 4px}
+.hint{background:var(--soft);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--ink2)}
+.print-only{display:none}
+.doc h1{font-size:28px}
+.doc .sec{margin-top:22px}
+.prop{max-width:900px;margin:0 auto}
+.blk{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.blk label.f{gap:4px;justify-content:flex-end}
+.blk .money input[type=text]{padding-left:34px}
+.blk input[type=text],.blk input[type=number]{padding:8px 10px}
+.blk .yns{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(330px,100%),1fr));column-gap:24px}
+.blk .yn{padding:6px 0}
+.blk h4{margin:0 0 10px;font-size:15px}
+.blk .grid{grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:10px 12px}
+details.more{border:1px dashed var(--line);border-radius:12px;padding:10px 16px;margin-bottom:14px}
+details.more>summary{cursor:pointer;font-weight:600;color:var(--blue);list-style:none}
+details.more>summary::before{content:"+ ";}
+details.more[open]>summary::before{content:"− ";}
+details.more[open]>summary{margin-bottom:12px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;flex:none}
+.seg button{border:0;background:#fff;padding:6px 14px;cursor:pointer;font-weight:600;color:var(--muted)}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button.on.s{background:var(--ink);color:#fff}
+.seg button.on.n{background:var(--ink);color:#fff}
+.big3{display:grid;grid-template-columns:1fr;gap:8px;margin:12px 0}
+.bn{background:var(--soft);border-radius:12px;padding:12px 14px}
+.bn .l{font-size:13px;color:var(--muted)}
+.bn .v{font-size:24px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.bn .s{font-size:12px;color:var(--muted)}
+.status{border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px}
+.status.ok{background:var(--ok-bg)} .status.warn{background:var(--warn-bg)} .status.bad{background:var(--bad-bg)} .status.plain{background:var(--soft)}
+.status .sc{font-size:34px;font-weight:700;line-height:1}
+.status .tx b{display:block;font-size:17px}
+.status .tx span{font-size:13px;color:var(--ink2)}
+.price2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.price2 .bn.dark{background:var(--ink);color:#fff} .price2 .bn.dark .l,.price2 .bn.dark .s{color:#cfd5dc}
+.svcs{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.svcs .svc{padding:12px;align-items:center}
+.prop .sec{break-inside:avoid}
+.prop p{margin:0 0 8px;color:var(--ink2)}
+.prop .hero{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px}
+.prop .box{border:1px solid var(--line);border-radius:12px;padding:16px}
+.prop .box.dark{background:var(--ink);color:#fff;border-color:var(--ink)}
+.prop .box .lb{font-size:12px;text-transform:uppercase;letter-spacing:.1em;opacity:.75}
+.prop .box .vl{font-size:30px;font-weight:700;letter-spacing:-.02em;margin:4px 0;font-variant-numeric:tabular-nums}
+.prop .box .dt{font-size:13px;opacity:.8}
+.prop ol{margin:0;padding-left:20px;color:var(--ink2)} .prop ol li{margin:4px 0}
+.prop .opp{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.prop .opp div{background:var(--soft);border-radius:10px;padding:10px 12px;font-size:14px}
+.prop .opp b{display:block;margin-bottom:2px}
+.prop .sign{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:34px}
+.prop .chips{display:flex;flex-wrap:wrap;gap:8px}
+.prop .chips span{border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:600}
+.prop .ganhos{margin:12px 0 0;padding-left:18px;color:var(--ink2);font-size:14px} .prop .ganhos li{margin:4px 0}
+.prop .cond{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.prop .cond div{background:var(--soft);border-radius:10px;padding:10px 12px;font-size:14px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.prop .cond span{display:block;font-size:12px;color:var(--muted)}
+.prop .sign div{border-top:1px solid var(--ink);padding-top:6px;font-size:13px;color:var(--muted)}
+.prop .clausulas{margin-top:34px;padding-top:24px;border-top:2px dashed var(--line)}
+.prop ol.cl{margin:0;padding-left:20px;font-size:12px;line-height:1.4;color:var(--ink2)}
+.prop ol.cl li{margin:0 0 4px;text-align:justify}
+.prop .sign.wit{margin-top:22px}
+@media print{ .prop .clausulas{break-before:page;page-break-before:always;margin-top:0;padding-top:0;border-top:0} .prop .sec{margin-top:16px} .prop .foot{margin-top:18px;font-size:11.5px;gap:4px 14px} .prop ol.cl{font-size:11.6px;line-height:1.38} .prop .sign{margin-top:24px} .prop .box{padding:13px} .prop .box .vl{font-size:27px} }
+.prop .foot{margin-top:26px;padding-top:12px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 18px}
+@media (max-width:640px){ .prop .hero,.prop .sign{grid-template-columns:1fr} .prop .cond{grid-template-columns:1fr 1fr} .prop .box .vl{font-size:26px} }
+@media print{ @page{size:A4;margin:14mm} .prop{max-width:none} .prop .box.dark{-webkit-print-color-adjust:exact;print-color-adjust:exact} }
+@media (min-width:1600px){ .grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))} }
+.cfgtable{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.fsbtn{background:none;border:1px solid var(--line);border-radius:8px;padding:7px 10px;cursor:pointer;color:var(--ink2);font-weight:500}
+.fsbtn:hover{border-color:var(--ink)}
+.mbar{display:none}
+.tabs .sm,nav .sm{display:none}
+@media (max-width:980px){
+  .split{grid-template-columns:1fr}
+  .sticky{position:static}
+  .client{grid-template-columns:1fr auto;gap:6px}
+  .client .hide-m{display:none}
+}
+@media (max-width:640px){
+  html,body{font-size:15px}
+  input[type=text],input[type=number],input[type=email],input[type=date],input[type=search],input[type=tel],select,textarea{font-size:16px} /* evita zoom no iPhone */
+  .bar{gap:8px;padding-top:10px;padding-bottom:10px;flex-wrap:nowrap}
+  nav .lg{display:none} nav .sm{display:inline}
+  .logo span{display:none}
+  nav{gap:2px}
+  nav button{padding:7px 9px;font-size:14px}
+  .fsbtn{padding:6px 8px}
+  .fsbtn span{display:none}
+  main{padding-top:16px}
+  h1{font-size:21px}
+  .card{padding:16px;border-radius:12px}
+  .grid{grid-template-columns:1fr}
+  .tabs{margin:12px -16px 16px;padding:0 16px;position:sticky;top:57px;background:var(--soft);z-index:5}
+  .tabs button{padding:10px 10px}
+  .tabs .lg{display:none}
+  .tabs .sm{display:inline}
+  .cli-head{flex-direction:column;align-items:stretch!important}
+  .cli-head .row{width:100%}
+  .cli-head select{flex:1}
+  .svc{padding:12px}
+  .svcs{grid-template-columns:1fr 1fr}
+  .blk .grid{grid-template-columns:1fr 1fr;gap:10px}
+  .blk .grid label.f{font-size:12.5px}
+  .blk{padding:12px}
+  .svcs .svc{padding:10px;font-size:14px}
+  .kv{font-size:14px}
+  .doc .split{grid-template-columns:1fr!important}
+  .mbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:20;background:#fff;border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom));align-items:center;gap:10px;box-shadow:0 -4px 16px rgba(0,0,0,.06)}
+  .mbar .mv{font-weight:700;font-size:16px}
+  .mbar .btn{margin-left:auto}
+  main.has-mbar{padding-bottom:calc(90px + env(safe-area-inset-bottom))}
+}
+@media print{
+  html,body{background:#fff}
+  header,.tabs,.no-print,.toast,.mbar{display:none!important}
+  main{padding:0;max-width:none}
+  .card{border:0;padding:0}
+  .print-only{display:block}
+  .split{grid-template-columns:1fr}
+}
+.voltar{display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid var(--line);border-radius:8px;padding:7px 10px;cursor:pointer;color:var(--ink2);font-weight:500;text-decoration:none}
+.voltar:hover{border-color:var(--ink)}
+.sync{font-size:12px;color:var(--muted);white-space:nowrap}
+.sync.err{color:var(--bad);font-weight:600}
+#gate{position:fixed;inset:0;z-index:50;background:var(--soft);display:flex;align-items:center;justify-content:center;padding:24px}
+#gate .card{max-width:420px;text-align:center}
+#gate[hidden]{display:none}
+@media (max-width:760px){.voltar span,.sync{display:none}}
+@media print{.voltar,.sync,#gate{display:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <a class="voltar" href="./" title="Voltar para o app NMS">‹ <span>App NMS</span></a>
+    <div class="logo" onclick="go('clientes')"><b>nms</b><span>diagnóstico e precificação</span></div>
+    <span class="sync" id="sync">Conectando…</span>
+    <nav id="nav">
+      <button data-v="clientes" onclick="go('clientes')">Clientes</button>
+      <button data-v="config" onclick="go('config')"><span class="lg">Configurações</span><span class="sm">Ajustes</span></button>
+      <button data-v="backup" onclick="go('backup')">Backup</button>
+      <button class="fsbtn" id="fsbtn" onclick="telaCheia()" title="Tela cheia">⛶ <span>Tela cheia</span></button>
+    </nav>
+  </div>
+</header>
+<main id="app"></main>
+<div id="gate"><div class="card"><h2 id="gate-t">Carregando…</h2><p class="muted small" id="gate-p">Conferindo seu acesso.</p><a class="btn" id="gate-b" href="./" hidden>Voltar para o app</a></div></div>
+<div class="mbar" id="mbar"></div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script>
+/* ============================================================
+   NMS Diagnóstico e Precificação — ferramenta interna
+   Dentro do app NMS: os dados ficam no Supabase (tabela nms_diagnostico)
+   e só quem está autorizado no banco (Nykollas e Kayan) lê ou grava.
+   ============================================================ */
+
+const DEFAULT_CONFIG = {
+  servicos: [
+    {id:'pagar',     nome:'Contas a pagar',        desc:'Controle de vencimentos e lançamento dos pagamentos.',          preco:0, volume:'pagar',   incluso:80, extra:0,   horas:6, ativo:true},
+    {id:'receber',   nome:'Contas a receber',      desc:'Lançamento dos recebimentos e acompanhamento de quem está em atraso.', preco:0, volume:'receber', incluso:80, extra:0,   horas:6, ativo:true},
+    {id:'concil',    nome:'Conciliação bancária',  desc:'Conferência do extrato, diferenças corrigidas, saldo confiável.', preco:0, volume:'contas',  incluso:1,  extra:0, horas:4, ativo:true},
+    {id:'fluxo',     nome:'Fluxo de caixa',        desc:'Previsão de entradas e saídas e alerta antes do aperto.',        preco:0, volume:'',        incluso:0,  extra:0,   horas:3, ativo:true},
+    {id:'relatorios',nome:'Relatórios mensais',    desc:'DRE gerencial explicado, indicadores do mês e reunião de resultado.', preco:0, volume:'',   incluso:0,  extra:0,   horas:4, ativo:true}
+  ],
+  pacote: {d2:5, d3:10, d4:15},          // % de desconto por quantidade de serviços
+  complexidade: {baixa:1, media:1.15, alta:1.3},
+  complexAuto: {fatMedia:80000, fatAlta:300000, funcMedia:6, funcAlta:16},
+  tabela: 3,
+  fixoMensal: 680,        // mensalidade fixa da NMS
+  variavelPct: 0.5,       // % sobre o valor recebido por mês (faturamento)
+  variavelTeto: 0,        // teto da parte variável em R$ (0 = sem teto)
+  minimoMensal: 680,
+  implantacaoPct: 0, implantacaoMin: 800,
+  descontoMax: 15,
+  arredondar: 10,
+  oferta: {ativa:false, meses:6, descontoPct:50, implantacao:800}, // oferta de entrada padrão nas propostas
+  custoHora: 40, margemMin: 35,
+  capacidade: {limiteResultadoPct:30, limiteFaturamentoPct:5, ganhoPct:2, folegoMin:1},
+  faixas: {saudavel:70, atencao:40},
+  empresa: {nome:'NMS BPO Financeiro', responsavel:'', endereco:'', foro:'Goiânia/GO', whatsapp:'', email:'', site:'nmsbpofinanceiro.netlify.app', instagram:'@nmsbpofinanceiro', cidade:'Goiânia - GO'},
+  banco: {banco:'', titular:'', cpf:'', agencia:'', conta:'', pix:''}, // dados pessoais e bancários ficam só na nuvem, nunca no código público
+  propostaPadrao: {validadeDias:15, prazoImplantacao:'Até 15 dias após a assinatura', vencimento:'Todo dia 10', formaPagamento:'Pix ou transferência', contrato:'Mínimo de 6 meses', duracaoMeses:6, diaRelatorio:10},
+  indicadores: {
+    margem:   {peso:30, c:[15,8,3,0]},    // % — maior é melhor
+    folego:   {peso:20, c:[3,2,1,0.5]},   // meses — maior é melhor
+    liquidez: {peso:20, c:[1.5,1.2,1,0.8]},// índice — maior é melhor
+    endiv:    {peso:15, c:[1,3,6,12]},    // meses de faturamento — menor é melhor
+    equilibrio:{peso:15, c:[30,15,5,0]}   // % de folga sobre o ponto de equilíbrio — maior é melhor
+  }
+};
+
+const IND_INFO = {
+  margem:    {nome:'Lucro de cada venda', un:'%', dir:1, exp:'Quanto sobra de cada R$ 100 vendidos depois de tudo pago, inclusive parcelas de dívidas.'},
+  folego:    {nome:'Fôlego do caixa', un:'meses', dir:1, exp:'Por quantos meses o caixa de hoje paga as despesas fixas e parcelas sem nenhuma venda.'},
+  liquidez:  {nome:'Paga as contas do mês?', un:'x', dir:1, exp:'(Caixa + a receber em 30 dias) ÷ a pagar em 30 dias. Acima de 1 = consegue pagar o mês.'},
+  endiv:     {nome:'Tamanho da dívida', un:'meses', dir:-1, exp:'Dívida total em meses de faturamento. Quanto menor, melhor.'},
+  equilibrio:{nome:'Distância do prejuízo', un:'%', dir:1, exp:'Quanto o faturamento está acima do mínimo necessário para não ter prejuízo.'}
+};
+
+const STATUS = ['Prospecção','Diagnóstico feito','Proposta enviada','Fechado','Perdido'];
+const STATUS_CLASS = {'Prospecção':'plain','Diagnóstico feito':'plain','Proposta enviada':'warn','Fechado':'ok','Perdido':'bad'};
+
+const CHECKS = [
+  {k:'separaPF', t:'Separa as contas da pessoa física e da empresa?', bom:'sim'},
+  {k:'temControle', t:'Tem algum controle financeiro hoje (planilha ou sistema)?', bom:'sim'},
+  {k:'sabeLucro', t:'Sabe dizer se teve lucro no último mês?', bom:'sim'},
+  {k:'pagaJuros', t:'Costuma pagar juros ou multa por atraso?', bom:'nao'},
+  {k:'inadimplencia', t:'Tem clientes em atraso de forma frequente?', bom:'nao'},
+  {k:'usaLimite', t:'Usa cheque especial ou limite da conta com frequência?', bom:'nao'}
+];
+
+const CLIENTE_TESTE = {"id": "cliente-teste", "criado": "2026-11-22T12:05:08.949Z", "atualizado": "2026-11-22T12:05:09.477Z", "status": "Diagnóstico feito", "cadastro": {"razao": "Cliente Teste Comércio Ltda", "fantasia": "Cliente Teste", "cnpj": "00.000.000/0001-00", "segmento": "Comércio de materiais de construção", "regime": "Simples Nacional", "cidade": "Goiânia - GO", "responsavel": "João Teste", "telefone": "(62) 90000-0000", "email": "teste@exemplo.com", "origem": "Indicação", "dataDiag": "2026-11-22", "obs": "Cliente fictício para teste da ferramenta."}, "diag": {"faturamento": 85000, "impostosPct": 7, "custosVar": 38000, "folha": 16500, "prolabore": 6000, "aluguel": 4500, "outrasFixas": 3200, "parcelas": 2800, "dividaTotal": 60000, "caixa": 22000, "receber30": 26000, "pagar30": 31000, "lancPagar": 110, "lancReceber": 70, "contasBancarias": 2, "funcionarios": 6, "checks": {"separaPF": "nao", "temControle": "sim", "sabeLucro": "nao", "pagaJuros": "sim", "inadimplencia": "nao", "usaLimite": "nao"}, "obs": "Dono mistura contas pessoais com a empresa e não sabe o lucro real. Paga multa de boletos atrasados quase todo mês."}, "preco": {"servicos": ["pagar", "receber", "fluxo", "relatorios"], "complexidade": "auto", "descontoManual": 0, "obs": "Implantação em até 15 dias. Contrato mínimo de 6 meses."}};
+const CLIENTE_CLINICA = {"id": "cliente-exemplo-clinica", "criado": "2026-11-22T12:44:40.699Z", "atualizado": "2026-11-22T12:44:41.179Z", "status": "Diagnóstico feito", "cadastro": {"razao": "Clínica Sorriso Exemplo Ltda", "fantasia": "Clínica Sorriso (exemplo)", "cnpj": "11.111.111/0001-11", "segmento": "Clínica odontológica", "regime": "Simples Nacional", "cidade": "Goiânia - GO", "responsavel": "Dra. Ana Exemplo", "telefone": "(62) 91111-1111", "email": "contato@exemplo.com", "origem": "Instagram", "dataDiag": "2026-11-22", "obs": "Cliente fictício 2: clínica pequena, recebe muito por cartão e convênio."}, "diag": {"faturamento": 42000, "impostosPct": 9, "custosVar": 7500, "folha": 11000, "prolabore": 7000, "aluguel": 4800, "outrasFixas": 3900, "parcelas": 2600, "dividaTotal": 48000, "caixa": 9000, "receber30": 21000, "pagar30": 24500, "lancPagar": 45, "lancReceber": 220, "contasBancarias": 3, "funcionarios": 4, "checks": {"separaPF": "nao", "temControle": "nao", "sabeLucro": "nao", "pagaJuros": "sim", "inadimplencia": "sim", "usaLimite": "sim"}, "obs": "Recebe muito no cartão e em convênios que demoram a pagar. Usa o cheque especial quase todo mês e não sabe quanto sobra."}, "preco": {"servicos": ["pagar", "receber", "concil", "fluxo"], "complexidade": "auto", "descontoManual": 0, "oferta": false, "obs": "Implantação em até 15 dias. Prioridade: conciliar cartões e convênios e sair do cheque especial."}};
+const EXEMPLOS = [CLIENTE_TESTE, CLIENTE_CLINICA];
+function carregarTeste(){
+  const ids=EXEMPLOS.map(x=>x.id); DB.clientes=DB.clientes.filter(x=>!ids.includes(x.id));
+  EXEMPLOS.slice().reverse().forEach(x=>{const c=clone(x); c.criado=c.atualizado=new Date().toISOString(); DB.clientes.unshift(c);});
+  save(); toast('Clientes de exemplo carregados'); go('clientes');
+}
+/* ---------------- estado ---------------- */
+let DB = load({}); // os dados chegam da nuvem em nuvemIniciar()
+let view = {name:'clientes', id:null, tab:'cadastro', busca:'', filtro:''};
+
+function clone(o){return JSON.parse(JSON.stringify(o))}
+function mergeDefaults(def, val){
+  if(Array.isArray(def)) return Array.isArray(val)?val:clone(def);
+  if(def && typeof def==='object'){
+    const out = {}; const v = (val&&typeof val==='object')?val:{};
+    for(const k in def) out[k] = mergeDefaults(def[k], v[k]);
+    for(const k in v) if(!(k in out)) out[k]=v[k];
+    return out;
+  }
+  return (val===undefined||val===null||val==='')?def:val;
+}
+function load(d){
+  d = d||{};
+  const config = mergeDefaults(DEFAULT_CONFIG, d.config);
+  if((d.config||{}).tabela!==2){ // tabela 2 (22/11/2026): 10% abaixo do preço de mercado
+    const antigo={pagar:[400,3],receber:[400,3],concil:[300,120],fluxo:[300,0],relatorios:[450,0]};
+    config.servicos.forEach(sv=>{const a=antigo[sv.id], nv=DEFAULT_CONFIG.servicos.find(x=>x.id===sv.id); if(a&&nv){ if(+sv.preco===a[0]) sv.preco=nv.preco; if(+sv.extra===a[1]) sv.extra=nv.extra; }});
+    if(+config.minimoMensal===500) config.minimoMensal=DEFAULT_CONFIG.minimoMensal;
+    if(+config.implantacaoMin===400) config.implantacaoMin=DEFAULT_CONFIG.implantacaoMin;
+    config.tabela=2;
+  }
+  const clientes = Array.isArray(d.clientes)?d.clientes:[];
+  if(config.propostaPadrao.formaPagamento==='Boleto ou Pix') config.propostaPadrao.formaPagamento='Pix ou transferência';
+  clientes.forEach(c=>{ if(c.proposta&&c.proposta.formaPagamento==='Boleto ou Pix') c.proposta.formaPagamento='Pix ou transferência'; if(c.renovacao&&c.renovacao.formaPagamento==='Boleto ou Pix') c.renovacao.formaPagamento='Pix ou transferência'; });
+  if(config.tabela!==3){ // tabela 3 (22/11/2026): R$ 680 fixos + % dos recebimentos, implantação R$ 800
+    const t2={pagar:[560,4],receber:[560,4],concil:[420,170],fluxo:[420,0],relatorios:[630,0]};
+    config.servicos.forEach(sv=>{const a=t2[sv.id]; if(a){ if(+sv.preco===a[0]) sv.preco=0; if(+sv.extra===a[1]) sv.extra=0; }});
+    if(+config.minimoMensal===720) config.minimoMensal=680;
+    if(+config.implantacaoMin===560) config.implantacaoMin=800;
+    if(+config.implantacaoPct===50) config.implantacaoPct=0;
+    config.oferta.ativa=false;
+    clientes.forEach(c=>{ if(c.preco) delete c.preco.oferta; });
+    config.tabela=3;
+  }
+  return {versao:1, clientes, config, ultimoBackup:d.ultimoBackup||null};
+}
+/* ---------------- nuvem (Supabase) ----------------
+   Cada cliente é um registro da tabela nms_diagnostico e as configurações são outro.
+   Só grava o que mudou; o banco só deixa ler e gravar quem está autorizado. */
+const CFG_ID='__config';
+const NV={sb:null, uid:null, last:{}, saveT:null, busy:false, again:false, puxarT:null, pronto:false};
+function canon(o){ // JSON com chaves em ordem: o banco reordena as chaves e isso não pode parecer mudança
+  if(Array.isArray(o)) return '['+o.map(canon).join(',')+']';
+  if(o&&typeof o==='object') return '{'+Object.keys(o).sort().filter(k=>o[k]!==undefined).map(k=>JSON.stringify(k)+':'+canon(o[k])).join(',')+'}';
+  return JSON.stringify(o===undefined?null:o);
+}
+function syncTag(t,err){const el=document.getElementById('sync'); if(el){el.textContent=t; el.classList.toggle('err',!!err);}}
+function gate(t,p,btn){
+  const g=document.getElementById('gate'); if(!t){ g.hidden=true; return; }
+  g.hidden=false; document.getElementById('gate-t').textContent=t; document.getElementById('gate-p').textContent=p||''; document.getElementById('gate-b').hidden=!btn;
+}
+function fotoLocal(){ const m={}; DB.clientes.forEach(c=>{ m[c.id]=canon(c); }); m[CFG_ID]=canon({config:DB.config, ultimoBackup:DB.ultimoBackup||null, iniciado:true}); return m; }
+function save(){ if(!NV.pronto) return; clearTimeout(NV.saveT); syncTag('Salvando…'); NV.saveT=setTimeout(enviar,500); }
+async function enviar(){
+  NV.saveT=null;
+  if(NV.busy){ NV.again=true; return; }
+  NV.busy=true;
+  try{
+    const cur=fotoLocal(), up=[], del=[], agora=new Date().toISOString();
+    for(const id in cur) if(cur[id]!==NV.last[id]) up.push({id, tipo:id===CFG_ID?'config':'cliente', data:JSON.parse(cur[id]), updated_at:agora, updated_by:NV.uid});
+    for(const id in NV.last) if(!(id in cur)) del.push(id);
+    if(up.length){ const {error}=await NV.sb.from('nms_diagnostico').upsert(up); if(error) throw error; }
+    if(del.length){ const {error}=await NV.sb.from('nms_diagnostico').delete().in('id',del); if(error) throw error; }
+    up.forEach(r=>{ NV.last[r.id]=cur[r.id]; }); del.forEach(id=>{ delete NV.last[id]; });
+    syncTag('Salvo na nuvem');
+  }catch(e){
+    syncTag('Não salvou, tentando de novo…',true);
+    setTimeout(save,5000);
+  }finally{
+    NV.busy=false; if(NV.again){ NV.again=false; save(); }
+  }
+}
+async function linhasNuvem(){
+  const {data,error}=await NV.sb.from('nms_diagnostico').select('id,tipo,data').limit(5000);
+  if(error) throw error; return data||[];
+}
+const porCriado=(a,b)=>String(b.criado||'').localeCompare(String(a.criado||''));
+// traz o que a outra pessoa mudou (tempo real, ao voltar para a janela e a cada 30 s)
+function agendarPuxar(ms){ clearTimeout(NV.puxarT); NV.puxarT=setTimeout(puxar, ms==null?400:ms); }
+async function puxar(){
+  if(!NV.pronto) return;
+  const a=document.activeElement;
+  if(NV.saveT||NV.busy||(a&&a.closest&&a.closest('#app')&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))) return agendarPuxar(3000); // não atrapalha quem está digitando
+  let rows; try{ rows=await linhasNuvem(); }catch(e){ return; }
+  if(NV.saveT||NV.busy) return agendarPuxar(3000);
+  const rem={}; rows.forEach(r=>{ rem[r.id]=canon(r.data); });
+  let mudou=false;
+  rows.forEach(r=>{
+    if(rem[r.id]===NV.last[r.id]) return;
+    mudou=true;
+    if(r.id===CFG_ID){ DB.config=mergeDefaults(DEFAULT_CONFIG,r.data.config); DB.ultimoBackup=r.data.ultimoBackup||null; }
+    else { const i=DB.clientes.findIndex(c=>c.id===r.id); if(i>=0) DB.clientes[i]=r.data; else { DB.clientes.push(r.data); DB.clientes.sort(porCriado); } }
+  });
+  Object.keys(NV.last).forEach(id=>{ if(!(id in rem)&&id!==CFG_ID){ DB.clientes=DB.clientes.filter(c=>c.id!==id); mudou=true; } });
+  NV.last=rem;
+  if(mudou){ render(); toast('Atualizado com as mudanças da equipe'); }
+}
+async function nuvemIniciar(){
+  const C=window.NMS_CONFIG||{};
+  if(!window.supabase||!C.supabaseUrl||/COLE_AQUI/.test(String(C.supabaseUrl)+C.supabaseAnonKey)) return gate('Diagnóstico indisponível','Este recurso só funciona com o app NMS conectado à nuvem.',true);
+  NV.sb=window.supabase.createClient(C.supabaseUrl,C.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+  let u=null; try{ const {data}=await NV.sb.auth.getSession(); u=data.session&&data.session.user; }catch(e){}
+  if(!u) return gate('Entre no app primeiro','Faça login no app NMS e abra o Diagnóstico pela conta NMS (empresa).',true);
+  NV.uid=u.id;
+  const {data:pode,error}=await NV.sb.rpc('nms_pode_diagnostico');
+  if(error) return gate('Sem conexão','Não foi possível conferir seu acesso agora. Verifique a internet e tente de novo.',true);
+  if(!pode) return gate('Acesso restrito','O diagnóstico é exclusivo da equipe NMS autorizada.',true);
+  let rows; try{ rows=await linhasNuvem(); }catch(e){ return gate('Sem conexão','Não foi possível carregar os clientes agora. Tente de novo em instantes.',true); }
+  const cfg=rows.find(r=>r.id===CFG_ID);
+  const clientes=rows.filter(r=>r.tipo==='cliente').map(r=>r.data).sort(porCriado);
+  rows.forEach(r=>{ NV.last[r.id]=canon(r.data); });
+  DB=load({config:cfg&&cfg.data.config, clientes, ultimoBackup:cfg&&cfg.data.ultimoBackup});
+  if(!(cfg&&cfg.data.iniciado)&&!clientes.length) EXEMPLOS.forEach(x=>{ const c=clone(x); c.criado=c.atualizado=new Date().toISOString(); DB.clientes.push(c); }); // primeira vez: já vem com os exemplos
+  NV.pronto=true; gate(null); syncTag('Salvo na nuvem'); go('clientes');
+  save(); // grava ajustes de versão e a primeira carga, se houver
+  NV.sb.channel('nms-diagnostico').on('postgres_changes',{event:'*',schema:'public',table:'nms_diagnostico'},()=>agendarPuxar()).subscribe();
+  setInterval(()=>agendarPuxar(0),30000);
+  window.addEventListener('focus',()=>agendarPuxar(0));
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden) agendarPuxar(0); });
+  window.addEventListener('beforeunload',e=>{ if(NV.saveT||NV.busy){ e.preventDefault(); e.returnValue=''; } });
+}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function cliente(){return DB.clientes.find(c=>c.id===view.id)}
+function novoCliente(){
+  const c = {id:uid(), criado:new Date().toISOString(), atualizado:new Date().toISOString(), status:'Prospecção',
+    cadastro:{razao:'',fantasia:'',cnpj:'',segmento:'',regime:'Simples Nacional',cidade:'Goiânia - GO',responsavel:'',telefone:'',email:'',origem:'',dataDiag:new Date().toISOString().slice(0,10),obs:''},
+    diag:{faturamento:null,impostosPct:null,custosVar:null,taxas:null,folha:null,prolabore:null,aluguel:null,outrasFixas:null,parcelas:null,dividaTotal:null,caixa:null,receber30:null,pagar30:null,
+          lancPagar:null,lancReceber:null,contasBancarias:null,funcionarios:null,checks:{},obs:''},
+    preco:{servicos:[],complexidade:'auto',descontoManual:0,oferta:!!DB.config.oferta.ativa,obs:''}};
+  DB.clientes.unshift(c); save(); return c;
+}
+
+/* ---------------- utilitários ---------------- */
+const fmtBRL = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
+const brl = v => (v===null||v===undefined||!isFinite(v))?'—':fmtBRL.format(v);
+const num = (v,d=1) => (v===null||v===undefined||!isFinite(v))?'—':v.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const pct = (v,d=1) => (v===null||v===undefined||!isFinite(v))?'—':num(v*100,d)+'%';
+const n = v => (v===null||v===undefined||v===''||isNaN(+v))?0:+v;
+const has = v => !(v===null||v===undefined||v===''||isNaN(+v));
+const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function fmtNum(v){ return (v===null||v===undefined||v===''||isNaN(+v))?'':(+v).toLocaleString('pt-BR',{maximumFractionDigits:2}); }
+function parseNum(t){ t=String(t||'').replace(/[^\d,.-]/g,''); if(!t) return null; t=t.replace(/\./g,'').replace(',','.'); return isNaN(+t)?null:+t; }
+function getPath(o,p){return p.split('.').reduce((a,k)=>a==null?a:a[k],o)}
+function setPath(o,p,v){const ks=p.split('.');let a=o;for(let i=0;i<ks.length-1;i++){if(a[ks[i]]==null)a[ks[i]]={};a=a[ks[i]]}a[ks.at(-1)]=v}
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),1800)}
+function nomeCliente(c){return c.cadastro.fantasia||c.cadastro.razao||'Cliente sem nome'}
+function tone(score){const f=DB.config.faixas;return score==null?'plain':score>=f.saudavel?'ok':score>=f.atencao?'warn':'bad'}
+function toneLabel(score){const t=tone(score);return t==='ok'?'Saudável':t==='warn'?'Atenção':t==='bad'?'Crítica':'Sem dados'}
+const COLORS={ok:'var(--ok)',warn:'var(--warn)',bad:'var(--bad)',plain:'var(--muted)'};
+
+/* ---------------- cálculos: diagnóstico ---------------- */
+function calcDiag(d){
+  const cfg = DB.config;
+  const fat = n(d.faturamento);
+  const impostos = fat*n(d.impostosPct)/100;
+  const recLiq = fat-impostos;
+  const cv = n(d.custosVar)+n(d.taxas);
+  const mc = recLiq-cv;
+  const mcPct = fat>0? mc/fat : null;
+  const fixas = n(d.folha)+n(d.prolabore)+n(d.aluguel)+n(d.outrasFixas);
+  const ebitda = mc-fixas;
+  const parcelas = n(d.parcelas);
+  const resultado = ebitda-parcelas;
+  const r = {fat,impostos,recLiq,cv,mc,mcPct,fixas,ebitda,parcelas,resultado,preenchido: fat>0};
+  r.margem = fat>0? resultado/fat : null;
+  r.pe = (mcPct&&mcPct>0)? fixas/mcPct : null;               // ponto de equilíbrio (faturamento)
+  r.peComDividas = (mcPct&&mcPct>0)? (fixas+parcelas)/mcPct : null;
+  r.folgaPE = (r.peComDividas&&r.peComDividas>0)? fat/r.peComDividas-1 : (fat>0 && mcPct>0 ? 1 : null);
+  const saidasFixas = fixas+parcelas;
+  r.folego = has(d.caixa) && saidasFixas>0 ? n(d.caixa)/saidasFixas : null;
+  r.liquidez = has(d.pagar30) && n(d.pagar30)>0 ? (n(d.caixa)+n(d.receber30))/n(d.pagar30) : null;
+  r.endivMeses = has(d.dividaTotal) && fat>0 ? n(d.dividaTotal)/fat : null;
+  r.caixa = n(d.caixa);
+
+  // pontuação 0-100
+  const vals = {margem: r.margem==null?null:r.margem*100, folego:r.folego, liquidez:r.liquidez, endiv:r.endivMeses, equilibrio: r.folgaPE==null?null:r.folgaPE*100};
+  if(fat>0 && mcPct!==null && mcPct<=0) vals.equilibrio = -100; // margem de contribuição negativa: nunca atinge o equilíbrio
+  let soma=0, pesos=0; r.ind={};
+  for(const k in cfg.indicadores){
+    const ic=cfg.indicadores[k], info=IND_INFO[k], v=vals[k];
+    if(v==null||!fat){ r.ind[k]={valor:null,nota:null}; continue; }
+    const c=ic.c.map(Number); let nota;
+    if(info.dir>0) nota = v>=c[0]?100: v>=c[1]?75: v>=c[2]?50: v>=c[3]?25:0;
+    else           nota = v<=c[0]?100: v<=c[1]?75: v<=c[2]?50: v<=c[3]?25:0;
+    r.ind[k]={valor:v,nota}; soma+=nota*n(ic.peso); pesos+=n(ic.peso);
+  }
+  r.score = pesos>0? Math.round(soma/pesos) : null;
+
+  // pontos de atenção
+  const al=[];
+  if(fat>0){
+    if(r.resultado<0) al.push('Fecha o mês no prejuízo: '+brl(r.resultado)+'.');
+    if(mcPct!==null && mcPct<0.25 && mcPct>0) al.push('Margem de contribuição baixa ('+pct(mcPct)+'): sobra pouco de cada venda para pagar as despesas fixas.');
+    if(mcPct!==null && mcPct<=0) al.push('Os custos variáveis e impostos consomem toda a receita: cada venda dá prejuízo.');
+    if(r.folego!==null && r.folego<1) al.push('O dinheiro em conta não paga nem um mês de contas fixas.');
+    if(r.liquidez!==null && r.liquidez<1) al.push('O que vai entrar nos próximos 30 dias não paga o que vai vencer.');
+    if(r.endivMeses!==null && r.endivMeses>6) al.push('Dívida equivale a '+num(r.endivMeses)+' meses de faturamento.');
+    if(n(d.prolabore)===0 && r.fixas>0) al.push('Pró-labore zerado: o dono pode estar tirando dinheiro sem controle.');
+  }
+  const ck=d.checks||{};
+  const ALERTA={separaPF:'Mistura a conta pessoal com a da empresa.',temControle:'Não tem controle financeiro.',sabeLucro:'Não sabe se teve lucro.',pagaJuros:'Paga juros e multa por atraso.',inadimplencia:'Tem clientes que atrasam.',usaLimite:'Usa o cheque especial.'};
+  for(const q of CHECKS){ if(ck[q.k] && ck[q.k]!==q.bom) al.push(ALERTA[q.k]||q.t); }
+  r.alertas=al;
+  return r;
+}
+
+/* ---------------- cálculos: precificação ---------------- */
+function volumeDe(d, vol){
+  if(vol==='pagar') return n(d.lancPagar);
+  if(vol==='receber') return n(d.lancReceber);
+  if(vol==='contas') return n(d.contasBancarias);
+  return 0;
+}
+const VOL_NOME={pagar:'lançamentos a pagar/mês',receber:'recebimentos/mês',contas:'contas bancárias',"":'—'};
+function complexSugerida(d){
+  const a=DB.config.complexAuto, f=n(d.faturamento), fu=n(d.funcionarios);
+  if(f>=a.fatAlta || fu>=a.funcAlta) return 'alta';
+  if(f>=a.fatMedia || fu>=a.funcMedia) return 'media';
+  return 'baixa';
+}
+function calcPreco(c){
+  const cfg=DB.config, d=c.diag, p=c.preco;
+  const linhas=[];
+  for(const s of cfg.servicos){
+    if(!p.servicos.includes(s.id)) continue;
+    const vol = volumeDe(d,s.volume);
+    const excedente = s.volume? Math.max(0, vol-n(s.incluso)) : 0;
+    const valorExtra = excedente*n(s.extra);
+    linhas.push({s, vol, excedente, valorExtra, base:n(s.preco), total:n(s.preco)+valorExtra});
+  }
+  const subtotal = linhas.reduce((a,l)=>a+l.total,0);
+  const cx = p.complexidade==='auto'? complexSugerida(d) : p.complexidade;
+  const fator = n(cfg.complexidade[cx])||1;
+  const qtd = linhas.length;
+  const pacPct = qtd>=4? n(cfg.pacote.d4) : qtd===3? n(cfg.pacote.d3) : qtd===2? n(cfg.pacote.d2) : 0;
+  const comFator = subtotal*fator;
+  const descPacote = comFator*pacPct/100;
+  const manPct = Math.min(Math.max(n(p.descontoManual),0),100);
+  // modelo NMS: fixo + % do valor recebido por mês + adicionais de serviço (se houver)
+  const fixo = qtd? n(cfg.fixoMensal) : 0;
+  const varPct = n(cfg.variavelPct);
+  let variavel = qtd? n(d.faturamento)*varPct/100 : 0;
+  const varTetoAplicado = n(cfg.variavelTeto)>0 && variavel>n(cfg.variavelTeto);
+  if(varTetoAplicado) variavel = n(cfg.variavelTeto);
+  const adicionais = comFator-descPacote;
+  const bruto = fixo+variavel+adicionais;
+  const descManual = bruto*manPct/100;
+  let mensal = bruto-descManual;
+  const arr = n(cfg.arredondar)||1;
+  mensal = qtd? Math.ceil(mensal/arr)*arr : 0;
+  let minimoAplicado=false;
+  if(qtd && mensal<n(cfg.minimoMensal)){ mensal=n(cfg.minimoMensal); minimoAplicado=true; }
+  const mensalCalculado = mensal;
+  const mensalManualOn = !!qtd && has(p.mensalManual) && n(p.mensalManual)>0;
+  if(mensalManualOn){ mensal = n(p.mensalManual); minimoAplicado=false; }
+  const implantacao = qtd? Math.ceil(Math.max(n(cfg.implantacaoMin), mensal*n(cfg.implantacaoPct)/100)/arr)*arr : 0;
+  const horas = linhas.reduce((a,l)=>a+n(l.s.horas),0)*fator;
+  const custo = horas*n(cfg.custoHora);
+  const margem = mensal>0? (mensal-custo)/mensal : null;
+  // oferta de entrada: X primeiros meses com desconto e implantação fixa
+  const ofCfg=cfg.oferta||{};
+  const ofOn = !!qtd && n(ofCfg.meses)>0 && (p.oferta===undefined? !!ofCfg.ativa : !!p.oferta);
+  const mesesOf = ofOn? n(ofCfg.meses) : 0;
+  const ofPct = ofOn? Math.min(Math.max(n(ofCfg.descontoPct),0),100) : 0;
+  const mensalOferta = ofOn? Math.ceil(mensal*(1-ofPct/100)/arr)*arr : mensal;
+  const implantacaoTabela = implantacao;
+  let implantacaoFinal = ofOn && n(ofCfg.implantacao)>0 ? n(ofCfg.implantacao) : implantacao;
+  const implantacaoCalculada = implantacaoFinal;
+  const implManualOn = !!qtd && has(p.implantacaoManual) && n(p.implantacaoManual)>=0 && p.implantacaoManual!=='';
+  if(implManualOn) implantacaoFinal = n(p.implantacaoManual);
+  const total12 = qtd? implantacaoFinal + mensalOferta*Math.min(mesesOf,12) + mensal*Math.max(0,12-mesesOf) : 0;
+  const economiaOferta = ofOn? (mensal-mensalOferta)*mesesOf + Math.max(0,implantacaoTabela-implantacaoFinal) : 0;
+  const margemOferta = ofOn && mensalOferta>0? (mensalOferta-custo)/mensalOferta : margem;
+  const avisos=[];
+  if(qtd && !n(d.faturamento)) avisos.push('Falta o faturamento no diagnóstico: sem ele a parte variável fica zerada.');
+  if(ofOn && margemOferta!==null && margemOferta<0) avisos.push('Durante a oferta (meses 1 a '+mesesOf+') a NMS fica abaixo do custo: margem de '+pct(margemOferta)+'. É o investimento para ganhar o cliente.');
+  if(manPct>n(cfg.descontoMax)) avisos.push('Desconto manual acima do limite de '+num(n(cfg.descontoMax),0)+'%.');
+  if(margem!==null && margem*100<n(cfg.margemMin)) avisos.push('Margem da NMS ('+pct(margem)+') abaixo do mínimo de '+num(n(cfg.margemMin),0)+'%.');
+  if(minimoAplicado) avisos.push('Aplicada a mensalidade mínima de '+brl(n(cfg.minimoMensal))+'.');
+  const faltaVolume = linhas.filter(l=>l.s.volume && n(l.s.extra)>0 && !has(d[{pagar:'lancPagar',receber:'lancReceber',contas:'contasBancarias'}[l.s.volume]]));
+  if(faltaVolume.length) avisos.push('Falta informar o volume no diagnóstico para: '+faltaVolume.map(l=>l.s.nome).join(', ')+'.');
+  return {mensalCalculado,mensalManualOn,implantacaoCalculada,implManualOn,fixo,variavel,varPct,varTetoAplicado,adicionais,bruto,linhas,subtotal,cx,fator,qtd,pacPct,comFator,descPacote,manPct,descManual,mensal,implantacao:implantacaoFinal,implantacaoTabela,ofOn,mesesOf,ofPct,mensalOferta,total12,economiaOferta,margemOferta,horas,custo,margem,avisos};
+}
+
+/* ---------------- cálculos: capacidade de pagamento ---------------- */
+function calcCapacidade(r, mensal){
+  const cap=DB.config.capacidade;
+  if(!r.preenchido) return null;
+  const tetoRes = Math.max(0, r.resultado*n(cap.limiteResultadoPct)/100);
+  const tetoFat = r.fat*n(cap.limiteFaturamentoPct)/100;
+  const teto = Math.min(tetoRes, tetoFat);
+  const sobra = r.resultado-mensal;
+  const comprometimento = r.resultado>0? mensal/r.resultado : null;
+  const ganho = r.fat*n(cap.ganhoPct)/100;
+  const retorno = ganho-mensal;
+  const roi = mensal>0? ganho/mensal : null;
+  let t, titulo, texto;
+  const folegoOk = r.folego==null || r.folego>=n(cap.folegoMin);
+  if(!mensal){ t='plain'; titulo='Selecione os serviços'; texto='Teto sugerido de mensalidade para este cliente: '+brl(teto)+'.'; }
+  else if(r.resultado<=0){ t='bad'; titulo='Não cabe no caixa hoje'; texto='A empresa já fecha o mês no prejuízo. A mensalidade aumentaria o rombo. Avalie começar só pelo essencial (fluxo de caixa) ou um plano de reorganização.'; }
+  else if(mensal<=teto && sobra>0 && folegoOk){ t='ok'; titulo='Cabe no caixa'; texto='A mensalidade usa '+pct(comprometimento)+' do resultado mensal e ainda sobram '+brl(sobra)+' por mês para a empresa.'; }
+  else if(sobra>0 && mensal<=teto){ t='warn'; titulo='Cabe, mas o caixa está curto'; texto='A mensalidade cabe na sobra do mês ('+pct(comprometimento)+' dela), mas o caixa de hoje cobre menos de '+num(n(cap.folegoMin),1)+' mês de despesas fixas. Considere parcelar a implantação.'; }
+  else if(sobra>0 && mensal<=teto*1.3){ t='warn'; titulo='Cabe, mas apertado'; texto='A mensalidade passa um pouco do teto recomendado ('+brl(teto)+'). '+(folegoOk?'':'O fôlego de caixa também está curto. ')+'Considere reduzir o escopo ou parcelar a implantação.'; }
+  else if(sobra>0){ t='bad'; titulo='Acima da capacidade'; texto='A mensalidade compromete '+pct(comprometimento)+' do resultado. O teto recomendado é '+brl(teto)+'. Reduza o escopo.'; }
+  else { t='bad'; titulo='Não cabe no caixa'; texto='Depois da mensalidade a empresa ficaria no prejuízo. Teto recomendado: '+brl(teto)+'.'; }
+  return {teto,tetoRes,tetoFat,sobra,comprometimento,ganho,retorno,roi,t,titulo,texto};
+}
+
+/* ---------------- navegação ---------------- */
+function go(name,id,tab){
+  view.name=name; if(id!==undefined) view.id=id; if(tab) view.tab=tab;
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.v===(name==='cliente'?'clientes':name)));
+  render(); window.scrollTo(0,0);
+}
+function render(){
+  const app=document.getElementById('app');
+  if(view.name==='cliente' && cliente()) app.innerHTML=vCliente();
+  else if(view.name==='config') app.innerHTML=vConfig();
+  else if(view.name==='backup') app.innerHTML=vBackup();
+  else { view.name='clientes'; app.innerHTML=vClientes(); }
+  refreshLive();
+}
+
+/* ---------------- tela: lista de clientes ---------------- */
+function vClientes(){
+  const b=view.busca.toLowerCase();
+  const lista = DB.clientes.filter(c=>(!view.filtro||c.status===view.filtro) && (!b || [c.cadastro.razao,c.cadastro.fantasia,c.cadastro.cnpj,c.cadastro.segmento,c.cadastro.responsavel].join(' ').toLowerCase().includes(b)));
+  const tot = s=>DB.clientes.filter(c=>c.status===s).length;
+  const fechados = DB.clientes.filter(c=>c.status==='Fechado');
+  const mrr = fechados.reduce((a,c)=>a+calcPreco(c).mensal,0);
+  return `
+  <div class="row spread" style="margin-bottom:18px">
+    <div><h1>Clientes</h1><div class="muted small">${DB.clientes.length} cadastrados · ${tot('Proposta enviada')} propostas em aberto · ${fechados.length} fechados (${brl(mrr)}/mês)</div></div>
+    <button class="btn" onclick="const c=novoCliente();go('cliente',c.id,'cadastro')">+ Novo cliente</button>
+  </div>
+  <div class="row" style="margin-bottom:14px">
+    <input type="search" placeholder="Buscar por nome, CNPJ, segmento..." value="${esc(view.busca)}" oninput="view.busca=this.value;document.getElementById('lst').innerHTML=listaHTML()" style="max-width:360px">
+    <select style="max-width:200px" onchange="view.filtro=this.value;render()">
+      <option value="">Todos os status</option>${STATUS.map(s=>`<option ${view.filtro===s?'selected':''}>${s}</option>`).join('')}
+    </select>
+  </div>
+  <div class="list" id="lst">${listaHTML(lista)}</div>`;
+}
+function listaHTML(lista){
+  if(!lista){ const b=view.busca.toLowerCase(); lista=DB.clientes.filter(c=>(!view.filtro||c.status===view.filtro)&&(!b||[c.cadastro.razao,c.cadastro.fantasia,c.cadastro.cnpj,c.cadastro.segmento,c.cadastro.responsavel].join(' ').toLowerCase().includes(b))); }
+  if(!DB.clientes.length) return `<div class="card empty"><h2>Nenhum cliente ainda</h2><p>Clique em <b>Novo cliente</b> para cadastrar e fazer o primeiro diagnóstico.</p><button class="btn ghost" onclick="carregarTeste()">Carregar clientes de exemplo</button></div>`;
+  if(!lista.length) return `<div class="card empty">Nenhum cliente encontrado.</div>`;
+  return lista.map(c=>{
+    const r=calcDiag(c.diag), p=calcPreco(c);
+    return `<div class="client" onclick="go('cliente','${c.id}','cadastro')">
+      <div><div class="nm">${esc(nomeCliente(c))}</div><div class="muted small">${esc([c.cadastro.segmento,c.cadastro.cidade].filter(Boolean).join(' · ')||'—')}</div></div>
+      <div class="hide-m small muted">${(()=>{const k=contratoAtual(c); if(k&&k.termino){const d=diasAte(k.termino); return `Contrato até ${dataBR(k.termino)}${d<0?' <b class="bad">(vencido)</b>':d<=30?' <b class="warn">(vence em '+d+' dias)</b>':''}`;} return r.preenchido?'Faturamento '+brl(r.fat):'Diagnóstico pendente';})()}</div>
+      <div class="hide-m"><span class="badge ${tone(r.score)}">${r.score==null?'Sem nota':r.score+' · '+toneLabel(r.score)}</span></div>
+      <div class="hide-m n" style="text-align:right;font-weight:600">${p.qtd?brl(p.mensal)+'<span class="muted small">/mês</span>':'<span class="muted small">Sem proposta</span>'}</div>
+      <div style="text-align:right"><span class="badge ${STATUS_CLASS[c.status]}">${c.status}</span></div>
+    </div>`}).join('');
+}
+
+/* ---------------- tela: cliente ---------------- */
+function vCliente(){
+  const c=cliente();
+  const tabs=[['cadastro','Cadastro'],['diag','Diagnóstico'],['preco','<span class="lg">Precificação</span><span class="sm">Preço</span>'],['resumo','Resumo'],['proposta','Proposta'],['renovacao','Renovação']];
+  let body='';
+  if(view.tab==='cadastro') body=tCadastro(c);
+  else if(view.tab==='diag') body=tDiag(c);
+  else if(view.tab==='preco') body=tPreco(c);
+  else if(view.tab==='proposta') body=tProposta(c);
+  else if(view.tab==='renovacao') body=tRenovacao(c);
+  else body=tResumo(c);
+  return `
+  <div class="row spread no-print cli-head">
+    <div class="row"><button class="btn ghost sm" onclick="go('clientes')">← Clientes</button>
+      <h1 id="cl-nome">${esc(nomeCliente(c))}</h1></div>
+    <div class="row">
+      <select style="width:auto" onchange="cliente().status=this.value;touch();toast('Status atualizado')">${STATUS.map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join('')}</select>
+      <button class="btn ghost sm" onclick="duplicar()">Duplicar</button>
+      <button class="btn danger sm" onclick="excluir()">Excluir</button>
+    </div>
+  </div>
+  <div class="tabs">${tabs.map((t,i)=>`<button class="${view.tab===t[0]?'on':''}" onclick="go('cliente',undefined,'${t[0]}')"><i>${i+1}</i>${t[1]}</button>`).join('')}</div>
+  ${body}`;
+}
+function touch(){const c=cliente(); if(c){c.atualizado=new Date().toISOString();} save();}
+function excluir(){
+  const c=cliente(); if(!confirm('Excluir "'+nomeCliente(c)+'"? Isso não pode ser desfeito (a menos que você tenha um backup).')) return;
+  DB.clientes=DB.clientes.filter(x=>x.id!==c.id); save(); go('clientes'); toast('Cliente excluído');
+}
+function duplicar(){
+  const c=clone(cliente()); c.id=uid(); c.cadastro.fantasia=(nomeCliente(c))+' (cópia)'; c.status='Prospecção'; c.criado=c.atualizado=new Date().toISOString();
+  DB.clientes.unshift(c); save(); go('cliente',c.id,'cadastro'); toast('Cliente duplicado');
+}
+
+/* campos ligados ao cliente: data-b="caminho" ; data-num para números */
+function fld(label, path, opt={}){
+  const c=cliente(); const v=getPath(c,path);
+  const t=opt.type||'text';
+  let input;
+  if(opt.options) input=`<select data-b="${path}">${opt.options.map(o=>`<option ${v===o?'selected':''}>${o}</option>`).join('')}</select>`;
+  else if(t==='textarea') input=`<textarea data-b="${path}" placeholder="${esc(opt.ph||'')}">${esc(v)}</textarea>`;
+  else if(t==='money'){
+    input=`<div class="money"><input type="text" inputmode="decimal" data-b="${path}" data-num="1" data-money="1" value="${v==null?'':fmtNum(v)}" placeholder="${esc(opt.ph||'0')}"></div>`;
+  }
+  else if(t==='pct'||t==='int'){
+    const inp=`<input type="number" data-b="${path}" data-num="1" step="${t==='int'?1:'any'}" min="0" value="${v==null?'':v}" placeholder="${esc(opt.ph||'')}">`;
+    input = t==='money'?`<div class="money">${inp}</div>`: t==='pct'?`<div class="pct">${inp}</div>`: inp;
+  }
+  else input=`<input type="${t}" data-b="${path}" value="${esc(v)}" placeholder="${esc(opt.ph||'')}">`;
+  return `<label class="f" ${opt.span?'style="grid-column:1/-1"':''}>${label}${opt.help?` <small>${opt.help}</small>`:''}${input}</label>`;
+}
+
+function tCadastro(c){
+  return `<div class="card">
+    <h3>Empresa</h3>
+    <div class="grid">
+      ${fld('Razão social','cadastro.razao')}
+      ${fld('Nome fantasia','cadastro.fantasia')}
+      ${fld('CNPJ','cadastro.cnpj',{ph:'00.000.000/0000-00'})}
+      ${fld('Segmento','cadastro.segmento',{ph:'Ex.: comércio, clínica, restaurante'})}
+      ${fld('Regime tributário','cadastro.regime',{options:['MEI','Simples Nacional','Lucro Presumido','Lucro Real','Não sabe']})}
+      ${fld('Cidade','cadastro.cidade')}
+    </div>
+    <h3>Contato</h3>
+    <div class="grid">
+      ${fld('Responsável','cadastro.responsavel')}
+      ${fld('Telefone / WhatsApp','cadastro.telefone',{type:'tel'})}
+      ${fld('E-mail','cadastro.email',{type:'email'})}
+      ${fld('Como chegou até a NMS','cadastro.origem',{ph:'Indicação, Instagram, site...'})}
+      ${fld('Data do diagnóstico','cadastro.dataDiag',{type:'date'})}
+    </div>
+    <h3>Observações</h3>
+    <div class="grid">${fld('Anotações da conversa','cadastro.obs',{type:'textarea',span:1})}</div>
+    <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn" onclick="go('cliente',undefined,'diag')">Ir para o diagnóstico →</button></div>
+  </div>`;
+}
+
+function tDiag(c){
+  const ck=c.diag.checks||{};
+  const perg={separaPF:'Separa a conta da empresa da conta pessoal?',temControle:'Tem algum controle financeiro (planilha ou sistema)?',sabeLucro:'Sabe se teve lucro no último mês?',pagaJuros:'Costuma pagar juros ou multa por atraso?',inadimplencia:'Tem clientes que atrasam com frequência?',usaLimite:'Usa cheque especial ou limite com frequência?'};
+  return `<div class="split">
+  <div class="card">
+    <p class="small muted" style="margin:0 0 12px">Mesma ordem do checklist do WhatsApp. Use a <b>média dos últimos 3 meses</b>; valor aproximado serve. Os dados da empresa (item 1) ficam na aba <a href="#" onclick="go('cliente',undefined,'cadastro');return false">Cadastro</a>.</p>
+    <div class="blk"><h4>2. Vendas (por mês)</h4><div class="grid">
+      ${fld('Faturamento do mês','diag.faturamento',{type:'money'})}
+      ${fld('Imposto sobre as vendas (%)','diag.impostosPct',{type:'pct',ph:'Ex.: 6'})}
+    </div></div>
+    <div class="blk"><h4>3. Gastos (por mês)</h4><div class="grid">
+      ${fld('Mercadoria e insumos','diag.custosVar',{type:'money'})}
+      ${fld('Comissões e taxas de cartão','diag.taxas',{type:'money'})}
+      ${fld('Salários + encargos','diag.folha',{type:'money'})}
+      ${fld('Retirada dos sócios','diag.prolabore',{type:'money'})}
+      ${fld('Aluguel, luz e água','diag.aluguel',{type:'money'})}
+      ${fld('Outras despesas fixas','diag.outrasFixas',{type:'money'})}
+      ${fld('Parcelas de empréstimos','diag.parcelas',{type:'money'})}
+    </div></div>
+    <div class="blk"><h4>4. Dinheiro e dívidas hoje</h4><div class="grid">
+      ${fld('Saldo em conta + aplicações','diag.caixa',{type:'money'})}
+      ${fld('A receber em 30 dias','diag.receber30',{type:'money'})}
+      ${fld('A pagar em 30 dias','diag.pagar30',{type:'money'})}
+      ${fld('Total de dívidas','diag.dividaTotal',{type:'money'})}
+    </div></div>
+    <div class="blk"><h4>5. Volume do dia a dia</h4><div class="grid">
+      ${fld('Contas pagas por mês','diag.lancPagar',{type:'int'})}
+      ${fld('Recebimentos por mês','diag.lancReceber',{type:'int'})}
+      ${fld('Contas bancárias','diag.contasBancarias',{type:'int'})}
+      ${fld('Funcionários','diag.funcionarios',{type:'int'})}
+    </div></div>
+    <div class="blk"><h4>6. Sim ou não</h4>
+      <div class="yns">${CHECKS.map(q=>`<div class="yn"><span>${perg[q.k]}</span><div class="seg" data-k="${q.k}"><button class="s ${ck[q.k]==='sim'?'on':''}" onclick="setCheck('${q.k}','sim',this)">Sim</button><button class="n ${ck[q.k]==='nao'?'on':''}" onclick="setCheck('${q.k}','nao',this)">Não</button></div></div>`).join('')}</div>
+    </div>
+    <div class="blk"><h4>Anotações</h4><div class="grid">${fld('','diag.obs',{type:'textarea',span:1,ph:'O que o cliente contou, dores, sazonalidade...'})}</div></div>
+    <div class="row" style="justify-content:flex-end"><button class="btn" onclick="go('cliente',undefined,'preco')">Ver o preço →</button></div>
+  </div>
+  <div class="sticky"><div class="card" id="live-diag"></div></div>
+  </div>`;
+}
+function setCheck(k,v,btn){
+  const c=cliente(); c.diag.checks=c.diag.checks||{};
+  c.diag.checks[k] = c.diag.checks[k]===v ? '' : v;   // tocar de novo desmarca
+  const seg=btn.parentNode; seg.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+  if(c.diag.checks[k]) btn.classList.add('on');
+  touch(); refreshLive();
+}
+function liveDiag(c){
+  const r=calcDiag(c.diag);
+  if(!r.preenchido) return `<h2>Resultado</h2><p class="muted">Preencha quanto entra por mês para ver o resultado.</p>`;
+  const t=tone(r.score);
+  const frase={ok:'As contas estão em ordem.',warn:'Dá para melhorar alguns pontos.',bad:'Precisa de cuidado agora.',plain:''}[t];
+  const nomeStatus={ok:'Empresa saudável',warn:'Precisa de atenção',bad:'Situação crítica',plain:'Sem dados'}[t];
+  const dias = r.folego==null? null : Math.round(r.folego*30);
+  return `<div class="status ${t}"><div class="sc ${t}">${r.score??'—'}</div><div class="tx"><b>${nomeStatus}</b><span>${frase}</span></div></div>
+  <div class="big3">
+    <div class="bn"><div class="l">Sobra por mês</div><div class="v ${r.resultado<0?'bad':''}">${brl(r.resultado)}</div><div class="s">${r.margem==null?'':'R$ '+num(r.margem*100,0)+' de cada R$ 100 vendidos'}</div></div>
+    <div class="bn"><div class="l">O dinheiro em conta aguenta</div><div class="v ${dias!=null&&dias<30?'bad':''}">${dias==null?'—':dias+' dias'}</div><div class="s">pagando as contas fixas sem vender nada</div></div>
+    <div class="bn"><div class="l">Precisa vender no mínimo</div><div class="v">${r.peComDividas==null?'—':brl(r.peComDividas)}</div><div class="s">por mês para não ter prejuízo</div></div>
+  </div>
+  ${r.alertas.length?`<h3>Atenção</h3><ul class="alerts">${r.alertas.slice(0,4).map(a=>`<li>${esc(a)}</li>`).join('')}</ul>`:''}
+  <details class="more" style="margin-top:14px"><summary>Ver detalhes</summary>${indicadoresHTML(r)}<h3>Conta do mês</h3>${dreHTML(r)}</details>`;
+}
+function indicadoresHTML(r){
+  return Object.keys(IND_INFO).map(k=>{
+    const info=IND_INFO[k], x=r.ind[k]||{};
+    const v=x.valor==null?'—': info.un==='%'?num(x.valor)+'%': info.un==='x'?num(x.valor,2)+'x': num(x.valor)+' '+info.un;
+    const t=x.nota==null?'plain':x.nota>=75?'ok':x.nota>=50?'warn':'bad';
+    return `<div class="ind"><div class="row"><span>${info.nome}</span><span class="v ${t}">${v}</span></div>
+      <div class="meter"><span style="width:${x.nota??0}%;background:${COLORS[t]}"></span></div><p>${info.exp}</p></div>`;
+  }).join('');
+}
+function dreHTML(r){
+  return `<div class="kv"><span>Faturamento</span><b>${brl(r.fat)}</b></div>
+  <div class="kv"><span>(−) Impostos</span><b>${brl(-r.impostos)}</b></div>
+  <div class="kv"><span>(−) Custos variáveis</span><b>${brl(-r.cv)}</b></div>
+  <div class="kv"><span>= Margem de contribuição <span class="muted small">(${pct(r.mcPct)})</span></span><b>${brl(r.mc)}</b></div>
+  <div class="kv"><span>(−) Despesas fixas</span><b>${brl(-r.fixas)}</b></div>
+  <div class="kv"><span>= EBITDA <span class="muted small">(resultado da operação)</span></span><b class="${r.ebitda<0?'bad':''}">${brl(r.ebitda)}</b></div>
+  <div class="kv"><span>(−) Parcelas de dívidas</span><b>${brl(-r.parcelas)}</b></div>
+  <div class="kv"><span><b>= Sobra no mês</b></span><b class="${r.resultado<0?'bad':'ok'}">${brl(r.resultado)}</b></div>
+  <div class="kv"><span>Ponto de equilíbrio <span class="muted small">(com parcelas)</span></span><b>${r.peComDividas==null?'Não atinge':brl(r.peComDividas)}</b></div>`;
+}
+
+function tPreco(c){
+  const cfg=DB.config, p=c.preco, sug=complexSugerida(c.diag);
+  const nomes={baixa:'Baixa',media:'Média',alta:'Alta'};
+  return `<div class="split">
+  <div class="card">
+    <div class="blk"><h4>O que o cliente vai contratar?</h4>
+    <div class="svcs">
+    ${cfg.servicos.filter(s=>s.ativo||p.servicos.includes(s.id)).map(s=>{
+      const on=p.servicos.includes(s.id);
+      return `<label class="svc ${on?'on':''}" title="${esc(s.desc)}"><input type="checkbox" ${on?'checked':''} onchange="toggleSvc('${s.id}',this.checked);this.closest('.svc').classList.toggle('on',this.checked)">
+        <div class="t">${esc(s.nome)}</div></label>`}).join('')}
+    </div>
+    <div class="row" style="margin-top:10px"><button class="btn ghost sm" onclick="cliente().preco.servicos=DB.config.servicos.filter(s=>s.ativo).map(s=>s.id);touch();render()">Marcar todos</button>
+      <button class="btn ghost sm" onclick="cliente().preco.servicos=[];touch();render()">Limpar</button></div></div>
+    <div class="blk"><h4>Valores para este cliente</h4>
+      <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(230px,1fr))">
+        <label class="f">Mensalidade
+          <div class="row" style="flex-wrap:nowrap;gap:6px"><button class="btn ghost sm" onclick="ajustaValor('mensalManual',-50);return false">−50</button>
+          <div class="money" style="flex:1"><input type="text" inputmode="decimal" data-b="preco.mensalManual" data-num="1" data-money="1" id="in-mensal" value="${has(p.mensalManual)?fmtNum(p.mensalManual):''}"></div>
+          <button class="btn ghost sm" onclick="ajustaValor('mensalManual',50);return false">+50</button></div>
+          <small id="ref-mensal"></small></label>
+        <label class="f">Implantação
+          <div class="row" style="flex-wrap:nowrap;gap:6px"><button class="btn ghost sm" onclick="ajustaValor('implantacaoManual',-50);return false">−50</button>
+          <div class="money" style="flex:1"><input type="text" inputmode="decimal" data-b="preco.implantacaoManual" data-num="1" data-money="1" id="in-impl" value="${has(p.implantacaoManual)?fmtNum(p.implantacaoManual):''}"></div>
+          <button class="btn ghost sm" onclick="ajustaValor('implantacaoManual',50);return false">+50</button></div>
+          <small id="ref-impl"></small></label>
+      </div>
+      <div class="row" style="margin-top:10px"><button class="btn ghost sm" onclick="ajustaValor('mensalManual','teto')">Usar o teto recomendado</button>
+        <button class="btn ghost sm" onclick="ajustaValor('todos','reset')">Voltar ao valor calculado</button></div>
+    </div>
+    <details class="more"><summary>Ajustes (opcional)</summary>
+    <div class="grid">
+      ${fld('Desconto (%)','preco.descontoManual',{type:'pct',help:'(até '+num(n(cfg.descontoMax),0)+'%)'})}
+      <label class="f">Complexidade
+        <select data-b="preco.complexidade">
+          <option value="auto" ${p.complexidade==='auto'?'selected':''}>Automática (${nomes[sug]})</option>
+          ${['baixa','media','alta'].map(k=>`<option value="${k}" ${p.complexidade===k?'selected':''}>${nomes[k]}</option>`).join('')}
+        </select></label>
+      <label class="f" style="flex-direction:row;align-items:center;gap:8px;grid-column:1/-1"><input type="checkbox" data-b="preco.oferta" ${(p.oferta===undefined?cfg.oferta.ativa:p.oferta)?'checked':''}> Oferta de entrada (${n(cfg.oferta.meses)} meses com ${num(n(cfg.oferta.descontoPct),0)}% de desconto)</label>
+      ${fld('Anotações do preço','preco.obs',{type:'textarea',span:1})}
+    </div></details>
+    <div class="row" style="justify-content:flex-end"><button class="btn" onclick="go('cliente',undefined,'proposta')">Fazer a proposta →</button></div>
+  </div>
+  <div class="sticky"><div class="card" id="live-preco"></div></div>
+  </div>`;
+}
+function ajustaValor(campo,acao){
+  const c=cliente(), p=c.preco, pr=calcPreco(c), cap=calcCapacidade(calcDiag(c.diag),pr.mensal);
+  if(acao==='reset'){ p.mensalManual=null; p.implantacaoManual=null; }
+  else if(acao==='teto'){ if(!cap||!cap.teto){ toast('Preencha o diagnóstico para ter o teto'); return; } p.mensalManual=Math.floor(cap.teto/10)*10; }
+  else { const atual = campo==='mensalManual'? pr.mensal : pr.implantacao; p[campo]=Math.max(0, atual+acao); }
+  const im=document.getElementById('in-mensal'), ii=document.getElementById('in-impl');
+  if(im) im.value=has(p.mensalManual)?fmtNum(p.mensalManual):''; if(ii) ii.value=has(p.implantacaoManual)?fmtNum(p.implantacaoManual):'';
+  touch(); refreshLive();
+}
+function toggleSvc(id,on){
+  const p=cliente().preco; p.servicos=p.servicos.filter(x=>x!==id); if(on) p.servicos.push(id);
+  // mantém a ordem da configuração
+  const ordem=DB.config.servicos.map(s=>s.id); p.servicos.sort((a,b)=>ordem.indexOf(a)-ordem.indexOf(b));
+  touch(); refreshLive();
+}
+function livePreco(c){
+  const pr=calcPreco(c), r=calcDiag(c.diag), cap=calcCapacidade(r,pr.mensal);
+  if(!pr.qtd) return `<h2>Preço</h2><p class="muted">Marque ao menos um serviço.</p>`;
+  const t=cap?cap.t:'plain';
+  const resp={ok:'Sim, cabe no bolso',warn:'Cabe, mas apertado',bad:'Não cabe agora',plain:'Falta o diagnóstico'}[t];
+  const nomes={baixa:'baixa',media:'média',alta:'alta'};
+  return `<h2>Preço</h2>
+  <div class="price2">
+    <div class="bn dark"><div class="l">Mensalidade</div><div class="v">${brl(pr.mensal)}</div><div class="s">${pr.mensalManualOn?'Ajustado à mão (calculado '+brl(pr.mensalCalculado)+')':brl(pr.fixo)+' + '+brl(pr.variavel)+' ('+num(pr.varPct,2)+'% do que entra)'}</div></div>
+    <div class="bn"><div class="l">Implantação</div><div class="v">${brl(pr.implantacao)}</div><div class="s">${pr.implManualOn?'Ajustada à mão (calculada '+brl(pr.implantacaoCalculada)+')':'uma vez só'}</div></div>
+  </div>
+  ${pr.ofOn?`<p class="small" style="margin:8px 0 0"><b>Oferta:</b> ${pr.mesesOf} primeiros meses por ${brl(pr.mensalOferta)}.</p>`:''}
+  <h3 style="margin-top:18px">O cliente consegue pagar?</h3>
+  <div class="status ${t}"><div class="tx"><b class="${t==='plain'?'':t}">${resp}</b><span>${cap? (r.resultado>0? 'Usa '+pct(pr.mensal/r.resultado,0)+' da sobra do mês. Continua sobrando '+brl(cap.sobra)+'.' : 'A empresa já fecha o mês no prejuízo.') : 'Preencha o diagnóstico para saber.'}</span></div></div>
+  ${pr.avisos.length?`<ul class="alerts">${pr.avisos.map(a=>`<li class="warn">${esc(a)}</li>`).join('')}</ul>`:''}
+  <details class="more" style="margin-top:14px"><summary>Ver detalhes</summary>
+    <div class="kv"><span>Mensalidade fixa</span><b>${brl(pr.fixo)}</b></div>
+    <div class="kv"><span>${num(pr.varPct,2)}% de ${brl(n(c.diag.faturamento))}</span><b>${brl(pr.variavel)}</b></div>
+    ${pr.adicionais>0?`<div class="kv"><span>Adicionais (complexidade ${nomes[pr.cx]})</span><b>${brl(pr.adicionais)}</b></div>`:''}
+    ${pr.manPct?`<div class="kv"><span>Desconto ${num(pr.manPct,1)}%</span><b>− ${brl(pr.descManual)}</b></div>`:''}
+    <div class="kv"><span>Total no primeiro ano</span><b>${brl(pr.total12)}</b></div>
+    <div class="kv"><span>Teto que o cliente aguenta</span><b>${cap?brl(cap.teto):'—'}</b></div>
+    <div class="kv"><span>Retorno estimado para o cliente</span><b>${cap?brl(cap.ganho)+'/mês':'—'}</b></div>
+    <div class="kv"><span>Horas de trabalho da NMS</span><b>${num(pr.horas)} h/mês</b></div>
+    <div class="kv"><span>Custo da NMS</span><b>${brl(pr.custo)}</b></div>
+    <div class="kv"><span>Margem da NMS</span><b class="${pr.margem*100<n(DB.config.margemMin)?'bad':'ok'}">${pct(pr.margem)}</b></div>
+  </details>`;
+}
+function capHTML(r,cap){
+  if(!cap) return `<p class="muted small">Preencha o diagnóstico (ao menos o faturamento) para ver a capacidade de pagamento.</p>`;
+  return `<div class="verdict ${cap.t==='plain'?'':cap.t}"><strong class="${cap.t==='plain'?'':cap.t}">${cap.titulo}</strong><p>${cap.texto}</p></div>
+    <div class="kv"><span>Sobra no mês hoje</span><b>${brl(r.resultado)}</b></div>
+    <div class="kv"><span>Teto de mensalidade recomendado</span><b>${brl(cap.teto)}</b></div>
+    <div class="kv"><span>Sobra depois da mensalidade</span><b class="${cap.sobra<0?'bad':''}">${brl(cap.sobra)}</b></div>
+    <div class="kv"><span>Retorno estimado com a NMS <span class="muted small">(${num(n(DB.config.capacidade.ganhoPct),1)}% do faturamento)</span></span><b>${brl(cap.ganho)}</b></div>
+    <div class="kv"><span>Retorno líquido para o cliente</span><b class="${cap.retorno<0?'bad':'ok'}">${brl(cap.retorno)}</b></div>
+    <div class="kv"><span>Cada R$ 1 investido retorna</span><b>${cap.roi==null?'—':brl(cap.roi)}</b></div>`;
+}
+
+function tResumo(c){
+  const r=calcDiag(c.diag), pr=calcPreco(c), cap=calcCapacidade(r,pr.mensal), cd=c.cadastro;
+  const data=cd.dataDiag?new Date(cd.dataDiag+'T12:00').toLocaleDateString('pt-BR'):new Date().toLocaleDateString('pt-BR');
+  return `<div class="row no-print" style="justify-content:flex-end;margin-bottom:12px">
+      <button class="btn ghost" onclick="copiarResumo()">Copiar texto para WhatsApp</button>
+      <button class="btn ghost" onclick="window.print()">Imprimir resumo interno</button>
+      <button class="btn" onclick="go('cliente',undefined,'proposta')">Gerar proposta para o cliente →</button></div>
+  <div class="card doc">
+    <div class="row spread"><div class="logo"><b>nms</b><span>bpo financeiro</span></div><span class="muted small">${data}</span></div>
+    <h1 style="margin-top:18px">Diagnóstico e proposta</h1>
+    <div class="muted">${esc(cd.razao||nomeCliente(c))}${cd.cnpj?' · CNPJ '+esc(cd.cnpj):''}${cd.responsavel?' · A/C '+esc(cd.responsavel):''}</div>
+    <div class="sec"><h3>Saúde financeira</h3>
+      ${r.preenchido?`<div class="score"><div class="ring" style="--v:${r.score??0};--c:${COLORS[tone(r.score)]}"><div>${r.score??'—'}</div></div>
+        <div><span class="badge ${tone(r.score)}">${toneLabel(r.score)}</span></div></div>
+        <div class="split" style="grid-template-columns:1fr 1fr;gap:24px"><div>${dreHTML(r)}</div><div>${indicadoresHTML(r)}</div></div>`:'<p class="muted">Diagnóstico ainda não preenchido.</p>'}
+    </div>
+    ${r.alertas.length?`<div class="sec"><h3>O que encontramos</h3><ul class="alerts" style="font-size:14px">${r.alertas.map(a=>`<li>${esc(a)}</li>`).join('')}</ul></div>`:''}
+    <div class="sec"><h3>Serviços propostos</h3>
+      ${pr.qtd?`<table><tr><th>Serviço</th><th>O que inclui</th></tr>${pr.linhas.map(l=>`<tr><td><b>${esc(l.s.nome)}</b></td><td>${esc(l.s.desc)}</td></tr>`).join('')}</table>
+      <div style="margin-top:14px;max-width:380px;margin-left:auto">
+        ${pr.ofOn?`<div class="kv"><span><b>Meses 1 a ${pr.mesesOf}</b> (oferta de entrada, ${num(pr.ofPct,0)}% de desconto)</span><b style="font-size:18px">${brl(pr.mensalOferta)}</b></div>`:''}
+        <div class="kv"><span>Mensalidade fixa</span><b>${brl(pr.fixo)}</b></div>
+        <div class="kv"><span>Parte variável (${num(pr.varPct,2)}% dos recebimentos do mês)</span><b>${brl(pr.variavel)}</b></div>
+        ${pr.adicionais>0?`<div class="kv"><span>Serviços adicionais</span><b>${brl(pr.adicionais)}</b></div>`:''}
+        <div class="kv"><span><b>Mensalidade${pr.ofOn?' a partir do '+(pr.mesesOf+1)+'º mês':''}</b></span><b style="font-size:18px">${brl(pr.mensal)}</b></div>
+        <div class="kv"><span>Implantação (uma vez)</span><b>${brl(pr.implantacao)}</b></div>
+        ${pr.ofOn?`<div class="kv"><span>Total no primeiro ano</span><b>${brl(pr.total12)}</b></div>
+        <div class="kv"><span>Você economiza com a oferta</span><b class="ok">${brl(pr.economiaOferta)}</b></div>`:''}
+        ${pr.manPct?`<div class="kv"><span>Desconto já incluso na mensalidade</span><b>${brl(pr.descManual)}</b></div>`:''}
+        <p class="small muted" style="margin:6px 0 0">A parte variável acompanha o valor recebido pela empresa no mês: sobe quando a empresa recebe mais e desce quando recebe menos.</p>
+      </div>`:'<p class="muted">Nenhum serviço selecionado.</p>'}
+      ${c.preco.obs?`<p style="white-space:pre-wrap">${esc(c.preco.obs)}</p>`:''}
+    </div>
+    ${cap&&pr.qtd?`<div class="sec"><h3>Cabe no caixa?</h3>${capHTML(r,cap)}</div>`:''}
+    <p class="small muted" style="margin-top:26px">Valores calculados a partir das informações passadas pela empresa no diagnóstico. Estimativas, sujeitas a revisão após a implantação.</p>
+  </div>
+  ${pr.qtd?`<div class="card no-print" style="margin-top:16px"><h3>Uso interno (não sai na impressão)</h3>
+    <div class="kv"><span>Esforço estimado</span><b>${num(pr.horas)} h/mês</b></div>
+    <div class="kv"><span>Custo interno</span><b>${brl(pr.custo)}</b></div>
+    <div class="kv"><span>Margem NMS${pr.ofOn?' (valor integral)':''}</span><b>${pct(pr.margem)}</b></div>
+    ${pr.ofOn?`<div class="kv"><span>Margem NMS na oferta</span><b>${pct(pr.margemOferta)}</b></div>`:''}
+    ${pr.avisos.length?`<ul class="alerts">${pr.avisos.map(a=>`<li class="warn">${esc(a)}</li>`).join('')}</ul>`:''}</div>`:''}`;
+}
+const OPORTUNIDADES = [
+  {se:(r,ck)=>ck.separaPF==='nao', t:'Separar empresa e pessoa física', d:'Cada real no lugar certo, para saber o que é da empresa e o que é seu.'},
+  {se:(r,ck)=>ck.sabeLucro==='nao', t:'Saber o lucro de verdade', d:'Todo mês um relatório simples mostrando se a empresa ganhou ou perdeu dinheiro.'},
+  {se:(r,ck)=>ck.pagaJuros==='sim', t:'Acabar com juros e multas', d:'Contas pagas no prazo, sem dinheiro jogado fora com atraso.'},
+  {se:(r,ck)=>ck.inadimplencia==='sim', t:'Receber na data certa', d:'Acompanhamento de quem está devendo e cobrança no dia certo.'},
+  {se:(r,ck)=>ck.usaLimite==='sim', t:'Sair do cheque especial', d:'Planejamento do caixa para não depender do limite do banco.'},
+  {se:(r,ck)=>ck.temControle==='nao', t:'Financeiro organizado', d:'Todas as contas num só lugar, no sistema NMS, com acesso pelo celular.'},
+  {se:(r,ck)=>r.folego!==null && r.folego<1, t:'Mais fôlego no caixa', d:'Previsão das próximas semanas e alerta antes do aperto.'},
+  {se:(r,ck)=>r.preenchido && r.resultado<0, t:'Voltar ao azul', d:'Entender onde o dinheiro está indo e o que ajustar para fechar o mês no positivo.'},
+  {se:(r,ck)=>r.mcPct!==null && r.mcPct>0 && r.mcPct<0.3, t:'Melhorar a margem', d:'Ver quanto sobra de cada venda e onde dá para ganhar mais.'}
+];
+const OPP_PADRAO = [
+  {t:'Números claros todo mês', d:'Relatório simples com o resultado da empresa e os principais indicadores.'},
+  {t:'Mais tempo para vender', d:'A rotina do financeiro sai da sua mesa.'},
+  {t:'Decisões com segurança', d:'Saldo confiável e previsão de caixa para decidir com tranquilidade.'}
+];
+function prop(c){ // dados da proposta com valores-padrão
+  const pd=DB.config.propostaPadrao;
+  if(!c.proposta) c.proposta={};
+  const p=c.proposta;
+  if(!p.numero){ const d=new Date(); p.numero=d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+'-'+c.id.slice(-3).toUpperCase(); }
+  if(!p.data) p.data=new Date().toISOString().slice(0,10);
+  for(const k of ['validadeDias','prazoImplantacao','vencimento','formaPagamento','contrato','duracaoMeses']) if(p[k]===undefined||p[k]===null||p[k]==='') p[k]=pd[k];
+  if(!p.inicio){ const d=new Date(p.data+'T12:00'); d.setMonth(d.getMonth()+1,1); p.inicio=d.toISOString().slice(0,10); } // padrão: dia 1 do mês seguinte
+  if(p.mostrarOpp===undefined) p.mostrarOpp=true;
+  if(p.mostrarAceite===undefined) p.mostrarAceite=true;
+  if(p.mostrarClausulas===undefined) p.mostrarClausulas=true;
+  if(!has(p.diaRelatorio)) p.diaRelatorio=pd.diaRelatorio;
+  return p;
+}
+function dataBR(iso){ return iso? new Date(iso+'T12:00').toLocaleDateString('pt-BR') : ''; }
+function isoDe(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function somaDias(iso,dias){ const d=new Date(iso+'T12:00'); d.setDate(d.getDate()+dias); return isoDe(d); }
+function terminoContrato(inicio,meses){ // início + N meses − 1 dia
+  if(!inicio||!n(meses)) return ''; const d=new Date(inicio+'T12:00'); const dia=d.getDate();
+  d.setDate(1); d.setMonth(d.getMonth()+n(meses)); const ult=new Date(d.getFullYear(),d.getMonth()+1,0,12).getDate(); d.setDate(Math.min(dia,ult)); d.setDate(d.getDate()-1); return isoDe(d); }
+function contratoAtual(c){ const l=(c.contratos||[]); return l.length? l[l.length-1] : null; }
+function diasAte(iso){ return Math.round((new Date(iso+'T12:00')-new Date(isoDe(new Date())+'T12:00'))/864e5); }
+function tProposta(c){
+  const p=prop(c), pr=calcPreco(c);
+  const ck=(id,label)=>`<label class="f" style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" data-b="proposta.${id}" ${p[id]?'checked':''} onchange="setTimeout(()=>{document.getElementById('prop-doc').innerHTML=propostaDoc(cliente())},0)"> ${label}</label>`;
+  return `<div class="card no-print" style="margin-bottom:16px">
+    <div class="row spread"><h2 style="margin:0">Dados da proposta</h2>
+      <div class="row"><button class="btn ghost sm" onclick="go('cliente',undefined,'preco')">Ajustar preço</button><button class="btn" onclick="gerarPDF()" ${pr.qtd?'':'disabled'}>Gerar PDF da proposta</button></div></div>
+    ${pr.qtd?'':'<p class="verdict warn" style="margin-top:12px">Selecione os serviços na aba Precificação antes de gerar a proposta.</p>'}
+    <div class="grid" style="margin-top:14px">
+      ${fld('Número da proposta','proposta.numero')}
+      ${fld('Data','proposta.data',{type:'date'})}
+      ${fld('Validade (dias)','proposta.validadeDias',{type:'int'})}
+      ${fld('Início do contrato','proposta.inicio',{type:'date'})}
+      ${fld('Duração do contrato (meses)','proposta.duracaoMeses',{type:'int',help:'término: '+(dataBR(terminoContrato(p.inicio,p.duracaoMeses))||'—')})}
+      ${fld('Prazo de implantação','proposta.prazoImplantacao')}
+      ${fld('Vencimento da mensalidade','proposta.vencimento')}
+      ${fld('Forma de pagamento','proposta.formaPagamento')}
+      ${fld('Relatório entregue até o dia','proposta.diaRelatorio',{type:'int'})}
+      ${fld('Mensagem para o cliente (opcional)','proposta.obs',{type:'textarea',span:1,ph:'Ex.: condição especial combinada, o que não está incluso, bônus...'})}
+    </div>
+    <div class="row" style="margin-top:10px">${ck('mostrarOpp','Mostrar "Onde vamos ajudar" (tirado do diagnóstico)')}${ck('mostrarClausulas','Incluir as cláusulas do contrato (página 2)')}${ck('mostrarAceite','Mostrar assinaturas')}</div>
+    <p class="small muted" style="margin:8px 0 0">O PDF traz só o que interessa ao cliente: serviços, valores, condições e próximos passos. Margem, custo interno e notas do diagnóstico ficam de fora.</p>
+  </div>
+  <div class="card doc prop" id="prop-doc">${propostaDoc(c)}</div>`;
+}
+function propostaDoc(c){
+  const p=prop(c), pr=calcPreco(c), r=calcDiag(c.diag), cd=c.cadastro, emp=DB.config.empresa;
+  const nome=cd.fantasia||cd.razao||'sua empresa';
+  const validade = p.data? new Date(new Date(p.data+'T12:00').getTime()+n(p.validadeDias)*864e5).toLocaleDateString('pt-BR') : '';
+  const ckv=c.diag.checks||{};
+  let opps = OPORTUNIDADES.filter(o=>{try{return o.se(r,ckv)}catch(e){return false}}).slice(0,3);
+  if(opps.length<3) opps = opps.concat(OPP_PADRAO.filter(o=>!opps.some(x=>x.t===o.t))).slice(0,3);
+  const fim=terminoContrato(p.inicio,p.duracaoMeses);
+  const cond=[ p.inicio?['Início do contrato',dataBR(p.inicio)]:null, fim?['Término do contrato',dataBR(fim)+' ('+n(p.duracaoMeses)+' meses)']:null,
+    p.prazoImplantacao?['Implantação',p.prazoImplantacao]:null, p.vencimento?['Vencimento',p.vencimento]:null,
+    p.formaPagamento?['Pagamento',p.formaPagamento]:null, validade?['Proposta válida até',validade]:null ].filter(Boolean);
+  return `
+  <div class="row spread"><div class="logo"><b>nms</b><span>bpo financeiro</span></div>
+    <div class="small muted" style="text-align:right">Proposta nº ${esc(p.numero)} · ${dataBR(p.data)}</div></div>
+  <h1 style="margin-top:20px">Proposta para ${esc(nome)}</h1>
+  <div class="muted small" style="margin-top:4px">${esc(cd.razao||nome)}${cd.cnpj?' · CNPJ '+esc(cd.cnpj):''}${cd.responsavel?' · A/C '+esc(cd.responsavel):''}</div>
+  <div class="sec"><h3>O que fazemos por você</h3>
+    ${pr.qtd?`<div class="chips">${pr.linhas.map(l=>`<span>${esc(l.s.nome)}</span>`).join('')}<span>Sistema NMS no PC e no celular</span></div>`:'<p class="muted">Nenhum serviço selecionado.</p>'}
+    ${p.mostrarOpp?`<ul class="ganhos">${opps.map(o=>`<li><b>${esc(o.t)}.</b> ${esc(o.d)}</li>`).join('')}</ul>`:''}
+  </div>
+  <div class="sec"><h3>Investimento</h3>
+    <div class="hero">
+      <div class="box dark"><div class="lb">Mensalidade</div><div class="vl">${brl(pr.mensal)}</div>
+        <div class="dt">por mês</div></div>
+      <div class="box"><div class="lb">Implantação · única vez</div><div class="vl">${brl(pr.implantacao)}</div>
+        <div class="dt">Organização inicial e configuração do sistema</div></div>
+    </div>
+    ${pr.ofOn?`<p style="margin-top:10px"><b>Condição de entrada:</b> ${pr.mesesOf} primeiros meses por ${brl(pr.mensalOferta)}.</p>`:''}
+  </div>
+  ${cond.length?`<div class="sec"><h3>Condições</h3><div class="cond">${cond.map(x=>`<div><span>${x[0]}</span><b>${esc(x[1])}</b></div>`).join('')}</div></div>`:''}
+  ${pagamentoHTML()}
+  ${p.obs?`<div class="sec"><p style="white-space:pre-wrap">${esc(p.obs)}</p></div>`:''}
+  <div class="sec"><p><b>Para começar:</b> assine ${p.mostrarClausulas?'ao final da página 2':'abaixo'} e faça o pagamento da implantação.</p></div>
+  ${p.mostrarAceite&&!p.mostrarClausulas?`<div class="sec"><p class="small"><b>Declaro que li e concordo com esta proposta.</b></p></div><div class="sec sign"><div>Aceite · ${esc(cd.razao||nome)}<br>Data ___/___/______</div><div>${esc(emp.nome)}</div></div>`:''}
+  <div class="foot"><b style="color:var(--ink)">${esc(emp.nome)}</b>${emp.whatsapp?`<span>WhatsApp ${esc(emp.whatsapp)}</span>`:''}${emp.email?`<span>${esc(emp.email)}</span>`:''}${emp.site?`<span>${esc(emp.site)}</span>`:''}${emp.instagram?`<span>${esc(emp.instagram)}</span>`:''}${emp.endereco?`<span>${esc(emp.endereco)}</span>`:''}</div>
+  ${p.mostrarClausulas?clausulasHTML(c):''}`;
+}
+function extenso(nm){ const e=['zero','um','dois','três','quatro','cinco','seis','sete','oito','nove','dez','onze','doze','treze','quatorze','quinze','dezesseis','dezessete','dezoito','dezenove','vinte','vinte e um','vinte e dois','vinte e três','vinte e quatro']; return e[nm]||String(nm); }
+function listaPT(a){ return a.length<=1? (a[0]||'') : a.slice(0,-1).join(', ')+' e '+a[a.length-1]; }
+function pagamentoHTML(){
+  const b=DB.config.banco||{};
+  if(!b.pix&&!b.conta) return '';
+  const it=[b.pix?['Chave Pix',b.pix]:null, b.banco?['Banco',b.banco]:null, b.agencia?['Agência',b.agencia]:null, b.conta?['Conta',b.conta]:null, b.titular?['Titular',b.titular]:null, b.cpf?['CPF do titular',b.cpf]:null].filter(Boolean);
+  return `<div class="sec"><h3>Dados para pagamento</h3><div class="cond">${it.map(x=>`<div><span>${x[0]}</span><b>${esc(x[1])}</b></div>`).join('')}</div></div>`;
+}
+function clausulasHTML(c){
+  const p=prop(c), pr=calcPreco(c), cd=c.cadastro, emp=DB.config.empresa;
+  const meses=n(p.duracaoMeses)||6, fim=terminoContrato(p.inicio,meses);
+  const serv=listaPT(pr.linhas.map(l=>l.s.nome.toLowerCase()).concat(['relatório gerencial mensal']).filter((v,i,a)=>a.indexOf(v)===i && !(v==='relatório gerencial mensal' && a.includes('relatórios mensais'))));
+  const venc=String(p.vencimento||'').replace(/^todo\s+/i,'').trim();
+  const hoje=new Date(), mesesN=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  const cl=[
+   ['Objeto',`A CONTRATADA prestará à CONTRATANTE serviços de BPO financeiro com o sistema NMS: ${esc(serv)}. Não estão incluídos contabilidade, apuração de impostos, folha de pagamento nem consultoria jurídica.`],
+   ['Prazo',`Este contrato vale por ${meses} (${extenso(meses)}) meses, de <b>${dataBR(p.inicio)||'___/___/____'}</b> a <b>${dataBR(fim)||'___/___/____'}</b>, e será renovado automaticamente por iguais períodos se nenhuma parte avisar o contrário, por escrito, com 30 (trinta) dias de antecedência.`],
+   ['Preço',`Taxa de implantação de <b>${brl(pr.implantacao)}</b>, paga uma única vez, e mensalidade de <b>${brl(pr.mensal)}</b>, com vencimento ${esc(venc?('no '+venc):'todo dia ___')} de cada mês, via ${esc(p.formaPagamento||'___')}. Os valores serão reajustados a cada 12 (doze) meses pelo IPCA/IBGE.`],
+   ['Atraso','O atraso no pagamento gera multa de 2% (dois por cento) e juros de 1% (um por cento) ao mês. Com mais de 15 (quinze) dias de atraso, a CONTRATADA pode suspender os serviços após aviso por escrito.'],
+   ['Obrigações da CONTRATADA e acesso bancário',`A CONTRATADA executará os serviços com cuidado e nos prazos combinados e entregará o relatório gerencial até o dia ${has(p.diaRelatorio)?n(p.diaRelatorio):'___'} de cada mês. A CONTRATADA não movimenta recursos da CONTRATANTE: seu acesso às contas bancárias é somente para consulta. Quando a CONTRATANTE autorizar por escrito, a CONTRATADA poderá preparar pagamentos ou enviar arquivo de remessa ao banco, mas a aprovação e a liberação final de qualquer valor são feitas exclusivamente pela CONTRATANTE.`],
+   ['Obrigações da CONTRATANTE','Pagar em dia, enviar documentos e acessos no prazo solicitado e aprovar e liberar os pagamentos no banco a tempo. Atrasos ou erros causados por falta ou erro de informação da CONTRATANTE não são de responsabilidade da CONTRATADA.'],
+   ['Sigilo e proteção de dados','A CONTRATADA manterá sigilo sobre todas as informações da CONTRATANTE durante o contrato e por 5 (cinco) anos após o seu término. Os dados pessoais serão tratados apenas para executar os serviços, conforme a Lei nº 13.709/2018 (LGPD), e serão devolvidos ou eliminados ao final do contrato.'],
+   ['Responsabilidade','A CONTRATADA responde pelos danos causados por erro próprio, limitados ao valor pago pela CONTRATANTE nos últimos 12 (doze) meses. Não responde por decisões de gestão da CONTRATANTE, por informações incorretas recebidas nem por falhas de bancos ou sistemas de terceiros. Este contrato não cria vínculo de emprego entre as partes.'],
+   ['Encerramento e multa','Qualquer parte pode encerrar este contrato com aviso prévio por escrito de 30 (trinta) dias. Com o aviso cumprido, não há multa: é devida apenas a mensalidade do período do aviso. Se a CONTRATANTE encerrar o contrato sem cumprir o aviso prévio, pagará multa equivalente a 1 (uma) mensalidade. Em caso de descumprimento grave, o contrato pode ser encerrado imediatamente, com multa de 1 (uma) mensalidade para a parte que deu causa. Ao final, a CONTRATADA entregará os relatórios e dados da CONTRATANTE em até 15 (quinze) dias.'],
+   ['Disposições finais',`Alterações só valem por escrito e assinadas pelas partes. Este contrato poderá ser transferido para a pessoa jurídica que a CONTRATADA vier a constituir para a mesma atividade, mediante simples comunicação. As partes reconhecem a validade da assinatura eletrônica. Fica eleito o foro da Comarca de ${esc(emp.foro||'Goiânia/GO')}.`]
+  ];
+  return `<div class="clausulas">
+    <div class="row spread"><div class="logo"><b>nms</b><span>bpo financeiro</span></div><div class="small muted">Proposta nº ${esc(p.numero)} · página 2</div></div>
+    <h2 style="margin:16px 0 4px">Condições do contrato de prestação de serviços</h2>
+    <p class="small muted" style="margin:0 0 10px">CONTRATANTE: ${esc(cd.razao||nomeCliente(c))}${cd.cnpj?', CNPJ '+esc(cd.cnpj):''}. CONTRATADA: ${esc(emp.responsavel||'')}${(DB.config.banco||{}).cpf?', CPF '+esc(DB.config.banco.cpf):''}${emp.responsavel?', que atua sob o nome comercial ':''}${esc(emp.nome)}${emp.endereco?', com endereço na '+esc(emp.endereco):''}. Contrato regido pelos arts. 593 a 609 do Código Civil.</p>
+    <ol class="cl">${cl.map(x=>`<li><b>${x[0]}.</b> ${x[1]}</li>`).join('')}</ol>
+    ${p.mostrarAceite?`<p class="small" style="margin:12px 0 0"><b>Declaro que li e concordo com esta proposta e com as cláusulas acima.</b></p>
+    <p class="small" style="margin:6px 0 0">${esc((emp.foro||'Goiânia/GO'))}, ____ de ______________ de ${hoje.getFullYear()}.</p>
+    <div class="sign" style="margin-top:26px"><div>CONTRATANTE<br>${esc(cd.razao||nomeCliente(c))}${cd.responsavel?'<br>'+esc(cd.responsavel):''}</div><div>CONTRATADA<br>${esc(emp.responsavel||'')}<br>${esc(emp.nome)}</div></div>
+    <div class="sign wit"><div>Testemunha 1 · CPF</div><div>Testemunha 2 · CPF</div></div>`:''}
+  </div>`;
+}
+function ren(c){
+  if(!c.renovacao) c.renovacao={};
+  const R=c.renovacao, atual=contratoAtual(c), pd=DB.config.propostaPadrao;
+  if(!R.fimAtual) R.fimAtual = atual&&atual.termino ? atual.termino : (c.proposta&&c.proposta.inicio? terminoContrato(c.proposta.inicio, c.proposta.duracaoMeses||pd.duracaoMeses) : '');
+  if(!n(R.meses)) R.meses = n(pd.duracaoMeses)||6;
+  if(!R.data) R.data = isoDe(new Date());
+  if(!R.numero){ const d=new Date(); R.numero='R'+d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+'-'+c.id.slice(-3).toUpperCase(); }
+  if(!R.vencimento) R.vencimento = (c.proposta&&c.proposta.vencimento)||pd.vencimento;
+  if(!R.formaPagamento) R.formaPagamento = (c.proposta&&c.proposta.formaPagamento)||pd.formaPagamento;
+  return R;
+}
+function renCalc(c){
+  const R=ren(c), pr=calcPreco(c);
+  const inicio = R.fimAtual? somaDias(R.fimAtual,1) : '';
+  const termino = terminoContrato(inicio, R.meses);
+  const mensal = has(R.mensal)&&n(R.mensal)>0 ? n(R.mensal) : pr.mensal;
+  return {R,pr,inicio,termino,mensal};
+}
+function tRenovacao(c){
+  const {R,pr,inicio,termino,mensal}=renCalc(c);
+  const hist=(c.contratos||[]);
+  return `<div class="card no-print" style="margin-bottom:16px">
+    <div class="row spread"><h2 style="margin:0">Renovação de contrato</h2>
+      <button class="btn" onclick="gerarRenovacao()" ${pr.qtd&&inicio?'':'disabled'}>Gerar PDF da renovação</button></div>
+    <p class="small muted" style="margin:6px 0 12px">Informe quando o contrato atual termina. A renovação começa no dia seguinte e vai até o fim do novo período. Não há nova implantação.</p>
+    <div class="grid">
+      ${fld('Fim do contrato atual','renovacao.fimAtual',{type:'date'})}
+      ${fld('Renovar por (meses)','renovacao.meses',{type:'int',help:'novo período: '+(inicio?dataBR(inicio)+' a '+dataBR(termino):'—')})}
+      ${fld('Mensalidade na renovação','renovacao.mensal',{type:'money',help:'em branco = valor atual calculado ('+brl(pr.mensal)+')'})}
+      ${fld('Vencimento','renovacao.vencimento')}
+      ${fld('Forma de pagamento','renovacao.formaPagamento')}
+      ${fld('Número do documento','renovacao.numero')}
+      ${fld('Observação para o cliente (opcional)','renovacao.obs',{type:'textarea',span:1,ph:'Ex.: reajuste aplicado, serviço novo incluído...'})}
+    </div>
+    <h3 style="margin-top:18px">Histórico de contratos</h3>
+    ${hist.length?`<table><tr><th>Tipo</th><th>Início</th><th>Término</th><th class="n">Mensalidade</th><th>Documento</th></tr>${hist.map(h=>`<tr><td>${esc(h.tipo)}</td><td>${dataBR(h.inicio)}</td><td>${dataBR(h.termino)}</td><td class="n">${brl(h.mensal)}</td><td class="small muted">${esc(h.documento||'')}</td></tr>`).join('')}</table>`:'<p class="small muted">Nenhum contrato registrado ainda. O contrato inicial entra aqui quando você gera o PDF da proposta.</p>'}
+  </div>
+  <div class="card doc prop" id="ren-doc">${renovacaoDoc(c)}</div>`;
+}
+function renovacaoDoc(c){
+  const {R,pr,inicio,termino,mensal}=renCalc(c), cd=c.cadastro, emp=DB.config.empresa;
+  const nome=cd.fantasia||cd.razao||'sua empresa';
+  const cond=[ ['Início da renovação',dataBR(inicio)||'—'], ['Término',termino?dataBR(termino)+' ('+n(R.meses)+' meses)':'—'],
+    ['Contrato anterior até',dataBR(R.fimAtual)||'—'], R.vencimento?['Vencimento',R.vencimento]:null, R.formaPagamento?['Pagamento',R.formaPagamento]:null, ['Implantação','Sem nova cobrança'] ].filter(Boolean);
+  return `
+  <div class="row spread"><div class="logo"><b>nms</b><span>bpo financeiro</span></div>
+    <div class="small muted" style="text-align:right">Renovação nº ${esc(R.numero)} · ${dataBR(R.data)}</div></div>
+  <h1 style="margin-top:20px">Renovação de contrato · ${esc(nome)}</h1>
+  <div class="muted small" style="margin-top:4px">${esc(cd.razao||nome)}${cd.cnpj?' · CNPJ '+esc(cd.cnpj):''}${cd.responsavel?' · A/C '+esc(cd.responsavel):''}</div>
+  <div class="sec"><p>Obrigado por continuar com a NMS. Este documento renova o contrato de prestação de serviços financeiros por mais <b>${n(R.meses)} meses</b>, nas condições abaixo.</p></div>
+  <div class="sec"><h3>Serviços que continuam</h3>
+    <div class="chips">${pr.linhas.map(l=>`<span>${esc(l.s.nome)}</span>`).join('')}<span>Sistema NMS no PC e no celular</span></div></div>
+  <div class="sec"><h3>Investimento</h3>
+    <div class="hero">
+      <div class="box dark"><div class="lb">Mensalidade</div><div class="vl">${brl(mensal)}</div>
+        <div class="dt">por mês</div></div>
+      <div class="box"><div class="lb">Período</div><div class="vl" style="font-size:22px">${dataBR(inicio)||'—'}<br>a ${dataBR(termino)||'—'}</div></div>
+    </div></div>
+  <div class="sec"><h3>Condições</h3><div class="cond">${cond.map(x=>`<div><span>${x[0]}</span><b>${esc(x[1])}</b></div>`).join('')}</div></div>
+  ${pagamentoHTML()}
+  ${R.obs?`<div class="sec"><p style="white-space:pre-wrap">${esc(R.obs)}</p></div>`:''}
+  <div class="sec"><p class="small">As demais cláusulas do contrato de prestação de serviços continuam valendo sem alteração.</p></div>
+  <div class="sec sign"><div>De acordo · ${esc(cd.razao||nome)}<br>Data ___/___/______</div><div>${esc(emp.nome)}</div></div>
+  <div class="foot"><b style="color:var(--ink)">${esc(emp.nome)}</b>${emp.whatsapp?`<span>WhatsApp ${esc(emp.whatsapp)}</span>`:''}${emp.email?`<span>${esc(emp.email)}</span>`:''}${emp.site?`<span>${esc(emp.site)}</span>`:''}${emp.instagram?`<span>${esc(emp.instagram)}</span>`:''}${emp.endereco?`<span>${esc(emp.endereco)}</span>`:''}</div>`;
+}
+function gerarRenovacao(){
+  const c=cliente(); const {R,inicio,termino,mensal}=renCalc(c);
+  c.contratos=c.contratos||[];
+  const reg={tipo:'Renovação', inicio, termino, meses:n(R.meses), mensal, implantacao:0, documento:R.numero, gerado:isoDe(new Date())};
+  const i=c.contratos.findIndex(x=>x.documento===R.numero); if(i>=0) c.contratos[i]=reg; else c.contratos.push(reg);
+  c.status='Fechado'; touch();
+  const t=document.title; document.title='Renovação NMS - '+nomeCliente(c)+' - '+R.numero;
+  setTimeout(()=>{ window.print(); setTimeout(()=>{ document.title=t; c.renovacao={}; save(); render(); },500); },50);
+}
+function gerarPDF(){
+  const c=cliente(); const p=prop(c); save();
+  const t=document.title; document.title='Proposta NMS - '+nomeCliente(c)+' - '+p.numero;
+  if(c.status==='Prospecção'||c.status==='Diagnóstico feito'){ c.status='Proposta enviada'; }
+  // registra/atualiza o contrato inicial no histórico
+  const pr=calcPreco(c); c.contratos=c.contratos||[];
+  const ini={tipo:'Inicial', inicio:p.inicio, termino:terminoContrato(p.inicio,p.duracaoMeses), meses:n(p.duracaoMeses), mensal:pr.mensal, implantacao:pr.implantacao, documento:p.numero, gerado:isoDe(new Date())};
+  const i=c.contratos.findIndex(x=>x.tipo==='Inicial'); if(i>=0) c.contratos[i]=ini; else c.contratos.unshift(ini);
+  touch();
+  setTimeout(()=>{ window.print(); setTimeout(()=>{document.title=t; render();},500); },50);
+}
+function copiarResumo(){
+  const c=cliente(), r=calcDiag(c.diag), pr=calcPreco(c), cap=calcCapacidade(r,pr.mensal);
+  const L=[];
+  L.push('*NMS BPO Financeiro: diagnóstico e proposta*');
+  L.push(nomeCliente(c)); L.push('');
+  if(r.preenchido){
+    L.push('*Saúde financeira:* '+(r.score??'—')+'/100 ('+toneLabel(r.score)+')');
+    L.push('Faturamento: '+brl(r.fat)+' · Sobra no mês: '+brl(r.resultado));
+    if(r.alertas.length){L.push('');L.push('*O que encontramos:*');r.alertas.forEach(a=>L.push('• '+a));}
+    L.push('');
+  }
+  if(pr.qtd){
+    L.push('*Serviços:*'); pr.linhas.forEach(l=>L.push('• '+l.s.nome));
+    L.push('');
+    if(pr.ofOn){ L.push('*Oferta de entrada:* '+pr.mesesOf+' primeiras mensalidades por '+brl(pr.mensalOferta)+' ('+num(pr.ofPct,0)+'% de desconto)'); L.push('*A partir do '+(pr.mesesOf+1)+'º mês:* '+brl(pr.mensal)); }
+    else L.push('*Mensalidade:* '+brl(pr.mensal));
+    L.push('*Implantação:* '+brl(pr.implantacao));
+    if(cap&&cap.ganho) L.push('Retorno estimado com a organização: '+brl(cap.ganho)+'/mês');
+  }
+  if(c.preco.obs){L.push('');L.push(c.preco.obs);}
+  const txt=L.join('\n');
+  (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>toast('Texto copiado'),()=>{prompt('Copie o texto:',txt)});
+}
+
+/* ---------------- tela: configurações ---------------- */
+function cf(path,type='num',extra=''){
+  const v=getPath(DB.config,path);
+  if(type==='text') return `<input type="text" data-c="${path}" value="${esc(v)}" ${extra}>`;
+  return `<input type="number" step="any" min="0" data-c="${path}" data-num="1" value="${v}" ${extra}>`;
+}
+function vConfig(){
+  const cfg=DB.config;
+  const volOpts=s=>`<select data-c="servicos.${cfg.servicos.indexOf(s)}.volume">${[['','Preço fixo'],['pagar','Lançamentos a pagar'],['receber','Recebimentos'],['contas','Contas bancárias']].map(o=>`<option value="${o[0]}" ${s.volume===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select>`;
+  return `<div class="row spread" style="margin-bottom:14px"><div><h1>Configurações</h1><div class="muted small">Preços e critérios usados em todos os cálculos. Tudo salva sozinho.</div></div>
+    <button class="btn danger sm" onclick="if(confirm('Voltar todos os preços e critérios para os valores-padrão?')){DB.config=clone(DEFAULT_CONFIG);save();render();toast('Configurações restauradas')}">Restaurar padrões</button></div>
+  <div class="card" style="overflow-x:auto">
+    <h3>Tabela de serviços</h3><p class="small muted" style="margin-top:0">Os serviços entram na mensalidade fixa. Preencha preço base só se quiser cobrar algum como adicional.</p>
+    <table class="cfgtable"><tr><th>Ativo</th><th>Serviço</th><th>Descrição (sai na proposta)</th><th>Preço base</th><th>Cobrança por volume</th><th>Incluso</th><th>R$ por extra</th><th>Horas/mês</th><th></th></tr>
+    ${cfg.servicos.map((s,i)=>`<tr>
+      <td><input type="checkbox" data-c="servicos.${i}.ativo" ${s.ativo?'checked':''}></td>
+      <td style="min-width:160px">${cf('servicos.'+i+'.nome','text')}</td>
+      <td style="min-width:240px">${cf('servicos.'+i+'.desc','text')}</td>
+      <td>${cf('servicos.'+i+'.preco')}</td>
+      <td style="min-width:150px">${volOpts(s)}</td>
+      <td>${cf('servicos.'+i+'.incluso')}</td>
+      <td>${cf('servicos.'+i+'.extra')}</td>
+      <td>${cf('servicos.'+i+'.horas')}</td>
+      <td><button class="btn danger sm" onclick="removerSvc(${i})">×</button></td></tr>`).join('')}
+    </table>
+    <button class="btn ghost sm" style="margin-top:10px" onclick="DB.config.servicos.push({id:uid(),nome:'Novo serviço',desc:'',preco:0,volume:'',incluso:0,extra:0,horas:0,ativo:true});save();render()">+ Adicionar serviço</button>
+  </div>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-top:16px">
+    <div class="card"><h3>Dados da NMS na proposta</h3>
+      <div class="grid" style="grid-template-columns:1fr 1fr">
+        <label class="f">Nome${cf('empresa.nome','text')}</label>
+        <label class="f">WhatsApp${cf('empresa.whatsapp','text')}</label>
+        <label class="f">E-mail${cf('empresa.email','text')}</label>
+        <label class="f">Site${cf('empresa.site','text')}</label>
+        <label class="f">Instagram${cf('empresa.instagram','text')}</label>
+        <label class="f">Cidade${cf('empresa.cidade','text')}</label>
+        <label class="f">Responsável (CONTRATADA)${cf('empresa.responsavel','text')}</label>
+        <label class="f" style="grid-column:1/-1">Endereço${cf('empresa.endereco','text')}</label>
+        <label class="f">Foro${cf('empresa.foro','text')}</label>
+      </div>
+      <h3>Dados para pagamento</h3>
+      <div class="grid" style="grid-template-columns:1fr 1fr">
+        <label class="f">Chave Pix${cf('banco.pix','text')}</label>
+        <label class="f">Banco${cf('banco.banco','text')}</label>
+        <label class="f">Agência${cf('banco.agencia','text')}</label>
+        <label class="f">Conta${cf('banco.conta','text')}</label>
+        <label class="f">Titular${cf('banco.titular','text')}</label>
+        <label class="f">CPF do titular${cf('banco.cpf','text')}</label>
+      </div>
+      <h3>Condições padrão da proposta</h3>
+      <div class="grid" style="grid-template-columns:1fr 1fr">
+        <label class="f">Validade (dias)${cf('propostaPadrao.validadeDias')}</label>
+        <label class="f">Prazo de implantação${cf('propostaPadrao.prazoImplantacao','text')}</label>
+        <label class="f">Vencimento${cf('propostaPadrao.vencimento','text')}</label>
+        <label class="f">Forma de pagamento${cf('propostaPadrao.formaPagamento','text')}</label>
+        <label class="f">Duração do contrato (meses)${cf('propostaPadrao.duracaoMeses')}</label>
+        <label class="f">Relatório entregue até o dia${cf('propostaPadrao.diaRelatorio')}</label>
+      </div>
+    </div>
+    <div class="card"><h3>Preço</h3>
+      <div class="grid" style="grid-template-columns:1fr 1fr">
+        <label class="f">Mensalidade fixa (R$)${cf('fixoMensal')}</label>
+        <label class="f">% sobre os recebimentos do mês${cf('variavelPct')}</label>
+        <label class="f">Teto da parte variável (R$, 0 = sem teto)${cf('variavelTeto')}</label>
+        <label class="f">Mensalidade mínima (R$)${cf('minimoMensal')}</label>
+        <label class="f">Arredondar para cima (R$)${cf('arredondar')}</label>
+        <label class="f">Implantação (% da mensalidade)${cf('implantacaoPct')}</label>
+        <label class="f">Implantação mínima (R$)${cf('implantacaoMin')}</label>
+        <label class="f">Desconto comercial máximo (%)${cf('descontoMax')}</label>
+      </div>
+      <h3>Desconto de pacote</h3>
+      <div class="grid" style="grid-template-columns:1fr 1fr 1fr">
+        <label class="f">2 serviços (%)${cf('pacote.d2')}</label>
+        <label class="f">3 serviços (%)${cf('pacote.d3')}</label>
+        <label class="f">4 ou mais (%)${cf('pacote.d4')}</label>
+      </div>
+      <h3>Complexidade (multiplicador)</h3>
+      <div class="grid" style="grid-template-columns:1fr 1fr 1fr">
+        <label class="f">Baixa${cf('complexidade.baixa')}</label>
+        <label class="f">Média${cf('complexidade.media')}</label>
+        <label class="f">Alta${cf('complexidade.alta')}</label>
+        <label class="f">Média a partir de faturamento (R$)${cf('complexAuto.fatMedia')}</label>
+        <label class="f">Alta a partir de faturamento (R$)${cf('complexAuto.fatAlta')}</label>
+        <span></span>
+        <label class="f">Média a partir de funcionários${cf('complexAuto.funcMedia')}</label>
+        <label class="f">Alta a partir de funcionários${cf('complexAuto.funcAlta')}</label>
+      </div>
+      <h3>Oferta de entrada (padrão nas propostas)</h3>
+      <div class="grid" style="grid-template-columns:1fr 1fr">
+        <label class="f" style="flex-direction:row;align-items:center;gap:8px;grid-column:1/-1"><input type="checkbox" data-c="oferta.ativa" ${cfg.oferta.ativa?'checked':''}> Marcar a oferta em clientes novos</label>
+        <label class="f">Meses com desconto${cf('oferta.meses')}</label>
+        <label class="f">Desconto nesses meses (%)${cf('oferta.descontoPct')}</label>
+        <label class="f">Implantação na oferta (R$)${cf('oferta.implantacao')}</label>
+      </div>
+      <h3>Custo interno da NMS</h3>
+      <div class="grid" style="grid-template-columns:1fr 1fr">
+        <label class="f">Custo por hora de trabalho (R$)${cf('custoHora')}</label>
+        <label class="f">Margem mínima aceitável (%)${cf('margemMin')}</label>
+      </div>
+    </div>
+    <div class="card"><h3>Capacidade de pagamento</h3>
+      <div class="grid" style="grid-template-columns:1fr 1fr">
+        <label class="f">Mensalidade até (% da sobra mensal)${cf('capacidade.limiteResultadoPct')}</label>
+        <label class="f">Mensalidade até (% do faturamento)${cf('capacidade.limiteFaturamentoPct')}</label>
+        <label class="f">Retorno estimado da NMS (% do faturamento)${cf('capacidade.ganhoPct')}</label>
+        <label class="f">Fôlego de caixa mínimo (meses)${cf('capacidade.folegoMin')}</label>
+      </div>
+      <p class="hint">O teto de mensalidade é o <b>menor</b> entre os dois limites. O retorno estimado representa juros e multas evitados, inadimplência recuperada e cortes de gastos que a organização costuma trazer.</p>
+      <h3>Nota de saúde financeira</h3>
+      <div class="grid" style="grid-template-columns:1fr 1fr">
+        <label class="f">Saudável a partir de${cf('faixas.saudavel')}</label>
+        <label class="f">Atenção a partir de${cf('faixas.atencao')}</label>
+      </div>
+      <table class="cfgtable" style="margin-top:12px"><tr><th>Indicador</th><th>Peso</th><th>100 pts</th><th>75 pts</th><th>50 pts</th><th>25 pts</th></tr>
+      ${Object.keys(IND_INFO).map(k=>{const info=IND_INFO[k];const s=info.dir>0?'≥ ':'≤ ';return `<tr><td>${info.nome}<div class="small muted">${info.un}${info.dir<0?' · menor é melhor':''}</div></td><td>${cf('indicadores.'+k+'.peso')}</td>${[0,1,2,3].map(j=>`<td><div class="small muted">${s}</div>${cf('indicadores.'+k+'.c.'+j)}</td>`).join('')}</tr>`}).join('')}
+      </table>
+      <p class="small muted">Abaixo da última faixa o indicador vale 0. Indicador sem dado fica fora da média.</p>
+    </div>
+  </div>`;
+}
+function removerSvc(i){
+  const s=DB.config.servicos[i]; const usado=DB.clientes.some(c=>c.preco.servicos.includes(s.id));
+  if(!confirm(usado?'"'+s.nome+'" está em propostas de clientes. Remover mesmo assim? (Prefira desmarcar "Ativo".)':'Remover "'+s.nome+'"?')) return;
+  DB.config.servicos.splice(i,1); DB.clientes.forEach(c=>c.preco.servicos=c.preco.servicos.filter(x=>x!==s.id)); save(); render();
+}
+
+/* ---------------- tela: backup ---------------- */
+function vBackup(){
+  const ult=DB.ultimoBackup?new Date(DB.ultimoBackup).toLocaleString('pt-BR'):'nunca';
+  return `<h1 style="margin-bottom:6px">Backup</h1>
+  <p class="muted" style="margin-top:0">Os dados ficam salvos na nuvem do NMS e aparecem para você e para o Kayan em qualquer aparelho. O backup é uma cópia extra em arquivo e também serve para trazer os clientes da versão antiga em HTML (exporte lá e importe aqui). Último backup: <b>${ult}</b>.</p>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+    <div class="card"><h2>Exportar</h2><p class="muted small">Gera um arquivo .json com todos os clientes e as configurações.</p>
+      <button class="btn" onclick="exportar()">Baixar backup (.json)</button>
+      <button class="btn ghost" style="margin-top:8px" onclick="exportarCSV()">Planilha de clientes (.csv)</button></div>
+    <div class="card"><h2>Importar</h2><p class="muted small">Carrega um backup. Você escolhe se junta com os dados atuais ou substitui tudo.</p>
+      <input type="file" accept=".json,application/json" onchange="importar(this.files[0]);this.value=''"></div>
+    <div class="card"><h2>Clientes de exemplo</h2><p class="muted small">Carrega (ou recarrega) os dois clientes fictícios, Cliente Teste e Clínica Sorriso, com diagnóstico e proposta prontos.</p>
+      <button class="btn ghost" onclick="carregarTeste()">Carregar clientes de exemplo</button></div>
+  </div>`;
+}
+function baixar(nome, conteudo, tipo){
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([conteudo],{type:tipo})); a.download=nome; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);
+}
+function exportar(){
+  DB.ultimoBackup=new Date().toISOString(); save();
+  baixar('nms-diagnostico-backup-'+new Date().toISOString().slice(0,10)+'.json', JSON.stringify(DB,null,2), 'application/json');
+  setTimeout(render,200);
+}
+function exportarCSV(){
+  const cols=['Cliente','CNPJ','Segmento','Cidade','Responsável','Telefone','Status','Faturamento','Sobra no mês','Nota saúde','Classificação','Serviços','Mensalidade','Mensalidade na oferta','Meses de oferta','Implantação','Margem NMS','Cabe no caixa'];
+  const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+  const f2=v=>(v==null||!isFinite(v))?'':v.toFixed(2).replace('.',',');
+  const rows=DB.clientes.map(c=>{const r=calcDiag(c.diag),p=calcPreco(c),cap=calcCapacidade(r,p.mensal);
+    return [nomeCliente(c),c.cadastro.cnpj,c.cadastro.segmento,c.cadastro.cidade,c.cadastro.responsavel,c.cadastro.telefone,c.status,f2(r.fat),f2(r.resultado),r.score??'',toneLabel(r.score),p.linhas.map(l=>l.s.nome).join(' + '),f2(p.mensal),p.ofOn?f2(p.mensalOferta):'',p.mesesOf||'',f2(p.implantacao),p.margem==null?'':f2(p.margem*100)+'%',cap?cap.titulo:''].map(q).join(';')});
+  baixar('nms-clientes-'+new Date().toISOString().slice(0,10)+'.csv','﻿'+[cols.map(q).join(';'),...rows].join('\r\n'),'text/csv;charset=utf-8');
+}
+function importar(file){
+  if(!file) return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    let d; try{ d=JSON.parse(rd.result); }catch(e){ alert('Arquivo inválido.'); return; }
+    if(!d||!Array.isArray(d.clientes)){ alert('Este arquivo não é um backup do NMS Diagnóstico.'); return; }
+    const substituir=confirm('Backup com '+d.clientes.length+' cliente(s).\n\nOK = SUBSTITUIR tudo (clientes e configurações) pelo backup.\nCancelar = JUNTAR com os dados atuais (clientes do backup atualizam os de mesmo cadastro).');
+    if(substituir){ DB={versao:1,clientes:d.clientes,config:mergeDefaults(DEFAULT_CONFIG,d.config),ultimoBackup:d.ultimoBackup||null}; }
+    else { d.clientes.forEach(c=>{const i=DB.clientes.findIndex(x=>x.id===c.id); if(i>=0){ if((c.atualizado||'')>(DB.clientes[i].atualizado||'')) DB.clientes[i]=c; } else DB.clientes.push(c);}); }
+    save(); toast('Backup importado'); go('clientes');
+  };
+  rd.readAsText(file);
+}
+
+/* ---------------- atualização ao digitar ---------------- */
+function refreshLive(){
+  const c=cliente();
+  const ld=document.getElementById('live-diag'); if(ld&&c) ld.innerHTML=liveDiag(c);
+  const lp=document.getElementById('live-preco'); if(lp&&c) lp.innerHTML=livePreco(c);
+  const nm=document.getElementById('cl-nome'); if(nm&&c) nm.textContent=nomeCliente(c);
+  const pd=document.getElementById('prop-doc'); if(pd&&c) pd.innerHTML=propostaDoc(c);
+  const rm=document.getElementById('ref-mensal'), ri=document.getElementById('ref-impl');
+  if((rm||ri)&&c){ const pr=calcPreco(c), cap=calcCapacidade(calcDiag(c.diag),pr.mensal);
+    const im=document.getElementById('in-mensal'), ii=document.getElementById('in-impl');
+    if(im) im.placeholder=fmtNum(pr.mensalCalculado); if(ii) ii.placeholder=fmtNum(pr.implantacaoCalculada);
+    if(rm) rm.innerHTML=`Calculado: ${brl(pr.mensalCalculado)} · Teto do cliente: <b>${cap?brl(cap.teto):'—'}</b>${pr.mensalManualOn?' · <b class="warn">ajustado</b>':''}`;
+    if(ri) ri.innerHTML=`Calculado: ${brl(pr.implantacaoCalculada)}${pr.implManualOn?' · <b class="warn">ajustado</b>':''}`; }
+  const rd=document.getElementById('ren-doc'); if(rd&&c) rd.innerHTML=renovacaoDoc(c);
+  const mb=document.getElementById('mbar'), app=document.getElementById('app');
+  let h='';
+  if(c && view.name==='cliente' && view.tab==='diag'){ const r=calcDiag(c.diag); h = r.preenchido? `<span class="badge ${tone(r.score)}">${r.score} · ${toneLabel(r.score)}</span><span class="small muted">Sobra ${brl(r.resultado)}/mês</span><button class="btn sm" onclick="document.getElementById('live-diag').scrollIntoView({behavior:'smooth'})">Ver resultado</button>`:''; }
+  if(c && view.name==='cliente' && view.tab==='preco'){ const pr=calcPreco(c); h = pr.qtd? `<div><div class="mv">${brl(pr.mensal)}<span class="small muted">/mês</span></div><div class="small muted">Implantação ${brl(pr.implantacao)}</div></div><button class="btn sm" onclick="document.getElementById('live-preco').scrollIntoView({behavior:'smooth'})">Ver preço</button>`:''; }
+  mb.innerHTML=h; mb.style.visibility=h?'visible':'hidden'; app.classList.toggle('has-mbar',!!h);
+}
+function telaCheia(){
+  const d=document, el=d.documentElement;
+  const on = d.fullscreenElement||d.webkitFullscreenElement;
+  try{
+    if(on) (d.exitFullscreen||d.webkitExitFullscreen).call(d);
+    else (el.requestFullscreen||el.webkitRequestFullscreen).call(el);
+  }catch(e){ toast('Este navegador não permite tela cheia'); }
+}
+if(!(document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen)){ document.addEventListener('DOMContentLoaded',()=>{const b=document.getElementById('fsbtn'); if(b) b.style.display='none';}); }
+function onField(e){
+  const el=e.target;
+  if(el.dataset.b){
+    const c=cliente(); if(!c) return;
+    let v = el.type==='checkbox'? el.checked : el.value; if(el.dataset.money) v = parseNum(v); else if(el.dataset.num) v = v===''?null:+v;
+    setPath(c, el.dataset.b, v); touch(); refreshLive();
+  } else if(el.dataset.c){
+    let v = el.type==='checkbox'? el.checked : el.value;
+    if(el.dataset.num) v = v===''?0:+v;
+    setPath(DB.config, el.dataset.c, v); save();
+    if(el.tagName==='SELECT'||el.type==='checkbox') render();
+  }
+}
+document.addEventListener('input', onField);
+document.addEventListener('keydown', e=>{
+  const el=e.target; if(e.key!=='Enter'||el.tagName!=='INPUT'||!el.dataset.b) return;
+  const all=[...document.querySelectorAll('#app input[data-b]:not([type=checkbox]),#app textarea[data-b]')]; const i=all.indexOf(el);
+  if(i>=0&&all[i+1]){ e.preventDefault(); all[i+1].focus(); all[i+1].select&&all[i+1].select(); }
+});
+document.addEventListener('focusout', e=>{ const el=e.target; if(el.dataset&&el.dataset.money){ el.value=fmtNum(parseNum(el.value)); } });
+document.addEventListener('change', e=>{ if(e.target.tagName==='SELECT'||e.target.type==='checkbox') onField(e); });
+
+nuvemIniciar();
+</script>
+</body>
+</html>

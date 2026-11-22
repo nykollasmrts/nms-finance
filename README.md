@@ -30,6 +30,7 @@ Aplicativo de controle financeiro pessoal (PF) e empresarial (PJ), instalável n
 | `index.html` | O aplicativo |
 | `config.js` | Endereço e chave do Supabase, e número da versão |
 | `nms-cloud.js` | Conexão com o banco de dados (Supabase) |
+| `diagnostico.html` | Diagnóstico e precificação de clientes da NMS (só para quem está em `nms_config.diagnostico_uids`) |
 | `sw.js` | Funcionamento offline e atualização automática |
 | `manifest.webmanifest`, `icons/` | Instalação como aplicativo |
 | `supabase/schema.sql` | Criação do banco e das regras de segurança |
@@ -56,3 +57,4 @@ Para lançar uma versão nova, aumente o número em `config.js` (`versao`) e em 
 
 - A chave `anon public` do Supabase pode ficar no `config.js`; os dados de cada usuário são protegidos pelas regras do `schema.sql`.
 - Nunca coloque a chave `service_role` neste repositório.
+- Este repositório é público: dados pessoais e bancários da NMS (CPF, conta, Pix, endereço) ficam só no banco, na configuração do diagnóstico, nunca no código.

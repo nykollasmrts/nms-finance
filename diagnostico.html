@@ -177,7 +177,7 @@ details.more[open]>summary{margin-bottom:12px}
 @media print{ .prop .clausulas{break-before:page;page-break-before:always;margin-top:0;padding-top:0;border-top:0} .prop .sec{margin-top:16px} .prop .foot{margin-top:18px;font-size:11.5px;gap:4px 14px} .prop ol.cl{font-size:11.6px;line-height:1.38} .prop .sign{margin-top:24px} .prop .box{padding:13px} .prop .box .vl{font-size:27px} }
 .prop .foot{margin-top:26px;padding-top:12px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 18px}
 @media (max-width:640px){ .prop .hero,.prop .sign{grid-template-columns:1fr} .prop .cond{grid-template-columns:1fr 1fr} .prop .box .vl{font-size:26px} }
-@media print{ @page{size:A4;margin:14mm} .prop{max-width:none} .prop .box.dark{-webkit-print-color-adjust:exact;print-color-adjust:exact} }
+@media print{ @page{size:A4;margin:0} .prop{max-width:none} .prop .box.dark{-webkit-print-color-adjust:exact;print-color-adjust:exact} }
 @media (min-width:1600px){ .grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))} }
 .cfgtable{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .fsbtn{background:none;border:1px solid var(--line);border-radius:8px;padding:7px 10px;cursor:pointer;color:var(--ink2);font-weight:500}
@@ -227,7 +227,8 @@ details.more[open]>summary{margin-bottom:12px}
 @media print{
   html,body{background:#fff}
   header,.tabs,.no-print,.toast,.mbar{display:none!important}
-  main{padding:0;max-width:none}
+  main{padding:14mm;max-width:none;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+  /* margem 0 na página: o navegador deixa de imprimir título, endereço, data e "1 of 2"; a margem vem do próprio conteúdo */
   .card{border:0;padding:0}
   .print-only{display:block}
   .split{grid-template-columns:1fr}

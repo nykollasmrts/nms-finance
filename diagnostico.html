@@ -241,6 +241,70 @@ details.more[open]>summary{margin-bottom:12px}
 #gate[hidden]{display:none}
 @media (max-width:760px){.voltar span,.sync{display:none}}
 @media print{.voltar,.sync,#gate{display:none!important}}
+/* ---------- interações (rápidas, sem atrasos) ---------- */
+html{-webkit-tap-highlight-color:transparent}
+.btn,.seg button,.tabs button,nav button,.fsbtn,.voltar,.client,.svc{transition:transform .08s ease,background-color .15s,border-color .15s,box-shadow .15s,color .15s}
+.btn:active,.seg button:active,.tabs button:active,nav button:active,.fsbtn:active,.voltar:active{transform:scale(.96)}
+.btn:hover{box-shadow:0 4px 12px rgba(10,10,10,.14)}
+.btn.ghost:hover{box-shadow:none}
+.client:hover{box-shadow:0 6px 18px rgba(10,10,10,.08);transform:translateY(-1px)}
+.client:active{transform:scale(.99)}
+.svc:hover{border-color:var(--ink2)}
+.svc:active{transform:scale(.985)}
+.fade-in{animation:fadeIn .14s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+/* blocos do diagnóstico: clicáveis, com progresso e destaque de onde está preenchendo */
+.blk{transition:border-color .15s,box-shadow .15s,background-color .15s;background:#fff}
+.blk:focus-within{border-color:var(--blue);box-shadow:0 0 0 3px rgba(31,111,168,.10)}
+.blk.done{border-color:#bfe3cf}
+.blk h4{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;margin:-12px -14px 0;padding:12px 14px;border-radius:12px}
+.blk h4:hover{background:var(--soft)}
+.blk h4 .bp{margin-left:auto;font-size:12px;font-weight:600;color:var(--muted);background:var(--soft2);border-radius:20px;padding:3px 9px;white-space:nowrap;transition:background-color .2s,color .2s}
+.blk.done h4 .bp{background:var(--ok-bg);color:var(--ok)}
+.blk h4 .chev{width:18px;height:18px;flex:none;color:var(--muted);transition:transform .15s}
+.blk.fechado h4 .chev{transform:rotate(-90deg)}
+.blk.fechado{padding-bottom:0}
+.blk.fechado > :not(h4){display:none}
+.blk > h4 + *{margin-top:10px}
+.dprog{display:flex;align-items:center;gap:10px;margin:0 0 12px;font-size:13px;color:var(--ink2);font-weight:600}
+.dprog .bar{flex:1;height:8px;background:var(--soft2);border-radius:8px;overflow:hidden}
+.dprog .bar span{display:block;height:100%;background:var(--blue);border-radius:8px;transition:width .25s ease,background-color .2s}
+.dprog.full .bar span{background:var(--ok)}
+.dprog .acoes{display:flex;gap:6px}
+.dprog .acoes button{background:none;border:1px solid var(--line);border-radius:8px;padding:4px 9px;font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer}
+.yn{transition:background-color .15s;border-radius:8px}
+.yn.ok-a span{color:var(--ink)}
+.yn:not(.ok-a) span{color:var(--ink2)}
+.seg button.on{animation:pop .16s ease-out}
+.seg button.on.bom{background:var(--ok);color:#fff}
+.seg button.on.ruim{background:var(--bad);color:#fff}
+@keyframes pop{0%{transform:scale(.9)}100%{transform:scale(1)}}
+/* nota de saúde em anel e valores que piscam quando mudam */
+.anel{position:relative;width:64px;height:64px;flex:none}
+.anel svg{width:64px;height:64px;transform:rotate(-90deg)}
+.anel circle{fill:none;stroke-width:7}
+.anel .bg{stroke:rgba(0,0,0,.08)}
+.anel .fg{stroke-linecap:round;transition:stroke-dashoffset .35s ease}
+.anel b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:700;font-variant-numeric:tabular-nums}
+.status.ok .anel .fg{stroke:var(--ok)} .status.ok .anel b{color:var(--ok)}
+.status.warn .anel .fg{stroke:var(--warn)} .status.warn .anel b{color:var(--warn)}
+.status.bad .anel .fg{stroke:var(--bad)} .status.bad .anel b{color:var(--bad)}
+.flash{animation:flash .5s ease-out}
+@keyframes flash{0%{background-color:rgba(124,200,242,.45)}100%{background-color:transparent}}
+.tabs button i.ok{background:var(--ok-bg);color:var(--ok)}
+.tabs button.on i.ok{background:var(--ok);color:#fff}
+@media (max-width:760px){
+  .tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;overflow:visible;border-bottom:0;margin:12px 0 14px;padding:6px 0}
+  .tabs button{border:1px solid var(--line);border-radius:10px;background:#fff;padding:9px 4px;font-size:13.5px;display:flex;align-items:center;justify-content:center;gap:5px;min-width:0}
+  .tabs button i{margin-right:0;flex:none}
+  .tabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .tabs button.on i{background:#fff;color:var(--ink)}
+  .tabs button.on i.ok{background:var(--ok);color:#fff}
+  .blk h4{font-size:15.5px;padding:14px}
+  .dprog .acoes{display:none}
+  .client:hover{transform:none;box-shadow:none}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
@@ -651,6 +715,7 @@ function go(name,id,tab){
   view.name=name; if(id!==undefined) view.id=id; if(tab) view.tab=tab;
   document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.v===(name==='cliente'?'clientes':name)));
   render(); window.scrollTo(0,0);
+  const a=document.getElementById('app'); a.classList.remove('fade-in'); void a.offsetWidth; a.classList.add('fade-in');
 }
 function render(){
   const app=document.getElementById('app');
@@ -658,7 +723,7 @@ function render(){
   else if(view.name==='config') app.innerHTML=vConfig();
   else if(view.name==='backup') app.innerHTML=vBackup();
   else { view.name='clientes'; app.innerHTML=vClientes(); }
-  refreshLive();
+  refreshLive(); enfeitar(true);
 }
 
 /* ---------------- tela: lista de clientes ---------------- */
@@ -778,6 +843,7 @@ function tDiag(c){
   const perg={separaPF:'Separa a conta da empresa da conta pessoal?',temControle:'Tem algum controle financeiro (planilha ou sistema)?',sabeLucro:'Sabe se teve lucro no último mês?',pagaJuros:'Costuma pagar juros ou multa por atraso?',inadimplencia:'Tem clientes que atrasam com frequência?',usaLimite:'Usa cheque especial ou limite com frequência?'};
   return `<div class="split">
   <div class="card">
+    <div class="dprog" id="dprog"><span id="dprog-t">Preenchido 0%</span><div class="bar"><span style="width:0"></span></div><div class="acoes"><button onclick="blocos(true)">Abrir tudo</button><button onclick="blocos(false)">Fechar tudo</button></div></div>
     <p class="small muted" style="margin:0 0 12px">Mesma ordem do checklist do WhatsApp. Use a <b>média dos últimos 3 meses</b>; valor aproximado serve. Os dados da empresa (item 1) ficam na aba <a href="#" onclick="go('cliente',undefined,'cadastro');return false">Cadastro</a>.</p>
     <div class="blk"><h4>2. Vendas (por mês)</h4><div class="grid">
       ${fld('Faturamento do mês','diag.faturamento',{type:'money'})}
@@ -827,7 +893,7 @@ function liveDiag(c){
   const frase={ok:'As contas estão em ordem.',warn:'Dá para melhorar alguns pontos.',bad:'Precisa de cuidado agora.',plain:''}[t];
   const nomeStatus={ok:'Empresa saudável',warn:'Precisa de atenção',bad:'Situação crítica',plain:'Sem dados'}[t];
   const dias = r.folego==null? null : Math.round(r.folego*30);
-  return `<div class="status ${t}"><div class="sc ${t}">${r.score??'—'}</div><div class="tx"><b>${nomeStatus}</b><span>${frase}</span></div></div>
+  return `<div class="status ${t}">${anel(r.score)}<div class="tx"><b>${nomeStatus}</b><span>${frase}</span></div></div>
   <div class="big3">
     <div class="bn"><div class="l">Sobra por mês</div><div class="v ${r.resultado<0?'bad':''}">${brl(r.resultado)}</div><div class="s">${r.margem==null?'':'R$ '+num(r.margem*100,0)+' de cada R$ 100 vendidos'}</div></div>
     <div class="bn"><div class="l">O dinheiro em conta aguenta</div><div class="v ${dias!=null&&dias<30?'bad':''}">${dias==null?'—':dias+' dias'}</div><div class="s">pagando as contas fixas sem vender nada</div></div>
@@ -1435,6 +1501,7 @@ function refreshLive(){
   if(c && view.name==='cliente' && view.tab==='diag'){ const r=calcDiag(c.diag); h = r.preenchido? `<span class="badge ${tone(r.score)}">${r.score} · ${toneLabel(r.score)}</span><span class="small muted">Sobra ${brl(r.resultado)}/mês</span><button class="btn sm" onclick="document.getElementById('live-diag').scrollIntoView({behavior:'smooth'})">Ver resultado</button>`:''; }
   if(c && view.name==='cliente' && view.tab==='preco'){ const pr=calcPreco(c); h = pr.qtd? `<div><div class="mv">${brl(pr.mensal)}<span class="small muted">/mês</span></div><div class="small muted">Implantação ${brl(pr.implantacao)}</div></div><button class="btn sm" onclick="document.getElementById('live-preco').scrollIntoView({behavior:'smooth'})">Ver preço</button>`:''; }
   mb.innerHTML=h; mb.style.visibility=h?'visible':'hidden'; app.classList.toggle('has-mbar',!!h);
+  enfeitar(false);
 }
 function telaCheia(){
   const d=document, el=d.documentElement;
@@ -1467,6 +1534,80 @@ document.addEventListener('keydown', e=>{
 document.addEventListener('focusout', e=>{ const el=e.target; if(el.dataset&&el.dataset.money){ el.value=fmtNum(parseNum(el.value)); } });
 document.addEventListener('change', e=>{ if(e.target.tagName==='SELECT'||e.target.type==='checkbox') onField(e); });
 
+/* ---------------- interações ---------------- */
+const BLK_FECHADO=new Set();
+let ultNota=null;
+function anel(score){
+  const C=2*Math.PI*28, de=ultNota==null?0:ultNota, v=score==null?0:score;
+  return `<div class="anel" data-v="${v}"><svg viewBox="0 0 64 64"><circle class="bg" cx="32" cy="32" r="28"/><circle class="fg" cx="32" cy="32" r="28" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-de/100)}"/></svg><b>${score==null?'—':de}</b></div>`;
+}
+function animarAnel(){
+  const r=document.querySelector('#live-diag .anel'); if(!r) return;
+  const v=+r.dataset.v, fg=r.querySelector('.fg'), b=r.querySelector('b'), C=2*Math.PI*28;
+  const de=ultNota==null?0:ultNota; ultNota=v;
+  requestAnimationFrame(()=>{ fg.style.strokeDashoffset=C*(1-v/100); });
+  if(b.textContent==='—') return;
+  if(de===v){ b.textContent=v; return; }
+  const t0=performance.now(), dur=320;
+  const passo=t=>{ const k=Math.min(1,(t-t0)/dur); b.textContent=Math.round(de+(v-de)*(1-Math.pow(1-k,3))); if(k<1) requestAnimationFrame(passo); };
+  requestAnimationFrame(passo);
+}
+const ultValores={};
+function piscarMudancas(){ // destaca só o número que mudou
+  document.querySelectorAll('#live-diag .bn .v, #live-preco .v, #live-preco .mv, .mbar .mv').forEach((el,i)=>{
+    const k=(el.closest('[id]')||{}).id+':'+i, txt=el.textContent;
+    if(ultValores[k]!==undefined && ultValores[k]!==txt){ el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
+    ultValores[k]=txt;
+  });
+}
+function preenchido(el){
+  if(el.type==='checkbox') return el.checked;
+  return String(el.value||'').trim()!=='';
+}
+function progressoBlocos(){
+  let tot=0, ok=0;
+  document.querySelectorAll('#app .blk').forEach((b,i)=>{
+    const h=b.querySelector('h4'); if(!h) return;
+    if(!h.querySelector('.bp')){
+      h.insertAdjacentHTML('afterbegin','<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>');
+      h.insertAdjacentHTML('beforeend','<span class="bp"></span>');
+      h.setAttribute('role','button'); h.tabIndex=0;
+      const chave=view.tab+':'+i; b.dataset.k=chave;
+      h.onclick=()=>{ b.classList.toggle('fechado'); BLK_FECHADO[b.classList.contains('fechado')?'add':'delete'](chave); };
+      h.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); h.onclick(); } };
+      if(BLK_FECHADO.has(chave)) b.classList.add('fechado');
+    }
+    const campos=[...b.querySelectorAll('input[data-b]:not([type=checkbox]),select[data-b]')];
+    const segs=[...b.querySelectorAll('.seg')];
+    const n=campos.length+segs.length;
+    const f=campos.filter(preenchido).length+segs.filter(s=>s.querySelector('.on')).length;
+    b.querySelectorAll('.yn').forEach(y=>y.classList.toggle('ok-a',!!y.querySelector('.on')));
+    segs.forEach(sg=>{ const q=CHECKS.find(x=>x.k===sg.dataset.k); if(!q) return; sg.querySelectorAll('button').forEach(bt=>{ const v=bt.classList.contains('s')?'sim':'nao'; bt.classList.toggle('bom',v===q.bom); bt.classList.toggle('ruim',v!==q.bom); }); });
+    const bp=h.querySelector('.bp');
+    if(view.tab!=='diag'){ bp.hidden=true; return; } // contagem só faz sentido no diagnóstico
+    if(!n){ bp.textContent=b.querySelector('textarea')&&b.querySelector('textarea').value.trim()?'✓ escrito':'opcional'; b.classList.toggle('done',bp.textContent[0]==='✓'); return; }
+    tot+=n; ok+=f;
+    bp.textContent = f===n ? '✓ completo' : f+' de '+n;
+    b.classList.toggle('done',f===n);
+  });
+  const dp=document.getElementById('dprog');
+  if(dp&&tot){ const pc=Math.round(ok/tot*100); dp.querySelector('#dprog-t').textContent='Preenchido '+pc+'%'; dp.querySelector('.bar span').style.width=pc+'%'; dp.classList.toggle('full',pc===100); }
+}
+function blocos(abrir){
+  document.querySelectorAll('#app .blk').forEach(b=>{ b.classList.toggle('fechado',!abrir); const k=b.dataset.k; if(k) BLK_FECHADO[abrir?'delete':'add'](k); });
+}
+function marcarAbas(){ // ✓ nas abas já preenchidas
+  const c=cliente(); if(!c) return;
+  const r=calcDiag(c.diag), p=calcPreco(c);
+  const ok={cadastro:!!(c.cadastro.razao||c.cadastro.fantasia), diag:!!r.preenchido, preco:!!p.qtd};
+  document.querySelectorAll('.tabs button').forEach((b,i)=>{ const k=['cadastro','diag','preco'][i]; const ic=b.querySelector('i'); if(!ic||!k) return; ic.classList.toggle('ok',ok[k]); ic.textContent=ok[k]?'✓':String(i+1); });
+}
+function enfeitar(novaTela){
+  if(novaTela){ ultNota=null; for(const k in ultValores) delete ultValores[k]; }
+  progressoBlocos(); marcarAbas(); animarAnel(); piscarMudancas();
+}
+// tocar num campo de valor seleciona o número inteiro (mais rápido de corrigir no celular)
+document.addEventListener('focusin', e=>{ const el=e.target; if(el.matches&&el.matches('input[data-money],input[type=number]')) setTimeout(()=>{ try{ el.select(); }catch(_){} },0); });
 nuvemIniciar();
 </script>
 </body>

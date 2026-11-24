@@ -1,4 +1,4 @@
--- NMS 1.9.9 · Staff: atividades diárias da equipe NMS (só para pessoas autorizadas)
+-- NMS 1.10.0 · Staff: atividades diárias da equipe NMS (só para pessoas autorizadas)
 -- O que muda:
 --   • Nova tabela nms_staff: uma linha por atividade (título, responsável, dia, pendente/feito, observação).
 --   • Só quem está na lista nms_config.staff_uids lê ou grava (regra no banco, não só no menu).

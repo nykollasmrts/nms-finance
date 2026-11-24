@@ -66,6 +66,8 @@
     try { const { data: e } = await SB.rpc("nms_empresa_uid"); window.NMS_EMPRESA = e || null; } catch { window.NMS_EMPRESA = null; }
     // diagnóstico e precificação: só para quem o banco autoriza (Nykollas e Kayan)
     try { const { data: d } = await SB.rpc("nms_pode_diagnostico"); window.NMS_DIAG = d === true; } catch { window.NMS_DIAG = false; }
+    // Staff (atividades diárias da equipe): só para quem o banco autoriza
+    try { const { data: d } = await SB.rpc("nms_pode_staff"); window.NMS_STAFF = d === true; } catch { window.NMS_STAFF = false; }
     return window.NMS_PROFILE;
   }
   window.NMS_loadProfile = loadProfile;

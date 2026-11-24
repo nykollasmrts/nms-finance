@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="NMS Staff">
+<title>NMS Staff</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="icons/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@500;600&display=swap" rel="stylesheet">
+<script>try{var t=localStorage.getItem("nms.tema");if(t==="claro"||t==="escuro")document.documentElement.setAttribute("data-theme",t==="claro"?"light":"dark")}catch(e){}</script>
+<style>
+:root{
+  --bg:#F3F5F7; --card:#fff; --ink:#0A0A0A; --ink2:#3A424D; --muted:#5B6470; --line:#E1E5EA; --soft:#F3F5F7; --hover:#EEF1F4;
+  --blue:#1F6FA8; --blue-l:#7CC8F2; --blue-bg:#E8F2FA;
+  --ok:#1E8E5A; --ok-bg:#E7F5EE; --warn:#B7791F; --warn-bg:#FDF4E3; --bad:#C0392B; --bad-bg:#FBEAE8;
+  --btn:#0A0A0A; --btn-fg:#fff;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1114; --card:#171B20; --ink:#EEF1F4; --ink2:#C9D0D8; --muted:#8C96A1; --line:#2A3038; --soft:#1C2127; --hover:#20262D;
+  --blue:#7CC8F2; --blue-bg:#16303F; --ok:#4CC38A; --ok-bg:#16301F; --warn:#E3B262; --warn-bg:#33281A; --bad:#EF7A6E; --bad-bg:#3A1F1C;
+  --btn:#EEF1F4; --btn-fg:#0E1114; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0E1114; --card:#171B20; --ink:#EEF1F4; --ink2:#C9D0D8; --muted:#8C96A1; --line:#2A3038; --soft:#1C2127; --hover:#20262D;
+  --blue:#7CC8F2; --blue-bg:#16303F; --ok:#4CC38A; --ok-bg:#16301F; --warn:#E3B262; --warn-bg:#33281A; --bad:#EF7A6E; --bad-bg:#3A1F1C;
+  --btn:#EEF1F4; --btn-fg:#0E1114; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:15px;line-height:1.45}
+button,input,select,textarea{font:inherit;color:inherit}
+header{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+.bar{max-width:980px;margin:0 auto;padding:12px 16px;padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right));display:flex;align-items:center;gap:14px}
+.logo{display:flex;align-items:baseline;gap:8px;user-select:none}
+.logo b{font-weight:600;font-size:24px;letter-spacing:-.04em;position:relative;padding-right:9px}
+.logo b::after{content:"";position:absolute;right:0;top:4px;width:7px;height:7px;border-radius:50%;background:var(--blue-l)}
+.logo span{font-size:13px;color:var(--muted);letter-spacing:.04em}
+.voltar{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:8px;padding:7px 10px;color:var(--ink2);font-weight:500;text-decoration:none}
+.voltar:hover{border-color:var(--ink)}
+.sync{margin-left:auto;font-size:12px;color:var(--muted);white-space:nowrap}
+.sync.err{color:var(--bad);font-weight:600}
+main{max-width:980px;margin:0 auto;padding:20px 16px calc(60px + env(safe-area-inset-bottom));padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+h1{font-family:Montserrat,Inter,sans-serif;font-weight:600;font-size:24px;letter-spacing:-.02em;margin:0}
+h2{font-size:13px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);margin:22px 0 10px;font-weight:700}
+.muted{color:var(--muted)} .small{font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.btn{border:1px solid var(--btn);background:var(--btn);color:var(--btn-fg);border-radius:10px;padding:9px 16px;cursor:pointer;font-weight:600;white-space:nowrap}
+.btn.ghost{background:var(--card);color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{border-color:var(--ink)}
+.btn.danger{background:var(--card);color:var(--bad);border-color:var(--line)}
+.btn.sm{padding:6px 11px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:default}
+input[type=text],input[type=date],select,textarea{border:1px solid var(--line);background:var(--card);border-radius:9px;padding:9px 11px;width:100%;outline:none;min-width:0}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(31,111,168,.15)}
+textarea{min-height:70px;resize:vertical}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--ink2);font-weight:500}
+
+/* dia */
+.dayHead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.dayNav{display:flex;align-items:center;gap:6px;margin-left:auto}
+.iconBtn{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--card);cursor:pointer;font-size:18px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+.iconBtn:hover{border-color:var(--ink)}
+.datePick{position:relative}
+.datePick input{width:150px}
+.sub{margin-top:2px}
+.prog{display:flex;align-items:center;gap:12px;margin-top:14px}
+.prog .track{flex:1;height:8px;border-radius:99px;background:var(--hover);overflow:hidden}
+.prog .fill{height:100%;background:var(--ok);border-radius:99px}
+.prog b{font-size:14px;white-space:nowrap}
+
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:14px}
+.wd{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 4px;text-align:center;cursor:pointer;min-width:0}
+.wd:hover{border-color:var(--ink2)}
+.wd .n{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.wd .d{font-weight:700;font-size:17px}
+.wd .c{font-size:11px;color:var(--muted);white-space:nowrap}
+.wd.hoje .d{color:var(--blue)}
+.wd.sel{border-color:var(--btn);box-shadow:0 0 0 1px var(--btn)}
+.wd.tudo .c{color:var(--ok);font-weight:600}
+.wd.falta .c{color:var(--warn);font-weight:600}
+
+.filtros{display:flex;gap:6px;flex-wrap:wrap;margin-top:16px}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:6px 12px;font-size:13px;cursor:pointer;font-weight:500;color:var(--ink2)}
+.chip[aria-pressed="true"]{background:var(--btn);color:var(--btn-fg);border-color:var(--btn)}
+
+.add{margin-top:16px;display:grid;grid-template-columns:1fr 170px auto;gap:8px}
+.add .mais{grid-column:1/-1;display:grid;grid-template-columns:170px 1fr;gap:8px}
+.add .mais[hidden]{display:none}
+.linkBtn{background:none;border:0;padding:0;color:var(--blue);cursor:pointer;font-size:13px;font-weight:500;justify-self:start}
+
+.list{display:flex;flex-direction:column;gap:8px}
+.it{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 12px 12px 14px}
+.it.feito{background:var(--soft)}
+.it.feito .tt{text-decoration:line-through;color:var(--muted)}
+.chk{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--muted);background:var(--card);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-top:1px;padding:0}
+.chk:hover{border-color:var(--ok)}
+.chk svg{width:15px;height:15px;opacity:0}
+.it.feito .chk{background:var(--ok);border-color:var(--ok);color:#fff}
+.it.feito .chk svg{opacity:1}
+.body{flex:1;min-width:0}
+.tt{font-weight:600;word-wrap:break-word}
+.meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px;align-items:center}
+.tag{font-size:12px;border-radius:99px;padding:2px 9px;background:var(--blue-bg);color:var(--blue);font-weight:600}
+.tag.ambos{background:var(--hover);color:var(--ink2)}
+.tag.atraso{background:var(--warn-bg);color:var(--warn)}
+.tag.ok{background:var(--ok-bg);color:var(--ok)}
+.obs{margin-top:6px;font-size:13px;color:var(--ink2);white-space:pre-wrap;word-wrap:break-word}
+.acts{display:flex;gap:4px;flex:none}
+.acts button{border:1px solid transparent;background:none;border-radius:8px;padding:5px 8px;cursor:pointer;color:var(--muted);font-size:13px;font-weight:500}
+.acts button:hover{border-color:var(--line);color:var(--ink)}
+.vazio{text-align:center;padding:26px 16px;color:var(--muted);border:1px dashed var(--line);border-radius:12px}
+.atrasoBox{border-color:var(--warn);background:var(--warn-bg)}
+.atrasoBox .it{background:var(--card)}
+.rowSpread{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+dialog{border:1px solid var(--line);border-radius:16px;padding:0;background:var(--card);color:var(--ink);width:min(480px,calc(100vw - 24px))}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog form{padding:20px;display:flex;flex-direction:column;gap:12px}
+dialog .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+dialog .foot{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
+dialog .foot .btn.danger{margin-right:auto}
+
+#gate{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
+#gate .card{max-width:420px;text-align:center}
+#gate[hidden]{display:none}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--btn);color:var(--btn-fg);padding:10px 16px;border-radius:10px;font-size:14px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .15s;z-index:60;max-width:calc(100vw - 32px)}
+.toast.show{opacity:1}
+
+@media (max-width:640px){
+  .voltar span,.logo span{display:none}
+  h1{font-size:20px}
+  .dayNav{margin-left:0;width:100%}
+  .datePick{flex:1}.datePick input{width:100%}
+  .week{gap:4px}.wd{padding:6px 2px}.wd .d{font-size:15px}.wd .c{font-size:10px}
+  .add{grid-template-columns:1fr 1fr}
+  .add input[name=titulo]{grid-column:1/-1}
+  .add .mais{grid-template-columns:1fr}
+  .it{padding:11px}
+  .acts{flex-direction:column;gap:0}
+  dialog .two{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <a class="voltar" href="./" title="Voltar para o app NMS">‹ <span>App NMS</span></a>
+    <div class="logo"><b>nms</b><span>staff</span></div>
+    <span class="sync" id="sync">Conectando…</span>
+  </div>
+</header>
+<main id="app"></main>
+<div id="gate"><div class="card"><h2 id="gate-t" style="margin-top:0">Carregando…</h2><p class="muted small" id="gate-p">Conferindo seu acesso.</p><a class="btn" id="gate-b" href="./" hidden>Voltar para o app</a></div></div>
+<dialog id="dlg"></dialog>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script>
+/* ============================================================
+   NMS Staff — atividades diárias da equipe NMS
+   Os dados ficam no Supabase (tabela nms_staff) e só quem está
+   autorizado no banco (Nykollas e Kayan) lê ou grava.
+   ============================================================ */
+const S = { sb:null, uid:null, equipe:[], itens:[], dia:hojeStr(), filtro:'todos', mais:false, busy:0, t:null };
+const DIAS = ['dom','seg','ter','qua','qui','sex','sáb'];
+
+function hojeStr(){ return ymd(new Date()); }
+function ymd(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function dt(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+function addDias(s,n){ const d=dt(s); d.setDate(d.getDate()+n); return ymd(d); }
+function rotuloDia(s){
+  const h=hojeStr(); const pre = s===h?'Hoje':s===addDias(h,1)?'Amanhã':s===addDias(h,-1)?'Ontem':'';
+  const t = dt(s).toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+  return pre ? pre+' · '+t : t.charAt(0).toUpperCase()+t.slice(1);
+}
+function curto(s){ return dt(s).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}); }
+function hora(iso){ try{ return new Date(iso).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); }catch(e){ return ''; } }
+const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function nome(id){ if(!id) return 'Os dois'; const p=S.equipe.find(e=>e.id===id); return p?(p.nome||'Sem nome'):'Outra pessoa'; }
+function primeiroNome(id){ return nome(id).split(' ')[0]; }
+function toast(t){ const el=document.getElementById('toast'); el.textContent=t; el.classList.add('show'); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('show'),1800); }
+function sync(t,err){ const el=document.getElementById('sync'); el.textContent=t; el.classList.toggle('err',!!err); }
+function gate(t,p,voltar){
+  const g=document.getElementById('gate');
+  if(!t){ g.hidden=true; return; }
+  g.hidden=false; document.getElementById('gate-t').textContent=t; document.getElementById('gate-p').textContent=p||''; document.getElementById('gate-b').hidden=!voltar;
+}
+function filtrar(lista){
+  if(S.filtro==='todos') return lista;
+  return lista.filter(x=>!x.responsavel||x.responsavel===S.filtro);
+}
+const ordem = (a,b) => (a.status===b.status?0:a.status==='pendente'?-1:1) || String(a.criado_em).localeCompare(String(b.criado_em));
+
+/* ---------------- tela ---------------- */
+function render(){
+  const app=document.getElementById('app');
+  const ativo=document.activeElement, foco=ativo&&ativo.name&&ativo.closest&&ativo.closest('#app')?ativo.name:null;
+  const rascunho={}; app.querySelectorAll('.add [name]').forEach(el=>rascunho[el.name]=el.value);
+  const h=hojeStr();
+  const doDia=filtrar(S.itens.filter(x=>x.dia===S.dia)).sort(ordem);
+  const feitos=doDia.filter(x=>x.status==='feito').length;
+  const atrasadas = S.dia===h ? filtrar(S.itens.filter(x=>x.status==='pendente'&&x.dia<h)).sort((a,b)=>a.dia.localeCompare(b.dia)) : [];
+  // semana (segunda a domingo) do dia escolhido
+  const d0=dt(S.dia), seg=addDias(S.dia,-((d0.getDay()+6)%7));
+  const semana=[...Array(7)].map((_,i)=>{ const s=addDias(seg,i); const l=filtrar(S.itens.filter(x=>x.dia===s)); const f=l.filter(x=>x.status==='feito').length;
+    const cls=['wd',s===S.dia?'sel':'',s===h?'hoje':'',l.length&&f===l.length?'tudo':'',l.length&&f<l.length&&s<h?'falta':''].join(' ');
+    return `<button class="${cls}" data-dia="${s}"><div class="n">${DIAS[dt(s).getDay()]}</div><div class="d">${dt(s).getDate()}</div><div class="c">${l.length?f+'/'+l.length:'–'}</div></button>`; }).join('');
+  const resp=(sel)=>`<option value="">Os dois</option>`+S.equipe.map(e=>`<option value="${e.id}"${sel===e.id?' selected':''}>${esc(e.nome||'Sem nome')}</option>`).join('');
+  const pct = doDia.length? Math.round(feitos/doDia.length*100):0;
+
+  app.innerHTML = `
+  <div class="dayHead">
+    <div><h1>${esc(rotuloDia(S.dia))}</h1><div class="sub muted small">Atividades da equipe NMS</div></div>
+    <div class="dayNav">
+      <button class="iconBtn" data-go="-1" aria-label="Dia anterior">‹</button>
+      <span class="datePick"><input type="date" id="pick" value="${S.dia}" aria-label="Escolher dia"></span>
+      <button class="iconBtn" data-go="1" aria-label="Próximo dia">›</button>
+      ${S.dia!==h?'<button class="btn ghost sm" data-go="hoje">Hoje</button>':''}
+    </div>
+  </div>
+  <div class="prog"><div class="track"><div class="fill" style="width:${pct}%"></div></div><b>${doDia.length?feitos+' de '+doDia.length+' feitas':'Nada marcado'}</b></div>
+  <div class="week">${semana}</div>
+  <div class="filtros">
+    <button class="chip" data-f="todos" aria-pressed="${S.filtro==='todos'}">Todos</button>
+    ${S.equipe.map(e=>`<button class="chip" data-f="${e.id}" aria-pressed="${S.filtro===e.id}">${e.id===S.uid?'Minhas':esc((e.nome||'').split(' ')[0])}</button>`).join('')}
+  </div>
+  <form class="add" id="addForm" autocomplete="off">
+    <input type="text" name="titulo" placeholder="Nova atividade para ${S.dia===h?'hoje':curto(S.dia)}…" maxlength="200" value="${esc(rascunho.titulo||'')}">
+    <select name="responsavel" aria-label="Responsável">${resp(rascunho.responsavel!==undefined?rascunho.responsavel:(S.filtro!=='todos'?S.filtro:S.uid))}</select>
+    <button class="btn" type="submit">Adicionar</button>
+    <button type="button" class="linkBtn" id="maisBtn">${S.mais?'− Menos detalhes':'+ Outro dia ou observação'}</button>
+    <div class="mais" ${S.mais?'':'hidden'}>
+      <input type="date" name="dia" value="${esc(rascunho.dia||S.dia)}" aria-label="Dia">
+      <input type="text" name="obs" placeholder="Observação (opcional)" maxlength="1000" value="${esc(rascunho.obs||'')}">
+    </div>
+  </form>
+  ${atrasadas.length?`<h2>Ficou de dias anteriores</h2>
+  <div class="card atrasoBox"><div class="rowSpread" style="margin-bottom:10px"><span class="small"><b>${atrasadas.length}</b> ${atrasadas.length>1?'atividades ainda pendentes':'atividade ainda pendente'}</span><button class="btn ghost sm" data-trazer="todas">Trazer todas para hoje</button></div>
+  <div class="list">${atrasadas.map(x=>item(x,true)).join('')}</div></div>`:''}
+  <h2>${S.dia===h?'Para hoje':'Atividades do dia'}</h2>
+  <div class="list">${doDia.length?doDia.map(x=>item(x,false)).join(''):`<div class="vazio">Nenhuma atividade ${S.filtro==='todos'?'':'para essa pessoa '}neste dia. Escreva acima e toque em Adicionar.</div>`}</div>`;
+  if(foco){ const el=app.querySelector(`[name="${foco}"]`); if(el){ el.focus(); if(el.setSelectionRange&&el.type==='text'){ const n=el.value.length; el.setSelectionRange(n,n); } } }
+}
+function item(x,atraso){
+  const feito=x.status==='feito';
+  return `<div class="it${feito?' feito':''}" data-id="${x.id}">
+    <button class="chk" data-tg="${x.id}" aria-label="${feito?'Marcar como pendente':'Marcar como feita'}" title="${feito?'Marcar como pendente':'Marcar como feita'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg></button>
+    <div class="body">
+      <div class="tt">${esc(x.titulo)}</div>
+      <div class="meta">
+        <span class="tag${x.responsavel?'':' ambos'}">${esc(x.responsavel?primeiroNome(x.responsavel):'Os dois')}</span>
+        ${atraso?`<span class="tag atraso">desde ${curto(x.dia)}</span>`:''}
+        ${feito?`<span class="tag ok">feito${x.feito_por?' por '+esc(primeiroNome(x.feito_por)):''}${x.feito_em?' às '+hora(x.feito_em):''}</span>`:''}
+      </div>
+      ${x.obs?`<div class="obs">${esc(x.obs)}</div>`:''}
+    </div>
+    <div class="acts">
+      ${atraso?`<button data-trazer="${x.id}">Hoje</button>`:(!feito?`<button data-amanha="${x.id}" title="Passar para o dia seguinte">Adiar</button>`:'')}
+      <button data-ed="${x.id}">Editar</button>
+    </div>
+  </div>`;
+}
+
+/* ---------------- ações ---------------- */
+async function salvar(id,campos,msg){
+  const i=S.itens.findIndex(x=>x.id===id); if(i<0) return;
+  const antes={...S.itens[i]};
+  S.itens[i]={...antes,...campos}; render();
+  S.busy++; sync('Salvando…');
+  const {data,error}=await S.sb.from('nms_staff').update({...campos,updated_at:new Date().toISOString()}).eq('id',id).select().maybeSingle();
+  S.busy--;
+  if(error||!data){ const j=S.itens.findIndex(x=>x.id===id); if(j>=0) S.itens[j]=antes; render(); sync('Não foi possível salvar',true); toast('Não salvou. Verifique a internet.'); return false; }
+  const j=S.itens.findIndex(x=>x.id===id); if(j>=0) S.itens[j]=data;
+  sync('Salvo na nuvem'); render(); if(msg) toast(msg); return true;
+}
+async function criar(f){
+  const titulo=String(f.titulo||'').trim(); if(!titulo){ toast('Escreva a atividade'); return false; }
+  const novo={titulo, responsavel:f.responsavel||null, dia:f.dia||S.dia, obs:String(f.obs||'').trim(), status:'pendente'};
+  S.busy++; sync('Salvando…');
+  const {data,error}=await S.sb.from('nms_staff').insert(novo).select().single();
+  S.busy--;
+  if(error){ sync('Não foi possível salvar',true); toast('Não salvou. Verifique a internet.'); return false; }
+  S.itens.push(data); sync('Salvo na nuvem');
+  if(data.dia!==S.dia) toast('Adicionada em '+curto(data.dia));
+  return true;
+}
+async function excluir(id){
+  const antes=S.itens.slice(); S.itens=S.itens.filter(x=>x.id!==id); render();
+  S.busy++; sync('Salvando…');
+  const {error}=await S.sb.from('nms_staff').delete().eq('id',id);
+  S.busy--;
+  if(error){ S.itens=antes; render(); sync('Não foi possível excluir',true); toast('Não excluiu. Verifique a internet.'); return; }
+  sync('Salvo na nuvem'); toast('Atividade excluída');
+}
+function alternar(id){
+  const x=S.itens.find(i=>i.id===id); if(!x) return;
+  if(x.status==='feito') salvar(id,{status:'pendente',feito_por:null,feito_em:null});
+  else salvar(id,{status:'feito',feito_por:S.uid,feito_em:new Date().toISOString()},'Feito!');
+}
+function editar(id){
+  const x=S.itens.find(i=>i.id===id); if(!x) return;
+  const d=document.getElementById('dlg');
+  d.innerHTML=`<form method="dialog" id="edForm">
+    <h1 style="font-size:19px">Editar atividade</h1>
+    <label class="f">Atividade<input type="text" name="titulo" maxlength="200" value="${esc(x.titulo)}" required></label>
+    <div class="two">
+      <label class="f">Responsável<select name="responsavel"><option value="">Os dois</option>${S.equipe.map(e=>`<option value="${e.id}"${x.responsavel===e.id?' selected':''}>${esc(e.nome||'Sem nome')}</option>`).join('')}</select></label>
+      <label class="f">Dia<input type="date" name="dia" value="${x.dia}" required></label>
+    </div>
+    <label class="f">Situação<select name="status"><option value="pendente"${x.status==='pendente'?' selected':''}>Pendente</option><option value="feito"${x.status==='feito'?' selected':''}>Feito</option></select></label>
+    <label class="f">Observação<textarea name="obs" maxlength="1000">${esc(x.obs||'')}</textarea></label>
+    <p class="muted small" style="margin:0">Criada por ${esc(primeiroNome(x.criado_por))} em ${curto(String(x.criado_em).slice(0,10))} às ${hora(x.criado_em)}.</p>
+    <div class="foot">
+      <button type="button" class="btn danger" id="edDel">Excluir</button>
+      <button type="button" class="btn ghost" id="edCancel">Cancelar</button>
+      <button type="submit" class="btn">Salvar</button>
+    </div></form>`;
+  d.showModal();
+  d.querySelector('#edCancel').onclick=()=>d.close();
+  d.querySelector('#edDel').onclick=()=>{ if(confirm('Excluir esta atividade?')){ d.close(); excluir(id); } };
+  d.querySelector('#edForm').onsubmit=e=>{
+    e.preventDefault();
+    const f=Object.fromEntries(new FormData(e.target));
+    if(!f.titulo.trim()||!f.dia) return;
+    const c={titulo:f.titulo.trim(),responsavel:f.responsavel||null,dia:f.dia,status:f.status,obs:f.obs.trim()};
+    if(c.status==='feito'&&x.status!=='feito'){ c.feito_por=S.uid; c.feito_em=new Date().toISOString(); }
+    if(c.status==='pendente'){ c.feito_por=null; c.feito_em=null; }
+    d.close(); salvar(id,c,'Atividade salva');
+  };
+}
+
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button,[data-dia]'); if(!b||!b.closest('#app')) return;
+  if(b.dataset.go){ S.dia = b.dataset.go==='hoje'?hojeStr():addDias(S.dia,+b.dataset.go); render(); }
+  else if(b.dataset.dia){ S.dia=b.dataset.dia; render(); }
+  else if(b.dataset.f){ S.filtro=b.dataset.f; try{ localStorage.setItem('nms.staff.filtro',S.filtro); }catch(_){}; render(); }
+  else if(b.dataset.tg) alternar(b.dataset.tg);
+  else if(b.dataset.ed) editar(b.dataset.ed);
+  else if(b.dataset.amanha) salvar(b.dataset.amanha,{dia:addDias(S.itens.find(x=>x.id===b.dataset.amanha).dia,1)},'Passou para o dia seguinte');
+  else if(b.dataset.trazer){
+    const h=hojeStr();
+    if(b.dataset.trazer==='todas') filtrar(S.itens.filter(x=>x.status==='pendente'&&x.dia<h)).forEach(x=>salvar(x.id,{dia:h}));
+    else salvar(b.dataset.trazer,{dia:h},'Trazida para hoje');
+  }
+  else if(b.id==='maisBtn'){ S.mais=!S.mais; render(); }
+});
+document.addEventListener('change',e=>{ if(e.target.id==='pick'&&e.target.value){ S.dia=e.target.value; render(); } });
+document.addEventListener('submit',async e=>{
+  if(e.target.id!=='addForm') return;
+  e.preventDefault();
+  const form=e.target, f=Object.fromEntries(new FormData(form));
+  const btn=form.querySelector('button[type=submit]'); btn.disabled=true;
+  const ok=await criar(f);
+  btn.disabled=false;
+  if(ok){ form.querySelector('[name=titulo]').value=''; form.querySelector('[name=obs]').value=''; render(); const t=document.querySelector('#addForm [name=titulo]'); t&&t.focus(); }
+});
+
+/* ---------------- nuvem ---------------- */
+async function puxar(){
+  if(S.busy||document.getElementById('dlg').open) return agendar(3000);
+  const {data,error}=await S.sb.from('nms_staff').select('*').order('dia').limit(5000);
+  if(error){ sync('Sem conexão agora',true); return; }
+  const antes=JSON.stringify(S.itens.map(x=>[x.id,x.updated_at]).sort());
+  S.itens=data||[];
+  sync('Salvo na nuvem');
+  if(JSON.stringify(S.itens.map(x=>[x.id,x.updated_at]).sort())!==antes) render();
+}
+function agendar(ms){ clearTimeout(S.t); S.t=setTimeout(puxar,ms??300); }
+async function iniciar(){
+  const C=window.NMS_CONFIG||{};
+  if(!window.supabase||!C.supabaseUrl||/COLE_AQUI/.test(String(C.supabaseUrl)+C.supabaseAnonKey)) return gate('Staff indisponível','Este recurso só funciona com o app NMS conectado à nuvem.',true);
+  S.sb=window.supabase.createClient(C.supabaseUrl,C.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+  let u=null; try{ const {data}=await S.sb.auth.getSession(); u=data.session&&data.session.user; }catch(e){}
+  if(!u) return gate('Entre no app primeiro','Faça login no app NMS e abra o Staff pelo menu.',true);
+  S.uid=u.id;
+  const {data:pode,error}=await S.sb.rpc('nms_pode_staff');
+  if(error) return gate('Sem conexão','Não foi possível conferir seu acesso agora. Verifique a internet e tente de novo.',true);
+  if(!pode) return gate('Acesso restrito','O Staff é exclusivo da equipe NMS autorizada.',true);
+  const [eq,it]=await Promise.all([S.sb.rpc('nms_staff_equipe'), S.sb.from('nms_staff').select('*').order('dia').limit(5000)]);
+  if(eq.error||it.error) return gate('Sem conexão','Não foi possível carregar as atividades agora. Tente de novo em instantes.',true);
+  S.equipe=eq.data||[]; S.itens=it.data||[];
+  try{ const f=localStorage.getItem('nms.staff.filtro'); if(f&&(f==='todos'||S.equipe.some(e=>e.id===f))) S.filtro=f; }catch(e){}
+  gate(null); sync('Salvo na nuvem'); render();
+  S.sb.channel('nms-staff').on('postgres_changes',{event:'*',schema:'public',table:'nms_staff'},()=>agendar()).subscribe();
+  setInterval(()=>agendar(0),30000);
+  window.addEventListener('focus',()=>agendar(0));
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden) agendar(0); });
+}
+iniciar();
+</script>
+</body>
+</html>

@@ -18,6 +18,12 @@ Aplicativo de controle financeiro pessoal (PF) e empresarial (PJ), instalável n
 - DRE fácil (cascata do faturamento ao lucro) e DRE completo (EBITDA, AV %, AH %)
 - Indicadores: margens, ponto de equilíbrio, burn rate, runway, liquidez e fluxo de caixa de 30 dias
 
+**Bancos e cartões** (PF e empresa)
+- Contas bancárias com saldo próprio; cada conta a pagar e cada lançamento escolhe de qual banco sai (campo "Pagar com")
+- Transferências entre contas do mesmo dono (origem e destino), sem contar como receita ou despesa
+- Cartões de crédito com dia de fechamento e vencimento: despesas no cartão, fatura de cada mês e pagamento da fatura escolhendo a conta que pagou
+- Na importação de extrato, dá para dizer de qual conta ou cartão é o arquivo
+
 **Geral**
 - Login por e-mail com conta Pessoal ou Empresa
 - Acesso Master para ver todos os usuários

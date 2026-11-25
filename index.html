@@ -923,6 +923,7 @@ body.corp .btn{font-weight:500}
     <button data-tab="calendario"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="1"/><path d="M3 9h18M3 15h18M9 9v12M15 9v12"/></svg><span class="nl" data-pf="Calendário" data-pj="Calendário financeiro" data-pjs="Calendário">Calendário</span></button>
     <button data-tab="master" id="navMaster" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.8c1.7.8 2.7 2.5 3 5.2"/></svg><span class="nl" data-pf="Master" data-pj="Master">Master</span></button>
     <button data-act="diag" id="navDiag" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6l1 3h3a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h3z"/><path d="M8 13l3 3 5-6"/></svg><span class="nl" data-pf="Diagnóstico" data-pj="Diagnóstico" data-pjs="Diagnóst.">Diagnóstico</span></button>
+    <button data-act="staff" id="navStaff" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M3 6l1.5 1.5L7 5M3 12l1.5 1.5L7 11M3 18l1.5 1.5L7 17"/></svg><span class="nl" data-pf="Staff" data-pj="Staff">Staff</span></button>
     <button data-tab="agenda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span class="nl" data-pf="Agenda" data-pj="Pagar e receber" data-pjs="Contas">Agenda</span></button>
     <button class="instBtn" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg>Instalar app</button>
     <div class="navSpace" id="navSpace" hidden></div>
@@ -2428,6 +2429,7 @@ function render(){
   if (ns) { ns.hidden = !temEmpresa; if (temEmpresa) ns.innerHTML = `<span class="label">Conta</span>${[["pessoal","Pessoal","PF"],["nms","NMS","Empresa"]].concat(typeof USUARIOS !== "undefined" ? Object.entries(USUARIOS).map(([k,u]) => [k, u.nome, u.tipo === "pj" ? "Empresa" : "PF"]) : []).map(([k,n,t]) => `<button data-act="space" data-v="${k}" aria-pressed="${(state.space||"pessoal")===k}"><b>${n}</b><small>${t}</small></button>`).join("")}`; }
   document.getElementById("navMaster").hidden = !isMaster;
   document.getElementById("navDiag").hidden = !(window.NMS_DIAG && state.space === "nms"); /* diagnóstico: só na conta NMS e só para quem o banco autoriza */
+  document.getElementById("navStaff").hidden = !window.NMS_STAFF; /* atividades da equipe: só para quem o banco autoriza (Nykollas e Kayan) */
   if (state.tab === "master" && !isMaster) state.tab = "painel";
   if (state.tab === "chat") state.tab = "painel";
   if (isMaster) startMaster();
@@ -3272,6 +3274,7 @@ document.addEventListener("click", async e => {
   if (el.dataset.act === "scrim" && e.target !== el) return;
   const act = el.dataset.act || "tab";
   if (act === "tab") { state.tab = el.dataset.tab; state.selDay = null; try { history.replaceState(null,"","#"+state.tab); } catch {} render(); window.scrollTo(0,0); }
+  else if (act === "staff") { if (window.NMS_STAFF) location.href = "staff.html"; return; }
   else if (act === "diag") { if (window.NMS_DIAG && state.space === "nms") location.href = "diagnostico.html"; return; }
   else if (act === "prev" || act === "next") { state.ym = addMonths(state.ym, act==="prev"?-1:1); state.selDay = null; render(); }
   else if (act === "newTx") openForm("tx");

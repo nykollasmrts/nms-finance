@@ -24,6 +24,12 @@ Aplicativo de controle financeiro pessoal (PF) e empresarial (PJ), instalável n
 - Cartões de crédito com dia de fechamento e vencimento: despesas no cartão, fatura de cada mês e pagamento da fatura escolhendo a conta que pagou
 - Na importação de extrato, dá para dizer de qual conta ou cartão é o arquivo
 
+**Centro de custo e rateio** (PF e empresa)
+- Cadastro de centros de custo (operação, projeto, obra, evento), com opção de encerrar sem perder o histórico
+- Cada lançamento ou conta a pagar/receber pode ter um centro de custo
+- Uma nota pode ser dividida em várias categorias (ex.: supermercado com parte em ferramentas e parte em alimentação); a soma precisa bater com o valor da nota
+- Gráficos, avisos, DRE e filtros somam cada parte na sua categoria; resumo "Por centro de custo" em Lançamentos e no DRE
+
 **Geral**
 - Login por e-mail com conta Pessoal ou Empresa
 - Acesso Master para ver todos os usuários
